@@ -106,6 +106,10 @@ def p_factor_num(p):
     'factor : NUMBER'
     p[0] = NumberExpression(p[1])
 
+def p_factor_var(p):
+    'factor : ID'
+    p[0] = VarExpression(p[1])
+
 def p_factor_expr(p):
     'factor : LPAREN expression RPAREN'
     p[0] = p[2]
@@ -120,14 +124,15 @@ def p_error(p):
 
 parser = yacc.yacc()
 
-dat = "3+5+6"
+dat = "2+4*5+6*7"
 
 result = parser.parse(dat)
 
 printVisitor = PrintVisitor()
 visitor = AssemblyVisitor()
+eval = EvalVisitor()
 
-res = result.accept(visitor)
+res = result.accept(printVisitor)
 
 print(res)
 

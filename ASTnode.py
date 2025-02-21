@@ -17,6 +17,13 @@ class NumberExpression(Expr):
     
     def accept(self, visitor):
         return visitor.visitNumberExpression(self)
+    
+class VarExpression(Expr):
+    def __init__(self, var: str):
+        self.var = var
+    
+    def accept(self, visitor):
+        return visitor.visitVarExpression(self)
 
 """ class Node:
     def __init__(self,type,children=None,leaf=None):

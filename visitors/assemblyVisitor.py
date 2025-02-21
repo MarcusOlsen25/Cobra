@@ -13,10 +13,11 @@ class AssemblyVisitor(Visitor):
             return self.addBoth(left, right)
         
         elif isinstance(expr.right, NumberExpression):
-            return left + self.addRight(expr.right.accept(self))
+            return left + self.addRight(right)
 
         elif isinstance(expr.left, NumberExpression):
-            return self.pushNumber(left) + right + self.popAddNumber()
+            """ return self.pushNumber(left) + right + self.popAddNumber() """
+            return right + self.addLeft(left)
         
         else:
             return left + self.pushExpression() + right + self.popAddNumber()
@@ -25,12 +26,9 @@ class AssemblyVisitor(Visitor):
         return str(expr.value)
     
     def popAddNumber(self):
-        output = f"popq %rbx\n"
-        output += f"addq %rbx, %rax\n"
         return "popq %rbx\naddq %rbx, %rax\n"
     
     def pushExpression(self):
-        output = f"pushq %rax\n"
         return "pushq %rax\n"
     
     def pushNumber(self, x: int):
@@ -39,6 +37,9 @@ class AssemblyVisitor(Visitor):
         return f"movq ${x}, %rbx\npushq %rbx\n"
     
     def addRight(self, x: int):
+        return f"addq ${x}, %rax\n"
+    
+    def addLeft(self, x: int):
         return f"addq ${x}, %rax\n"
     
     def addBoth(self, x: int, y: int): 

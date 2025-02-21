@@ -10,6 +10,9 @@ class PrintVisitor(Visitor):
     
     def visitNumberExpression(self, expr: NumberExpression):
         return str(expr.value)
+    
+    def visitVarExpression(self, expr: VarExpression):
+        return str(expr.value)
 
     """ def visit(self, node):
         if node.type == "binop":
