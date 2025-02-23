@@ -19,23 +19,18 @@ class NumberExpression(Expr):
         return visitor.visitNumberExpression(self)
     
 class VarExpression(Expr):
+    #Add type
     def __init__(self, var: str):
         self.var = var
     
     def accept(self, visitor):
         return visitor.visitVarExpression(self)
-
-""" class Node:
-    def __init__(self,type,children=None,leaf=None):
-         self.type = type
-         if children:
-              self.children = children
-         else:
-              self.children = [ ]
-         self.leaf = leaf
     
-    def accept(self, visitor):
-        print(type(visitor.visit(self)))
-        return visitor.visit(self)
+class AssignExpression(Expr):
+    def __init__(self, var: str, value: str):
+        self.var = var
+        self.value = value
 
- """
+    def accept(self, visitor):
+        return visitor.visitAssignExpression(self)
+

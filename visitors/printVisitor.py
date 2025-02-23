@@ -1,5 +1,6 @@
 from .visitor import Visitor
-from ASTnode import *
+from ASTexpressions import *
+from ASTstatements import *
 
 class PrintVisitor(Visitor):
 
@@ -12,7 +13,18 @@ class PrintVisitor(Visitor):
         return str(expr.value)
     
     def visitVarExpression(self, expr: VarExpression):
-        return str(expr.value)
+        return str(expr.var)
+    
+    def visitAssignExpression(self, expr: AssignExpression):
+        return expr.var + " = " + expr.value.accept(self)
+    
+    def visitVarDeclaration(self, stmt: VarDeclaration):
+        if stmt.initializer == None:
+            return f"var {stmt.var} = " + str(None)
+        else:
+            return f"var {stmt.var} = {stmt.initializer.accept(self)}"
+    
+    
 
     """ def visit(self, node):
         if node.type == "binop":

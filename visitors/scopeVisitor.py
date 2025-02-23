@@ -1,25 +1,18 @@
 from .visitor import Visitor
 from ASTexpressions import *
 
-class EvalVisitor(Visitor):
+class ScopeVisitor(Visitor):
 
     def visitBinaryExpression(self, expr: BinaryExpression):
         left = expr.left.accept(self)
         right = expr.right.accept(self)
-
-        match expr.operator:
-            case "+":
-                return left + right
-            case "-":
-                return left - right
-        return 0
+        return f"({left} + {right})"
     
     def visitNumberExpression(self, expr: NumberExpression):
-        return expr.value
+        return str(expr.value)
     
     def visitVarExpression(self, expr: VarExpression):
-        return expr.var
+        return str(expr.var)
     
     def visitAssignExpression(self, expr: AssignExpression):
-        return expr.var + " = " + str(expr.value.accept(self))
-    
+        return expr.var + " = " + expr.value.accept(self)

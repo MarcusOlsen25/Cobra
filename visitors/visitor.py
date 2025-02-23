@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from ASTnode import *
+from ASTexpressions import *
 
 class Visitor:
     @abstractmethod
