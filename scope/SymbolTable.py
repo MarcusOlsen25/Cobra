@@ -10,7 +10,7 @@ class SymbolTable:
 
     def insert(self, name, value):
         self._tab[name] = value
-        
+
     def lookup(self, name):
         if name in self._tab:
             return self._tab[name]

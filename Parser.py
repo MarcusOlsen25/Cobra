@@ -2,27 +2,35 @@ import ply.yacc as yacc
 from ASTexpressions import *
 from ASTstatements import *
 
+def p_program(p):
+    '''program : declaration_list'''
+    p[0] = p[1]
+
+def p_declaration_list(p):
+    '''declaration_list : declaration
+                        | declaration_list declaration'''
+    if len(p) == 2:
+        p[0] = [p[1]]
+    else:
+        p[0] = p[1] + [p[2]]
+
 def p_declaration(p):
-    '''declaration : statement
-                   | varDeclaration'''
+    '''declaration : varDeclaration
+                   | statement'''
     p[0] = p[1]
 
 def p_statement(p):
-    'statement : expression'
+    '''statement : expression'''
     p[0] = p[1]
 
 def p_varDeclaration_uninitialized(p):
     'varDeclaration : VAR ID'
     p[0] = VarDeclaration(p[2], None)
-
+#Add multiple assignment
 def p_varDeclaration_initialized(p):
-    'varDeclaration : VAR assign'
-    p[0] = VarDeclaration(p[2].var, p[2].value)
-
-def p_assign(p):
-    'assign : ID ASSIGN expression'
-    p[0] = AssignExpression(p[1], p[3])
-
+    'varDeclaration : VAR ID ASSIGN expression'
+    p[0] = VarDeclaration(p[2], p[4])
+#Add multiple assignment
 def p_expression_assign(p):
     'expression : ID ASSIGN expression'
     p[0] = AssignExpression(p[1], p[3])
