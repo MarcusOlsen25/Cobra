@@ -30,3 +30,5 @@ class ScopeVisitor(Visitor):
         else:
             self.table.insert(stmt.var, None)
             print("var " + str(stmt.var) + " : " + "uninitialized")
+
+    

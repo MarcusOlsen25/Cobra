@@ -20,16 +20,29 @@ lexer.input(lexerData)
 
 parser = yacc.yacc()
 
-parserData = "var c = 3 var b = 4 c = 3 var d d = 4"
+parserData = '''
+var a = 4
+var b = 5
+c = 2
+d = 3
+var e = (4+5)-5*6
+var f = a + b
+'''
 
-result = parser.parse(parserData)
+data = '''
+var a = 4
+var b = 3
+var c = 2
+a+b*c
+'''
+
+result = parser.parse(data)
 
 printVisitor = PrintVisitor()
 assemblyVisitor = AssemblyVisitor()
 evalVisitor = EvalVisitor()
 nodeVisitor = NodeVisitor()
-
 scopeVisitor = ScopeVisitor()
-
 for statement in result:
-    res = statement.accept(scopeVisitor)
+    res = statement.accept(evalVisitor)
+    print(res) 

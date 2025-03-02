@@ -6,41 +6,89 @@ class AssemblyVisitor(Visitor):
     
     def visitBinaryExpression(self, expr: BinaryExpression):
 
-        left = expr.left.accept(self)
-        right = expr.right.accept(self)
-
-        if isinstance(expr.left, NumberExpression) and isinstance(expr.right, NumberExpression):
-            return self.addBoth(left, right)
+        if expr.operator == "*" or expr.operator == "/":
+            return self.mult_div_operators(expr)
         
-        elif isinstance(expr.right, NumberExpression):
-            return left + self.addRight(right)
-
-        elif isinstance(expr.left, NumberExpression):
-            """ return self.pushNumber(left) + right + self.popAddNumber() """
-            return right + self.addLeft(left)
-        
-        else:
-            return left + self.pushExpression() + right + self.popAddNumber()
+        elif expr.operator == "+" or expr.operator == "-":
+            return self.add_sub_operators(expr)
 
     def visitNumberExpression(self, expr: NumberExpression):
         return str(expr.value)
     
-    def popAddNumber(self):
-        return "popq %rbx\naddq %rbx, %rax\n"
+    def popAddSubNumber(self, operator: str):
+        if operator == "+":
+            operator = "addq"
+        else:
+            operator = "subq"
+        return f"popq %rbx\n{operator} %rax, %rbx\n"
+    
+    def popMultDivNumber(self, operator: str):
+        if operator == "*":
+            operator = "imulq"
+        else:
+            operator = "idivq"
+        return f"popq %rdx\n{operator} %rdx, %rax\n"
     
     def pushExpression(self):
         return "pushq %rax\n"
     
-    def pushNumber(self, x: int):
-        output = f"movq ${x}, %rbx\n"
-        output += f"pushq %rbx\n"
-        return f"movq ${x}, %rbx\npushq %rbx\n"
+    def addSub(self, x: int, operator: str):
+        if operator == "+":
+            operator = "add"
+        else:
+            operator = "sub"
+        return f"{operator}q ${x}, %rax\n"
     
-    def addRight(self, x: int):
-        return f"addq ${x}, %rax\n"
+    def addSubBoth(self, x: int, y: int, operator: str): 
+        if operator == "+":
+            operator = "addq"
+        else:
+            operator = "subq"
+        return f"movq ${x}, %rax\n{operator} ${y}, %rax\n"
     
-    def addLeft(self, x: int):
-        return f"addq ${x}, %rax\n"
+    def multDivBoth(self, x: int, y: int, operator: str):
+        if operator == "*":
+            return f"movq ${x}, %rax\nmovq ${y}, %rdx\nimulq %rdx, %rax\n"
+        else:
+            return f"movq ${x}, %rax\nmovq ${y}, %rbx\nmovq $0, %rdx\nidivq %rbx\n"
     
-    def addBoth(self, x: int, y: int): 
-        return f"movq ${x}, %rax\naddq ${y}, %rax\n"
+    def multDiv(self, x: int, operator: str):
+        if operator == "*":    
+            return f"movq ${x}, %rdx\nimulq %rdx, %rax\n"
+        else:
+            return f"movq ${x}, %rbx\nmovq $0, %rdx\nidivq %rbx\n"
+    
+    def add_sub_operators(self, expr: BinaryExpression):
+
+        left = expr.left.accept(self)
+        right = expr.right.accept(self)
+
+        if isinstance(expr.left, NumberExpression) and isinstance(expr.right, NumberExpression):
+            return self.addSubBoth(left, right, expr.operator)
+        
+        elif isinstance(expr.right, NumberExpression):
+            return left + self.addSub(right, expr.operator)
+
+        elif isinstance(expr.left, NumberExpression):
+            return right + self.addSub(left, expr.operator)
+        
+        else:
+            return left + self.pushExpression() + right + self.popAddSubNumber(expr.operator)
+        
+
+    def mult_div_operators(self, expr: BinaryExpression):
+
+        left = expr.left.accept(self)
+        right = expr.right.accept(self)
+
+        if isinstance(expr.left, NumberExpression) and isinstance(expr.right, NumberExpression):
+            return self.multDivBoth(left, right, expr.operator)
+        
+        elif isinstance(expr.right, NumberExpression):
+            return left + self.multDiv(right, expr.operator)
+
+        elif isinstance(expr.left, NumberExpression):
+            return right + self.multDiv(left, expr.operator)
+        
+        else:
+            return left + self.pushExpression() + right + self.popMultDivNumber(expr.operator)

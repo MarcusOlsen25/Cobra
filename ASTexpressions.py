@@ -34,3 +34,10 @@ class AssignExpression(Expr):
     def accept(self, visitor):
         return visitor.visitAssignExpression(self)
 
+class CallExpression(Expr):
+    def __init__(self, var: str, arguments: list[str]):
+        self.var = var
+        self.arguments = arguments
+
+    def accept(self, visitor):
+        return visitor.visitCallExpression(self)

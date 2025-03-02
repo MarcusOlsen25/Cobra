@@ -16,7 +16,7 @@ class NodeVisitor(Visitor):
         return expr
     
     def visitAssignExpression(self, expr):
-        return expr
+        return str(expr) + str(expr.value.accept(self))
     
     def visitVarDeclaration(self, stmt: VarDeclaration):
         if stmt.initializer == None:

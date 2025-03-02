@@ -7,7 +7,7 @@ class PrintVisitor(Visitor):
     def visitBinaryExpression(self, expr: BinaryExpression):
         left = expr.left.accept(self)
         right = expr.right.accept(self)
-        return f"({left} + {right})"
+        return f"({left} {expr.operator} {right})"
     
     def visitNumberExpression(self, expr: NumberExpression):
         return str(expr.value)
@@ -16,34 +16,24 @@ class PrintVisitor(Visitor):
         return str(expr.var)
     
     def visitAssignExpression(self, expr: AssignExpression):
-        return expr.var + " = " + expr.value.accept(self)
+        value = expr.value.accept(self)
+        return f"({expr.var} = {value})"
     
     def visitVarDeclaration(self, stmt: VarDeclaration):
         if stmt.initializer == None:
             return f"var {stmt.var} = " + str(None)
         else:
             return f"var {stmt.var} = {stmt.initializer.accept(self)}"
+        
+    def visitFunctionDeclaration(self, stmt: FunctionDeclaration):
+        body = []
+        for s in stmt.body:
+            body.append(s.accept(self))
+        return f"({stmt.var}, {stmt.params}, {body})"
     
-    
-
-    """ def visit(self, node):
-        if node.type == "binop":
-            if node.leaf == "+":
-                return self.visit_add(node)
-            elif node.leaf == "*":
-                return self.visit_mult(node)
-        else:
-            return self.visit_number(node)
-
-    def visit_add(self, node):
-        left = self.visit(node.children[0])
-        right = self.visit(node.children[1])
-        return f"({left} + {right})"
-    
-    def visit_mult(self,node):
-        left = self.visit(node.children[0])
-        right = self.visit(node.children[1])
-        return f"({left} * {right})"
-
-    def visit_number(self, node):
-        return str(node.leaf) """
+    def visitCallExpression(self, expr: CallExpression):
+        var = expr.var.accept(self)
+        args = []
+        for a in expr.arguments:
+            args.append(a.accept(self))
+        return f"{var}, {args}"

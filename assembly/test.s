@@ -8,13 +8,17 @@ form:
 .globl main
 main:
 
-movq $3, %rax
-addq $4, %rax
+movq $10, %rax
+movq $4, %rdx
+imulq %rdx, %rax
 pushq %rax
-movq $5, %rax
-addq $6, %rax
+movq $8, %rax
+movq $2, %rbx
+movq $0, %rdx
+idivq %rbx
 popq %rbx
-addq %rbx, %rax
+subq %rax, %rbx
+
 
 leaq form(%rip), %rdi	# Passing string address (1. argument)
 	movq %rax,%rsi		# Passing %rax (2. argument)

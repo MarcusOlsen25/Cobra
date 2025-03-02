@@ -2,9 +2,8 @@ Created by PLY version 3.11 (http://www.dabeaz.com/ply)
 
 Unused terminals:
 
-    COMMA
-    FUNC
     IF
+    RETURN
     THEN
 
 Grammar
@@ -15,47 +14,68 @@ Rule 2     declaration_list -> declaration
 Rule 3     declaration_list -> declaration_list declaration
 Rule 4     declaration -> varDeclaration
 Rule 5     declaration -> statement
-Rule 6     statement -> expression
-Rule 7     varDeclaration -> VAR ID
-Rule 8     varDeclaration -> VAR ID ASSIGN expression
-Rule 9     expression -> ID ASSIGN expression
-Rule 10    expression -> expression PLUS term
-Rule 11    expression -> expression MINUS term
-Rule 12    expression -> term
-Rule 13    term -> term TIMES factor
-Rule 14    term -> term DIVIDE factor
-Rule 15    term -> factor
-Rule 16    factor -> NUMBER
-Rule 17    factor -> ID
-Rule 18    factor -> LPAREN expression RPAREN
+Rule 6     declaration -> funcDeclaration
+Rule 7     statement -> expression
+Rule 8     varDeclaration -> VAR ID
+Rule 9     varDeclaration -> VAR ID ASSIGN expression
+Rule 10    expression -> assignment
+Rule 11    assignment -> ID ASSIGN assignment
+Rule 12    assignment -> assignment PLUS term
+Rule 13    assignment -> assignment MINUS term
+Rule 14    assignment -> term
+Rule 15    term -> term TIMES factor
+Rule 16    term -> term DIVIDE factor
+Rule 17    term -> factor
+Rule 18    factor -> call
+Rule 19    call -> primary LPAREN arguments RPAREN
+Rule 20    call -> primary
+Rule 21    primary -> NUMBER
+Rule 22    primary -> ID
+Rule 23    primary -> LPAREN expression RPAREN
+Rule 24    arguments -> arguments COMMA expression
+Rule 25    arguments -> expression
+Rule 26    arguments -> <empty>
+Rule 27    funcDeclaration -> FUNC ID LPAREN parameter_list RPAREN LBRACE declaration_list RBRACE
+Rule 28    parameter_list -> parameter_list COMMA ID
+Rule 29    parameter_list -> ID
+Rule 30    parameter_list -> <empty>
 
 Terminals, with rules where they appear
 
-ASSIGN               : 8 9
-COMMA                : 
-DIVIDE               : 14
-FUNC                 : 
-ID                   : 7 8 9 17
+ASSIGN               : 9 11
+COMMA                : 24 28
+DIVIDE               : 16
+FUNC                 : 27
+ID                   : 8 9 11 22 27 28 29
 IF                   : 
-LPAREN               : 18
-MINUS                : 11
-NUMBER               : 16
-PLUS                 : 10
-RPAREN               : 18
+LBRACE               : 27
+LPAREN               : 19 23 27
+MINUS                : 13
+NUMBER               : 21
+PLUS                 : 12
+RBRACE               : 27
+RETURN               : 
+RPAREN               : 19 23 27
 THEN                 : 
-TIMES                : 13
-VAR                  : 7 8
+TIMES                : 15
+VAR                  : 8 9
 error                : 
 
 Nonterminals, with rules where they appear
 
+arguments            : 19 24
+assignment           : 10 11 12 13
+call                 : 18
 declaration          : 2 3
-declaration_list     : 1 3
-expression           : 6 8 9 10 11 18
-factor               : 13 14 15
+declaration_list     : 1 3 27
+expression           : 7 9 23 24 25
+factor               : 15 16 17
+funcDeclaration      : 6
+parameter_list       : 27 28
+primary              : 19 20
 program              : 0
 statement            : 5
-term                 : 10 11 12 13 14
+term                 : 12 13 14 15 16
 varDeclaration       : 4
 
 Parsing method: LALR
@@ -68,33 +88,44 @@ state 0
     (3) declaration_list -> . declaration_list declaration
     (4) declaration -> . varDeclaration
     (5) declaration -> . statement
-    (7) varDeclaration -> . VAR ID
-    (8) varDeclaration -> . VAR ID ASSIGN expression
-    (6) statement -> . expression
-    (9) expression -> . ID ASSIGN expression
-    (10) expression -> . expression PLUS term
-    (11) expression -> . expression MINUS term
-    (12) expression -> . term
-    (13) term -> . term TIMES factor
-    (14) term -> . term DIVIDE factor
-    (15) term -> . factor
-    (16) factor -> . NUMBER
-    (17) factor -> . ID
-    (18) factor -> . LPAREN expression RPAREN
+    (6) declaration -> . funcDeclaration
+    (8) varDeclaration -> . VAR ID
+    (9) varDeclaration -> . VAR ID ASSIGN expression
+    (7) statement -> . expression
+    (27) funcDeclaration -> . FUNC ID LPAREN parameter_list RPAREN LBRACE declaration_list RBRACE
+    (10) expression -> . assignment
+    (11) assignment -> . ID ASSIGN assignment
+    (12) assignment -> . assignment PLUS term
+    (13) assignment -> . assignment MINUS term
+    (14) assignment -> . term
+    (15) term -> . term TIMES factor
+    (16) term -> . term DIVIDE factor
+    (17) term -> . factor
+    (18) factor -> . call
+    (19) call -> . primary LPAREN arguments RPAREN
+    (20) call -> . primary
+    (21) primary -> . NUMBER
+    (22) primary -> . ID
+    (23) primary -> . LPAREN expression RPAREN
 
-    VAR             shift and go to state 6
-    ID              shift and go to state 7
-    NUMBER          shift and go to state 11
-    LPAREN          shift and go to state 12
+    VAR             shift and go to state 7
+    FUNC            shift and go to state 10
+    ID              shift and go to state 8
+    NUMBER          shift and go to state 17
+    LPAREN          shift and go to state 11
 
     program                        shift and go to state 1
     declaration_list               shift and go to state 2
     declaration                    shift and go to state 3
     varDeclaration                 shift and go to state 4
     statement                      shift and go to state 5
-    expression                     shift and go to state 8
-    term                           shift and go to state 9
-    factor                         shift and go to state 10
+    funcDeclaration                shift and go to state 6
+    expression                     shift and go to state 9
+    assignment                     shift and go to state 12
+    term                           shift and go to state 13
+    factor                         shift and go to state 14
+    call                           shift and go to state 15
+    primary                        shift and go to state 16
 
 state 1
 
@@ -108,42 +139,55 @@ state 2
     (3) declaration_list -> declaration_list . declaration
     (4) declaration -> . varDeclaration
     (5) declaration -> . statement
-    (7) varDeclaration -> . VAR ID
-    (8) varDeclaration -> . VAR ID ASSIGN expression
-    (6) statement -> . expression
-    (9) expression -> . ID ASSIGN expression
-    (10) expression -> . expression PLUS term
-    (11) expression -> . expression MINUS term
-    (12) expression -> . term
-    (13) term -> . term TIMES factor
-    (14) term -> . term DIVIDE factor
-    (15) term -> . factor
-    (16) factor -> . NUMBER
-    (17) factor -> . ID
-    (18) factor -> . LPAREN expression RPAREN
+    (6) declaration -> . funcDeclaration
+    (8) varDeclaration -> . VAR ID
+    (9) varDeclaration -> . VAR ID ASSIGN expression
+    (7) statement -> . expression
+    (27) funcDeclaration -> . FUNC ID LPAREN parameter_list RPAREN LBRACE declaration_list RBRACE
+    (10) expression -> . assignment
+    (11) assignment -> . ID ASSIGN assignment
+    (12) assignment -> . assignment PLUS term
+    (13) assignment -> . assignment MINUS term
+    (14) assignment -> . term
+    (15) term -> . term TIMES factor
+    (16) term -> . term DIVIDE factor
+    (17) term -> . factor
+    (18) factor -> . call
+    (19) call -> . primary LPAREN arguments RPAREN
+    (20) call -> . primary
+    (21) primary -> . NUMBER
+    (22) primary -> . ID
+    (23) primary -> . LPAREN expression RPAREN
 
     $end            reduce using rule 1 (program -> declaration_list .)
-    VAR             shift and go to state 6
-    ID              shift and go to state 7
-    NUMBER          shift and go to state 11
-    LPAREN          shift and go to state 12
+    VAR             shift and go to state 7
+    FUNC            shift and go to state 10
+    ID              shift and go to state 8
+    NUMBER          shift and go to state 17
+    LPAREN          shift and go to state 11
 
-    declaration                    shift and go to state 13
+    declaration                    shift and go to state 18
     varDeclaration                 shift and go to state 4
     statement                      shift and go to state 5
-    expression                     shift and go to state 8
-    term                           shift and go to state 9
-    factor                         shift and go to state 10
+    funcDeclaration                shift and go to state 6
+    expression                     shift and go to state 9
+    assignment                     shift and go to state 12
+    term                           shift and go to state 13
+    factor                         shift and go to state 14
+    call                           shift and go to state 15
+    primary                        shift and go to state 16
 
 state 3
 
     (2) declaration_list -> declaration .
 
     VAR             reduce using rule 2 (declaration_list -> declaration .)
+    FUNC            reduce using rule 2 (declaration_list -> declaration .)
     ID              reduce using rule 2 (declaration_list -> declaration .)
     NUMBER          reduce using rule 2 (declaration_list -> declaration .)
     LPAREN          reduce using rule 2 (declaration_list -> declaration .)
     $end            reduce using rule 2 (declaration_list -> declaration .)
+    RBRACE          reduce using rule 2 (declaration_list -> declaration .)
 
 
 state 4
@@ -151,10 +195,12 @@ state 4
     (4) declaration -> varDeclaration .
 
     VAR             reduce using rule 4 (declaration -> varDeclaration .)
+    FUNC            reduce using rule 4 (declaration -> varDeclaration .)
     ID              reduce using rule 4 (declaration -> varDeclaration .)
     NUMBER          reduce using rule 4 (declaration -> varDeclaration .)
     LPAREN          reduce using rule 4 (declaration -> varDeclaration .)
     $end            reduce using rule 4 (declaration -> varDeclaration .)
+    RBRACE          reduce using rule 4 (declaration -> varDeclaration .)
 
 
 state 5
@@ -162,401 +208,822 @@ state 5
     (5) declaration -> statement .
 
     VAR             reduce using rule 5 (declaration -> statement .)
+    FUNC            reduce using rule 5 (declaration -> statement .)
     ID              reduce using rule 5 (declaration -> statement .)
     NUMBER          reduce using rule 5 (declaration -> statement .)
     LPAREN          reduce using rule 5 (declaration -> statement .)
     $end            reduce using rule 5 (declaration -> statement .)
+    RBRACE          reduce using rule 5 (declaration -> statement .)
 
 
 state 6
 
-    (7) varDeclaration -> VAR . ID
-    (8) varDeclaration -> VAR . ID ASSIGN expression
+    (6) declaration -> funcDeclaration .
 
-    ID              shift and go to state 14
+    VAR             reduce using rule 6 (declaration -> funcDeclaration .)
+    FUNC            reduce using rule 6 (declaration -> funcDeclaration .)
+    ID              reduce using rule 6 (declaration -> funcDeclaration .)
+    NUMBER          reduce using rule 6 (declaration -> funcDeclaration .)
+    LPAREN          reduce using rule 6 (declaration -> funcDeclaration .)
+    $end            reduce using rule 6 (declaration -> funcDeclaration .)
+    RBRACE          reduce using rule 6 (declaration -> funcDeclaration .)
 
 
 state 7
 
-    (9) expression -> ID . ASSIGN expression
-    (17) factor -> ID .
+    (8) varDeclaration -> VAR . ID
+    (9) varDeclaration -> VAR . ID ASSIGN expression
 
-    ASSIGN          shift and go to state 15
-    TIMES           reduce using rule 17 (factor -> ID .)
-    DIVIDE          reduce using rule 17 (factor -> ID .)
-    PLUS            reduce using rule 17 (factor -> ID .)
-    MINUS           reduce using rule 17 (factor -> ID .)
-    VAR             reduce using rule 17 (factor -> ID .)
-    ID              reduce using rule 17 (factor -> ID .)
-    NUMBER          reduce using rule 17 (factor -> ID .)
-    LPAREN          reduce using rule 17 (factor -> ID .)
-    $end            reduce using rule 17 (factor -> ID .)
-    RPAREN          reduce using rule 17 (factor -> ID .)
+    ID              shift and go to state 19
 
 
 state 8
 
-    (6) statement -> expression .
-    (10) expression -> expression . PLUS term
-    (11) expression -> expression . MINUS term
+    (11) assignment -> ID . ASSIGN assignment
+    (22) primary -> ID .
 
-    VAR             reduce using rule 6 (statement -> expression .)
-    ID              reduce using rule 6 (statement -> expression .)
-    NUMBER          reduce using rule 6 (statement -> expression .)
-    LPAREN          reduce using rule 6 (statement -> expression .)
-    $end            reduce using rule 6 (statement -> expression .)
-    PLUS            shift and go to state 16
-    MINUS           shift and go to state 17
+    ASSIGN          shift and go to state 20
+    LPAREN          reduce using rule 22 (primary -> ID .)
+    TIMES           reduce using rule 22 (primary -> ID .)
+    DIVIDE          reduce using rule 22 (primary -> ID .)
+    PLUS            reduce using rule 22 (primary -> ID .)
+    MINUS           reduce using rule 22 (primary -> ID .)
+    VAR             reduce using rule 22 (primary -> ID .)
+    FUNC            reduce using rule 22 (primary -> ID .)
+    ID              reduce using rule 22 (primary -> ID .)
+    NUMBER          reduce using rule 22 (primary -> ID .)
+    $end            reduce using rule 22 (primary -> ID .)
+    RPAREN          reduce using rule 22 (primary -> ID .)
+    COMMA           reduce using rule 22 (primary -> ID .)
+    RBRACE          reduce using rule 22 (primary -> ID .)
 
 
 state 9
 
-    (12) expression -> term .
-    (13) term -> term . TIMES factor
-    (14) term -> term . DIVIDE factor
+    (7) statement -> expression .
 
-    PLUS            reduce using rule 12 (expression -> term .)
-    MINUS           reduce using rule 12 (expression -> term .)
-    VAR             reduce using rule 12 (expression -> term .)
-    ID              reduce using rule 12 (expression -> term .)
-    NUMBER          reduce using rule 12 (expression -> term .)
-    LPAREN          reduce using rule 12 (expression -> term .)
-    $end            reduce using rule 12 (expression -> term .)
-    RPAREN          reduce using rule 12 (expression -> term .)
-    TIMES           shift and go to state 18
-    DIVIDE          shift and go to state 19
+    VAR             reduce using rule 7 (statement -> expression .)
+    FUNC            reduce using rule 7 (statement -> expression .)
+    ID              reduce using rule 7 (statement -> expression .)
+    NUMBER          reduce using rule 7 (statement -> expression .)
+    LPAREN          reduce using rule 7 (statement -> expression .)
+    $end            reduce using rule 7 (statement -> expression .)
+    RBRACE          reduce using rule 7 (statement -> expression .)
 
 
 state 10
 
-    (15) term -> factor .
+    (27) funcDeclaration -> FUNC . ID LPAREN parameter_list RPAREN LBRACE declaration_list RBRACE
 
-    TIMES           reduce using rule 15 (term -> factor .)
-    DIVIDE          reduce using rule 15 (term -> factor .)
-    PLUS            reduce using rule 15 (term -> factor .)
-    MINUS           reduce using rule 15 (term -> factor .)
-    VAR             reduce using rule 15 (term -> factor .)
-    ID              reduce using rule 15 (term -> factor .)
-    NUMBER          reduce using rule 15 (term -> factor .)
-    LPAREN          reduce using rule 15 (term -> factor .)
-    $end            reduce using rule 15 (term -> factor .)
-    RPAREN          reduce using rule 15 (term -> factor .)
+    ID              shift and go to state 21
 
 
 state 11
 
-    (16) factor -> NUMBER .
+    (23) primary -> LPAREN . expression RPAREN
+    (10) expression -> . assignment
+    (11) assignment -> . ID ASSIGN assignment
+    (12) assignment -> . assignment PLUS term
+    (13) assignment -> . assignment MINUS term
+    (14) assignment -> . term
+    (15) term -> . term TIMES factor
+    (16) term -> . term DIVIDE factor
+    (17) term -> . factor
+    (18) factor -> . call
+    (19) call -> . primary LPAREN arguments RPAREN
+    (20) call -> . primary
+    (21) primary -> . NUMBER
+    (22) primary -> . ID
+    (23) primary -> . LPAREN expression RPAREN
 
-    TIMES           reduce using rule 16 (factor -> NUMBER .)
-    DIVIDE          reduce using rule 16 (factor -> NUMBER .)
-    PLUS            reduce using rule 16 (factor -> NUMBER .)
-    MINUS           reduce using rule 16 (factor -> NUMBER .)
-    VAR             reduce using rule 16 (factor -> NUMBER .)
-    ID              reduce using rule 16 (factor -> NUMBER .)
-    NUMBER          reduce using rule 16 (factor -> NUMBER .)
-    LPAREN          reduce using rule 16 (factor -> NUMBER .)
-    $end            reduce using rule 16 (factor -> NUMBER .)
-    RPAREN          reduce using rule 16 (factor -> NUMBER .)
+    ID              shift and go to state 8
+    NUMBER          shift and go to state 17
+    LPAREN          shift and go to state 11
 
+    expression                     shift and go to state 22
+    assignment                     shift and go to state 12
+    term                           shift and go to state 13
+    factor                         shift and go to state 14
+    call                           shift and go to state 15
+    primary                        shift and go to state 16
 
 state 12
 
-    (18) factor -> LPAREN . expression RPAREN
-    (9) expression -> . ID ASSIGN expression
-    (10) expression -> . expression PLUS term
-    (11) expression -> . expression MINUS term
-    (12) expression -> . term
-    (13) term -> . term TIMES factor
-    (14) term -> . term DIVIDE factor
-    (15) term -> . factor
-    (16) factor -> . NUMBER
-    (17) factor -> . ID
-    (18) factor -> . LPAREN expression RPAREN
+    (10) expression -> assignment .
+    (12) assignment -> assignment . PLUS term
+    (13) assignment -> assignment . MINUS term
 
-    ID              shift and go to state 7
-    NUMBER          shift and go to state 11
-    LPAREN          shift and go to state 12
+    VAR             reduce using rule 10 (expression -> assignment .)
+    FUNC            reduce using rule 10 (expression -> assignment .)
+    ID              reduce using rule 10 (expression -> assignment .)
+    NUMBER          reduce using rule 10 (expression -> assignment .)
+    LPAREN          reduce using rule 10 (expression -> assignment .)
+    $end            reduce using rule 10 (expression -> assignment .)
+    RPAREN          reduce using rule 10 (expression -> assignment .)
+    COMMA           reduce using rule 10 (expression -> assignment .)
+    RBRACE          reduce using rule 10 (expression -> assignment .)
+    PLUS            shift and go to state 23
+    MINUS           shift and go to state 24
 
-    expression                     shift and go to state 20
-    term                           shift and go to state 9
-    factor                         shift and go to state 10
 
 state 13
 
-    (3) declaration_list -> declaration_list declaration .
+    (14) assignment -> term .
+    (15) term -> term . TIMES factor
+    (16) term -> term . DIVIDE factor
 
-    VAR             reduce using rule 3 (declaration_list -> declaration_list declaration .)
-    ID              reduce using rule 3 (declaration_list -> declaration_list declaration .)
-    NUMBER          reduce using rule 3 (declaration_list -> declaration_list declaration .)
-    LPAREN          reduce using rule 3 (declaration_list -> declaration_list declaration .)
-    $end            reduce using rule 3 (declaration_list -> declaration_list declaration .)
+    PLUS            reduce using rule 14 (assignment -> term .)
+    MINUS           reduce using rule 14 (assignment -> term .)
+    VAR             reduce using rule 14 (assignment -> term .)
+    FUNC            reduce using rule 14 (assignment -> term .)
+    ID              reduce using rule 14 (assignment -> term .)
+    NUMBER          reduce using rule 14 (assignment -> term .)
+    LPAREN          reduce using rule 14 (assignment -> term .)
+    $end            reduce using rule 14 (assignment -> term .)
+    RPAREN          reduce using rule 14 (assignment -> term .)
+    COMMA           reduce using rule 14 (assignment -> term .)
+    RBRACE          reduce using rule 14 (assignment -> term .)
+    TIMES           shift and go to state 25
+    DIVIDE          shift and go to state 26
 
 
 state 14
 
-    (7) varDeclaration -> VAR ID .
-    (8) varDeclaration -> VAR ID . ASSIGN expression
+    (17) term -> factor .
 
-    VAR             reduce using rule 7 (varDeclaration -> VAR ID .)
-    ID              reduce using rule 7 (varDeclaration -> VAR ID .)
-    NUMBER          reduce using rule 7 (varDeclaration -> VAR ID .)
-    LPAREN          reduce using rule 7 (varDeclaration -> VAR ID .)
-    $end            reduce using rule 7 (varDeclaration -> VAR ID .)
-    ASSIGN          shift and go to state 21
+    TIMES           reduce using rule 17 (term -> factor .)
+    DIVIDE          reduce using rule 17 (term -> factor .)
+    PLUS            reduce using rule 17 (term -> factor .)
+    MINUS           reduce using rule 17 (term -> factor .)
+    VAR             reduce using rule 17 (term -> factor .)
+    FUNC            reduce using rule 17 (term -> factor .)
+    ID              reduce using rule 17 (term -> factor .)
+    NUMBER          reduce using rule 17 (term -> factor .)
+    LPAREN          reduce using rule 17 (term -> factor .)
+    $end            reduce using rule 17 (term -> factor .)
+    RPAREN          reduce using rule 17 (term -> factor .)
+    COMMA           reduce using rule 17 (term -> factor .)
+    RBRACE          reduce using rule 17 (term -> factor .)
 
 
 state 15
 
-    (9) expression -> ID ASSIGN . expression
-    (9) expression -> . ID ASSIGN expression
-    (10) expression -> . expression PLUS term
-    (11) expression -> . expression MINUS term
-    (12) expression -> . term
-    (13) term -> . term TIMES factor
-    (14) term -> . term DIVIDE factor
-    (15) term -> . factor
-    (16) factor -> . NUMBER
-    (17) factor -> . ID
-    (18) factor -> . LPAREN expression RPAREN
+    (18) factor -> call .
 
-    ID              shift and go to state 7
-    NUMBER          shift and go to state 11
-    LPAREN          shift and go to state 12
+    TIMES           reduce using rule 18 (factor -> call .)
+    DIVIDE          reduce using rule 18 (factor -> call .)
+    PLUS            reduce using rule 18 (factor -> call .)
+    MINUS           reduce using rule 18 (factor -> call .)
+    VAR             reduce using rule 18 (factor -> call .)
+    FUNC            reduce using rule 18 (factor -> call .)
+    ID              reduce using rule 18 (factor -> call .)
+    NUMBER          reduce using rule 18 (factor -> call .)
+    LPAREN          reduce using rule 18 (factor -> call .)
+    $end            reduce using rule 18 (factor -> call .)
+    RPAREN          reduce using rule 18 (factor -> call .)
+    COMMA           reduce using rule 18 (factor -> call .)
+    RBRACE          reduce using rule 18 (factor -> call .)
 
-    expression                     shift and go to state 22
-    term                           shift and go to state 9
-    factor                         shift and go to state 10
 
 state 16
 
-    (10) expression -> expression PLUS . term
-    (13) term -> . term TIMES factor
-    (14) term -> . term DIVIDE factor
-    (15) term -> . factor
-    (16) factor -> . NUMBER
-    (17) factor -> . ID
-    (18) factor -> . LPAREN expression RPAREN
+    (19) call -> primary . LPAREN arguments RPAREN
+    (20) call -> primary .
 
-    NUMBER          shift and go to state 11
-    ID              shift and go to state 24
-    LPAREN          shift and go to state 12
+  ! shift/reduce conflict for LPAREN resolved as shift
+    LPAREN          shift and go to state 27
+    TIMES           reduce using rule 20 (call -> primary .)
+    DIVIDE          reduce using rule 20 (call -> primary .)
+    PLUS            reduce using rule 20 (call -> primary .)
+    MINUS           reduce using rule 20 (call -> primary .)
+    VAR             reduce using rule 20 (call -> primary .)
+    FUNC            reduce using rule 20 (call -> primary .)
+    ID              reduce using rule 20 (call -> primary .)
+    NUMBER          reduce using rule 20 (call -> primary .)
+    $end            reduce using rule 20 (call -> primary .)
+    RPAREN          reduce using rule 20 (call -> primary .)
+    COMMA           reduce using rule 20 (call -> primary .)
+    RBRACE          reduce using rule 20 (call -> primary .)
 
-    term                           shift and go to state 23
-    factor                         shift and go to state 10
+  ! LPAREN          [ reduce using rule 20 (call -> primary .) ]
+
 
 state 17
 
-    (11) expression -> expression MINUS . term
-    (13) term -> . term TIMES factor
-    (14) term -> . term DIVIDE factor
-    (15) term -> . factor
-    (16) factor -> . NUMBER
-    (17) factor -> . ID
-    (18) factor -> . LPAREN expression RPAREN
+    (21) primary -> NUMBER .
 
-    NUMBER          shift and go to state 11
-    ID              shift and go to state 24
-    LPAREN          shift and go to state 12
+    LPAREN          reduce using rule 21 (primary -> NUMBER .)
+    TIMES           reduce using rule 21 (primary -> NUMBER .)
+    DIVIDE          reduce using rule 21 (primary -> NUMBER .)
+    PLUS            reduce using rule 21 (primary -> NUMBER .)
+    MINUS           reduce using rule 21 (primary -> NUMBER .)
+    VAR             reduce using rule 21 (primary -> NUMBER .)
+    FUNC            reduce using rule 21 (primary -> NUMBER .)
+    ID              reduce using rule 21 (primary -> NUMBER .)
+    NUMBER          reduce using rule 21 (primary -> NUMBER .)
+    $end            reduce using rule 21 (primary -> NUMBER .)
+    RPAREN          reduce using rule 21 (primary -> NUMBER .)
+    COMMA           reduce using rule 21 (primary -> NUMBER .)
+    RBRACE          reduce using rule 21 (primary -> NUMBER .)
 
-    term                           shift and go to state 25
-    factor                         shift and go to state 10
 
 state 18
 
-    (13) term -> term TIMES . factor
-    (16) factor -> . NUMBER
-    (17) factor -> . ID
-    (18) factor -> . LPAREN expression RPAREN
+    (3) declaration_list -> declaration_list declaration .
 
-    NUMBER          shift and go to state 11
-    ID              shift and go to state 24
-    LPAREN          shift and go to state 12
+    VAR             reduce using rule 3 (declaration_list -> declaration_list declaration .)
+    FUNC            reduce using rule 3 (declaration_list -> declaration_list declaration .)
+    ID              reduce using rule 3 (declaration_list -> declaration_list declaration .)
+    NUMBER          reduce using rule 3 (declaration_list -> declaration_list declaration .)
+    LPAREN          reduce using rule 3 (declaration_list -> declaration_list declaration .)
+    $end            reduce using rule 3 (declaration_list -> declaration_list declaration .)
+    RBRACE          reduce using rule 3 (declaration_list -> declaration_list declaration .)
 
-    factor                         shift and go to state 26
 
 state 19
 
-    (14) term -> term DIVIDE . factor
-    (16) factor -> . NUMBER
-    (17) factor -> . ID
-    (18) factor -> . LPAREN expression RPAREN
+    (8) varDeclaration -> VAR ID .
+    (9) varDeclaration -> VAR ID . ASSIGN expression
 
-    NUMBER          shift and go to state 11
-    ID              shift and go to state 24
-    LPAREN          shift and go to state 12
+    VAR             reduce using rule 8 (varDeclaration -> VAR ID .)
+    FUNC            reduce using rule 8 (varDeclaration -> VAR ID .)
+    ID              reduce using rule 8 (varDeclaration -> VAR ID .)
+    NUMBER          reduce using rule 8 (varDeclaration -> VAR ID .)
+    LPAREN          reduce using rule 8 (varDeclaration -> VAR ID .)
+    $end            reduce using rule 8 (varDeclaration -> VAR ID .)
+    RBRACE          reduce using rule 8 (varDeclaration -> VAR ID .)
+    ASSIGN          shift and go to state 28
 
-    factor                         shift and go to state 27
 
 state 20
 
-    (18) factor -> LPAREN expression . RPAREN
-    (10) expression -> expression . PLUS term
-    (11) expression -> expression . MINUS term
+    (11) assignment -> ID ASSIGN . assignment
+    (11) assignment -> . ID ASSIGN assignment
+    (12) assignment -> . assignment PLUS term
+    (13) assignment -> . assignment MINUS term
+    (14) assignment -> . term
+    (15) term -> . term TIMES factor
+    (16) term -> . term DIVIDE factor
+    (17) term -> . factor
+    (18) factor -> . call
+    (19) call -> . primary LPAREN arguments RPAREN
+    (20) call -> . primary
+    (21) primary -> . NUMBER
+    (22) primary -> . ID
+    (23) primary -> . LPAREN expression RPAREN
 
-    RPAREN          shift and go to state 28
-    PLUS            shift and go to state 16
-    MINUS           shift and go to state 17
+    ID              shift and go to state 8
+    NUMBER          shift and go to state 17
+    LPAREN          shift and go to state 11
 
+    assignment                     shift and go to state 29
+    term                           shift and go to state 13
+    factor                         shift and go to state 14
+    call                           shift and go to state 15
+    primary                        shift and go to state 16
 
 state 21
 
-    (8) varDeclaration -> VAR ID ASSIGN . expression
-    (9) expression -> . ID ASSIGN expression
-    (10) expression -> . expression PLUS term
-    (11) expression -> . expression MINUS term
-    (12) expression -> . term
-    (13) term -> . term TIMES factor
-    (14) term -> . term DIVIDE factor
-    (15) term -> . factor
-    (16) factor -> . NUMBER
-    (17) factor -> . ID
-    (18) factor -> . LPAREN expression RPAREN
+    (27) funcDeclaration -> FUNC ID . LPAREN parameter_list RPAREN LBRACE declaration_list RBRACE
 
-    ID              shift and go to state 7
-    NUMBER          shift and go to state 11
-    LPAREN          shift and go to state 12
+    LPAREN          shift and go to state 30
 
-    expression                     shift and go to state 29
-    term                           shift and go to state 9
-    factor                         shift and go to state 10
 
 state 22
 
-    (9) expression -> ID ASSIGN expression .
-    (10) expression -> expression . PLUS term
-    (11) expression -> expression . MINUS term
+    (23) primary -> LPAREN expression . RPAREN
 
-  ! shift/reduce conflict for PLUS resolved as shift
-  ! shift/reduce conflict for MINUS resolved as shift
-    VAR             reduce using rule 9 (expression -> ID ASSIGN expression .)
-    ID              reduce using rule 9 (expression -> ID ASSIGN expression .)
-    NUMBER          reduce using rule 9 (expression -> ID ASSIGN expression .)
-    LPAREN          reduce using rule 9 (expression -> ID ASSIGN expression .)
-    $end            reduce using rule 9 (expression -> ID ASSIGN expression .)
-    RPAREN          reduce using rule 9 (expression -> ID ASSIGN expression .)
-    PLUS            shift and go to state 16
-    MINUS           shift and go to state 17
-
-  ! PLUS            [ reduce using rule 9 (expression -> ID ASSIGN expression .) ]
-  ! MINUS           [ reduce using rule 9 (expression -> ID ASSIGN expression .) ]
+    RPAREN          shift and go to state 31
 
 
 state 23
 
-    (10) expression -> expression PLUS term .
-    (13) term -> term . TIMES factor
-    (14) term -> term . DIVIDE factor
+    (12) assignment -> assignment PLUS . term
+    (15) term -> . term TIMES factor
+    (16) term -> . term DIVIDE factor
+    (17) term -> . factor
+    (18) factor -> . call
+    (19) call -> . primary LPAREN arguments RPAREN
+    (20) call -> . primary
+    (21) primary -> . NUMBER
+    (22) primary -> . ID
+    (23) primary -> . LPAREN expression RPAREN
 
-    PLUS            reduce using rule 10 (expression -> expression PLUS term .)
-    MINUS           reduce using rule 10 (expression -> expression PLUS term .)
-    VAR             reduce using rule 10 (expression -> expression PLUS term .)
-    ID              reduce using rule 10 (expression -> expression PLUS term .)
-    NUMBER          reduce using rule 10 (expression -> expression PLUS term .)
-    LPAREN          reduce using rule 10 (expression -> expression PLUS term .)
-    $end            reduce using rule 10 (expression -> expression PLUS term .)
-    RPAREN          reduce using rule 10 (expression -> expression PLUS term .)
-    TIMES           shift and go to state 18
-    DIVIDE          shift and go to state 19
+    NUMBER          shift and go to state 17
+    ID              shift and go to state 33
+    LPAREN          shift and go to state 11
 
+    term                           shift and go to state 32
+    factor                         shift and go to state 14
+    call                           shift and go to state 15
+    primary                        shift and go to state 16
 
 state 24
 
-    (17) factor -> ID .
+    (13) assignment -> assignment MINUS . term
+    (15) term -> . term TIMES factor
+    (16) term -> . term DIVIDE factor
+    (17) term -> . factor
+    (18) factor -> . call
+    (19) call -> . primary LPAREN arguments RPAREN
+    (20) call -> . primary
+    (21) primary -> . NUMBER
+    (22) primary -> . ID
+    (23) primary -> . LPAREN expression RPAREN
 
-    TIMES           reduce using rule 17 (factor -> ID .)
-    DIVIDE          reduce using rule 17 (factor -> ID .)
-    PLUS            reduce using rule 17 (factor -> ID .)
-    MINUS           reduce using rule 17 (factor -> ID .)
-    VAR             reduce using rule 17 (factor -> ID .)
-    ID              reduce using rule 17 (factor -> ID .)
-    NUMBER          reduce using rule 17 (factor -> ID .)
-    LPAREN          reduce using rule 17 (factor -> ID .)
-    $end            reduce using rule 17 (factor -> ID .)
-    RPAREN          reduce using rule 17 (factor -> ID .)
+    NUMBER          shift and go to state 17
+    ID              shift and go to state 33
+    LPAREN          shift and go to state 11
 
+    term                           shift and go to state 34
+    factor                         shift and go to state 14
+    call                           shift and go to state 15
+    primary                        shift and go to state 16
 
 state 25
 
-    (11) expression -> expression MINUS term .
-    (13) term -> term . TIMES factor
-    (14) term -> term . DIVIDE factor
+    (15) term -> term TIMES . factor
+    (18) factor -> . call
+    (19) call -> . primary LPAREN arguments RPAREN
+    (20) call -> . primary
+    (21) primary -> . NUMBER
+    (22) primary -> . ID
+    (23) primary -> . LPAREN expression RPAREN
 
-    PLUS            reduce using rule 11 (expression -> expression MINUS term .)
-    MINUS           reduce using rule 11 (expression -> expression MINUS term .)
-    VAR             reduce using rule 11 (expression -> expression MINUS term .)
-    ID              reduce using rule 11 (expression -> expression MINUS term .)
-    NUMBER          reduce using rule 11 (expression -> expression MINUS term .)
-    LPAREN          reduce using rule 11 (expression -> expression MINUS term .)
-    $end            reduce using rule 11 (expression -> expression MINUS term .)
-    RPAREN          reduce using rule 11 (expression -> expression MINUS term .)
-    TIMES           shift and go to state 18
-    DIVIDE          shift and go to state 19
+    NUMBER          shift and go to state 17
+    ID              shift and go to state 33
+    LPAREN          shift and go to state 11
 
+    factor                         shift and go to state 35
+    call                           shift and go to state 15
+    primary                        shift and go to state 16
 
 state 26
 
-    (13) term -> term TIMES factor .
+    (16) term -> term DIVIDE . factor
+    (18) factor -> . call
+    (19) call -> . primary LPAREN arguments RPAREN
+    (20) call -> . primary
+    (21) primary -> . NUMBER
+    (22) primary -> . ID
+    (23) primary -> . LPAREN expression RPAREN
 
-    TIMES           reduce using rule 13 (term -> term TIMES factor .)
-    DIVIDE          reduce using rule 13 (term -> term TIMES factor .)
-    PLUS            reduce using rule 13 (term -> term TIMES factor .)
-    MINUS           reduce using rule 13 (term -> term TIMES factor .)
-    VAR             reduce using rule 13 (term -> term TIMES factor .)
-    ID              reduce using rule 13 (term -> term TIMES factor .)
-    NUMBER          reduce using rule 13 (term -> term TIMES factor .)
-    LPAREN          reduce using rule 13 (term -> term TIMES factor .)
-    $end            reduce using rule 13 (term -> term TIMES factor .)
-    RPAREN          reduce using rule 13 (term -> term TIMES factor .)
+    NUMBER          shift and go to state 17
+    ID              shift and go to state 33
+    LPAREN          shift and go to state 11
 
+    factor                         shift and go to state 36
+    call                           shift and go to state 15
+    primary                        shift and go to state 16
 
 state 27
 
-    (14) term -> term DIVIDE factor .
+    (19) call -> primary LPAREN . arguments RPAREN
+    (24) arguments -> . arguments COMMA expression
+    (25) arguments -> . expression
+    (26) arguments -> .
+    (10) expression -> . assignment
+    (11) assignment -> . ID ASSIGN assignment
+    (12) assignment -> . assignment PLUS term
+    (13) assignment -> . assignment MINUS term
+    (14) assignment -> . term
+    (15) term -> . term TIMES factor
+    (16) term -> . term DIVIDE factor
+    (17) term -> . factor
+    (18) factor -> . call
+    (19) call -> . primary LPAREN arguments RPAREN
+    (20) call -> . primary
+    (21) primary -> . NUMBER
+    (22) primary -> . ID
+    (23) primary -> . LPAREN expression RPAREN
 
-    TIMES           reduce using rule 14 (term -> term DIVIDE factor .)
-    DIVIDE          reduce using rule 14 (term -> term DIVIDE factor .)
-    PLUS            reduce using rule 14 (term -> term DIVIDE factor .)
-    MINUS           reduce using rule 14 (term -> term DIVIDE factor .)
-    VAR             reduce using rule 14 (term -> term DIVIDE factor .)
-    ID              reduce using rule 14 (term -> term DIVIDE factor .)
-    NUMBER          reduce using rule 14 (term -> term DIVIDE factor .)
-    LPAREN          reduce using rule 14 (term -> term DIVIDE factor .)
-    $end            reduce using rule 14 (term -> term DIVIDE factor .)
-    RPAREN          reduce using rule 14 (term -> term DIVIDE factor .)
+    RPAREN          reduce using rule 26 (arguments -> .)
+    COMMA           reduce using rule 26 (arguments -> .)
+    ID              shift and go to state 8
+    NUMBER          shift and go to state 17
+    LPAREN          shift and go to state 11
 
+    primary                        shift and go to state 16
+    arguments                      shift and go to state 37
+    expression                     shift and go to state 38
+    assignment                     shift and go to state 12
+    term                           shift and go to state 13
+    factor                         shift and go to state 14
+    call                           shift and go to state 15
 
 state 28
 
-    (18) factor -> LPAREN expression RPAREN .
+    (9) varDeclaration -> VAR ID ASSIGN . expression
+    (10) expression -> . assignment
+    (11) assignment -> . ID ASSIGN assignment
+    (12) assignment -> . assignment PLUS term
+    (13) assignment -> . assignment MINUS term
+    (14) assignment -> . term
+    (15) term -> . term TIMES factor
+    (16) term -> . term DIVIDE factor
+    (17) term -> . factor
+    (18) factor -> . call
+    (19) call -> . primary LPAREN arguments RPAREN
+    (20) call -> . primary
+    (21) primary -> . NUMBER
+    (22) primary -> . ID
+    (23) primary -> . LPAREN expression RPAREN
 
-    TIMES           reduce using rule 18 (factor -> LPAREN expression RPAREN .)
-    DIVIDE          reduce using rule 18 (factor -> LPAREN expression RPAREN .)
-    PLUS            reduce using rule 18 (factor -> LPAREN expression RPAREN .)
-    MINUS           reduce using rule 18 (factor -> LPAREN expression RPAREN .)
-    VAR             reduce using rule 18 (factor -> LPAREN expression RPAREN .)
-    ID              reduce using rule 18 (factor -> LPAREN expression RPAREN .)
-    NUMBER          reduce using rule 18 (factor -> LPAREN expression RPAREN .)
-    LPAREN          reduce using rule 18 (factor -> LPAREN expression RPAREN .)
-    $end            reduce using rule 18 (factor -> LPAREN expression RPAREN .)
-    RPAREN          reduce using rule 18 (factor -> LPAREN expression RPAREN .)
+    ID              shift and go to state 8
+    NUMBER          shift and go to state 17
+    LPAREN          shift and go to state 11
 
+    expression                     shift and go to state 39
+    assignment                     shift and go to state 12
+    term                           shift and go to state 13
+    factor                         shift and go to state 14
+    call                           shift and go to state 15
+    primary                        shift and go to state 16
 
 state 29
 
-    (8) varDeclaration -> VAR ID ASSIGN expression .
-    (10) expression -> expression . PLUS term
-    (11) expression -> expression . MINUS term
+    (11) assignment -> ID ASSIGN assignment .
+    (12) assignment -> assignment . PLUS term
+    (13) assignment -> assignment . MINUS term
 
-    VAR             reduce using rule 8 (varDeclaration -> VAR ID ASSIGN expression .)
-    ID              reduce using rule 8 (varDeclaration -> VAR ID ASSIGN expression .)
-    NUMBER          reduce using rule 8 (varDeclaration -> VAR ID ASSIGN expression .)
-    LPAREN          reduce using rule 8 (varDeclaration -> VAR ID ASSIGN expression .)
-    $end            reduce using rule 8 (varDeclaration -> VAR ID ASSIGN expression .)
-    PLUS            shift and go to state 16
-    MINUS           shift and go to state 17
+  ! shift/reduce conflict for PLUS resolved as shift
+  ! shift/reduce conflict for MINUS resolved as shift
+    VAR             reduce using rule 11 (assignment -> ID ASSIGN assignment .)
+    FUNC            reduce using rule 11 (assignment -> ID ASSIGN assignment .)
+    ID              reduce using rule 11 (assignment -> ID ASSIGN assignment .)
+    NUMBER          reduce using rule 11 (assignment -> ID ASSIGN assignment .)
+    LPAREN          reduce using rule 11 (assignment -> ID ASSIGN assignment .)
+    $end            reduce using rule 11 (assignment -> ID ASSIGN assignment .)
+    RPAREN          reduce using rule 11 (assignment -> ID ASSIGN assignment .)
+    COMMA           reduce using rule 11 (assignment -> ID ASSIGN assignment .)
+    RBRACE          reduce using rule 11 (assignment -> ID ASSIGN assignment .)
+    PLUS            shift and go to state 23
+    MINUS           shift and go to state 24
+
+  ! PLUS            [ reduce using rule 11 (assignment -> ID ASSIGN assignment .) ]
+  ! MINUS           [ reduce using rule 11 (assignment -> ID ASSIGN assignment .) ]
+
+
+state 30
+
+    (27) funcDeclaration -> FUNC ID LPAREN . parameter_list RPAREN LBRACE declaration_list RBRACE
+    (28) parameter_list -> . parameter_list COMMA ID
+    (29) parameter_list -> . ID
+    (30) parameter_list -> .
+
+    ID              shift and go to state 40
+    RPAREN          reduce using rule 30 (parameter_list -> .)
+    COMMA           reduce using rule 30 (parameter_list -> .)
+
+    parameter_list                 shift and go to state 41
+
+state 31
+
+    (23) primary -> LPAREN expression RPAREN .
+
+    LPAREN          reduce using rule 23 (primary -> LPAREN expression RPAREN .)
+    TIMES           reduce using rule 23 (primary -> LPAREN expression RPAREN .)
+    DIVIDE          reduce using rule 23 (primary -> LPAREN expression RPAREN .)
+    PLUS            reduce using rule 23 (primary -> LPAREN expression RPAREN .)
+    MINUS           reduce using rule 23 (primary -> LPAREN expression RPAREN .)
+    VAR             reduce using rule 23 (primary -> LPAREN expression RPAREN .)
+    FUNC            reduce using rule 23 (primary -> LPAREN expression RPAREN .)
+    ID              reduce using rule 23 (primary -> LPAREN expression RPAREN .)
+    NUMBER          reduce using rule 23 (primary -> LPAREN expression RPAREN .)
+    $end            reduce using rule 23 (primary -> LPAREN expression RPAREN .)
+    RPAREN          reduce using rule 23 (primary -> LPAREN expression RPAREN .)
+    COMMA           reduce using rule 23 (primary -> LPAREN expression RPAREN .)
+    RBRACE          reduce using rule 23 (primary -> LPAREN expression RPAREN .)
+
+
+state 32
+
+    (12) assignment -> assignment PLUS term .
+    (15) term -> term . TIMES factor
+    (16) term -> term . DIVIDE factor
+
+    PLUS            reduce using rule 12 (assignment -> assignment PLUS term .)
+    MINUS           reduce using rule 12 (assignment -> assignment PLUS term .)
+    VAR             reduce using rule 12 (assignment -> assignment PLUS term .)
+    FUNC            reduce using rule 12 (assignment -> assignment PLUS term .)
+    ID              reduce using rule 12 (assignment -> assignment PLUS term .)
+    NUMBER          reduce using rule 12 (assignment -> assignment PLUS term .)
+    LPAREN          reduce using rule 12 (assignment -> assignment PLUS term .)
+    $end            reduce using rule 12 (assignment -> assignment PLUS term .)
+    RPAREN          reduce using rule 12 (assignment -> assignment PLUS term .)
+    COMMA           reduce using rule 12 (assignment -> assignment PLUS term .)
+    RBRACE          reduce using rule 12 (assignment -> assignment PLUS term .)
+    TIMES           shift and go to state 25
+    DIVIDE          shift and go to state 26
+
+
+state 33
+
+    (22) primary -> ID .
+
+    LPAREN          reduce using rule 22 (primary -> ID .)
+    TIMES           reduce using rule 22 (primary -> ID .)
+    DIVIDE          reduce using rule 22 (primary -> ID .)
+    PLUS            reduce using rule 22 (primary -> ID .)
+    MINUS           reduce using rule 22 (primary -> ID .)
+    VAR             reduce using rule 22 (primary -> ID .)
+    FUNC            reduce using rule 22 (primary -> ID .)
+    ID              reduce using rule 22 (primary -> ID .)
+    NUMBER          reduce using rule 22 (primary -> ID .)
+    $end            reduce using rule 22 (primary -> ID .)
+    RPAREN          reduce using rule 22 (primary -> ID .)
+    COMMA           reduce using rule 22 (primary -> ID .)
+    RBRACE          reduce using rule 22 (primary -> ID .)
+
+
+state 34
+
+    (13) assignment -> assignment MINUS term .
+    (15) term -> term . TIMES factor
+    (16) term -> term . DIVIDE factor
+
+    PLUS            reduce using rule 13 (assignment -> assignment MINUS term .)
+    MINUS           reduce using rule 13 (assignment -> assignment MINUS term .)
+    VAR             reduce using rule 13 (assignment -> assignment MINUS term .)
+    FUNC            reduce using rule 13 (assignment -> assignment MINUS term .)
+    ID              reduce using rule 13 (assignment -> assignment MINUS term .)
+    NUMBER          reduce using rule 13 (assignment -> assignment MINUS term .)
+    LPAREN          reduce using rule 13 (assignment -> assignment MINUS term .)
+    $end            reduce using rule 13 (assignment -> assignment MINUS term .)
+    RPAREN          reduce using rule 13 (assignment -> assignment MINUS term .)
+    COMMA           reduce using rule 13 (assignment -> assignment MINUS term .)
+    RBRACE          reduce using rule 13 (assignment -> assignment MINUS term .)
+    TIMES           shift and go to state 25
+    DIVIDE          shift and go to state 26
+
+
+state 35
+
+    (15) term -> term TIMES factor .
+
+    TIMES           reduce using rule 15 (term -> term TIMES factor .)
+    DIVIDE          reduce using rule 15 (term -> term TIMES factor .)
+    PLUS            reduce using rule 15 (term -> term TIMES factor .)
+    MINUS           reduce using rule 15 (term -> term TIMES factor .)
+    VAR             reduce using rule 15 (term -> term TIMES factor .)
+    FUNC            reduce using rule 15 (term -> term TIMES factor .)
+    ID              reduce using rule 15 (term -> term TIMES factor .)
+    NUMBER          reduce using rule 15 (term -> term TIMES factor .)
+    LPAREN          reduce using rule 15 (term -> term TIMES factor .)
+    $end            reduce using rule 15 (term -> term TIMES factor .)
+    RPAREN          reduce using rule 15 (term -> term TIMES factor .)
+    COMMA           reduce using rule 15 (term -> term TIMES factor .)
+    RBRACE          reduce using rule 15 (term -> term TIMES factor .)
+
+
+state 36
+
+    (16) term -> term DIVIDE factor .
+
+    TIMES           reduce using rule 16 (term -> term DIVIDE factor .)
+    DIVIDE          reduce using rule 16 (term -> term DIVIDE factor .)
+    PLUS            reduce using rule 16 (term -> term DIVIDE factor .)
+    MINUS           reduce using rule 16 (term -> term DIVIDE factor .)
+    VAR             reduce using rule 16 (term -> term DIVIDE factor .)
+    FUNC            reduce using rule 16 (term -> term DIVIDE factor .)
+    ID              reduce using rule 16 (term -> term DIVIDE factor .)
+    NUMBER          reduce using rule 16 (term -> term DIVIDE factor .)
+    LPAREN          reduce using rule 16 (term -> term DIVIDE factor .)
+    $end            reduce using rule 16 (term -> term DIVIDE factor .)
+    RPAREN          reduce using rule 16 (term -> term DIVIDE factor .)
+    COMMA           reduce using rule 16 (term -> term DIVIDE factor .)
+    RBRACE          reduce using rule 16 (term -> term DIVIDE factor .)
+
+
+state 37
+
+    (19) call -> primary LPAREN arguments . RPAREN
+    (24) arguments -> arguments . COMMA expression
+
+    RPAREN          shift and go to state 42
+    COMMA           shift and go to state 43
+
+
+state 38
+
+    (25) arguments -> expression .
+
+    RPAREN          reduce using rule 25 (arguments -> expression .)
+    COMMA           reduce using rule 25 (arguments -> expression .)
+
+
+state 39
+
+    (9) varDeclaration -> VAR ID ASSIGN expression .
+
+    VAR             reduce using rule 9 (varDeclaration -> VAR ID ASSIGN expression .)
+    FUNC            reduce using rule 9 (varDeclaration -> VAR ID ASSIGN expression .)
+    ID              reduce using rule 9 (varDeclaration -> VAR ID ASSIGN expression .)
+    NUMBER          reduce using rule 9 (varDeclaration -> VAR ID ASSIGN expression .)
+    LPAREN          reduce using rule 9 (varDeclaration -> VAR ID ASSIGN expression .)
+    $end            reduce using rule 9 (varDeclaration -> VAR ID ASSIGN expression .)
+    RBRACE          reduce using rule 9 (varDeclaration -> VAR ID ASSIGN expression .)
+
+
+state 40
+
+    (29) parameter_list -> ID .
+
+    RPAREN          reduce using rule 29 (parameter_list -> ID .)
+    COMMA           reduce using rule 29 (parameter_list -> ID .)
+
+
+state 41
+
+    (27) funcDeclaration -> FUNC ID LPAREN parameter_list . RPAREN LBRACE declaration_list RBRACE
+    (28) parameter_list -> parameter_list . COMMA ID
+
+    RPAREN          shift and go to state 44
+    COMMA           shift and go to state 45
+
+
+state 42
+
+    (19) call -> primary LPAREN arguments RPAREN .
+
+    TIMES           reduce using rule 19 (call -> primary LPAREN arguments RPAREN .)
+    DIVIDE          reduce using rule 19 (call -> primary LPAREN arguments RPAREN .)
+    PLUS            reduce using rule 19 (call -> primary LPAREN arguments RPAREN .)
+    MINUS           reduce using rule 19 (call -> primary LPAREN arguments RPAREN .)
+    VAR             reduce using rule 19 (call -> primary LPAREN arguments RPAREN .)
+    FUNC            reduce using rule 19 (call -> primary LPAREN arguments RPAREN .)
+    ID              reduce using rule 19 (call -> primary LPAREN arguments RPAREN .)
+    NUMBER          reduce using rule 19 (call -> primary LPAREN arguments RPAREN .)
+    LPAREN          reduce using rule 19 (call -> primary LPAREN arguments RPAREN .)
+    $end            reduce using rule 19 (call -> primary LPAREN arguments RPAREN .)
+    RPAREN          reduce using rule 19 (call -> primary LPAREN arguments RPAREN .)
+    COMMA           reduce using rule 19 (call -> primary LPAREN arguments RPAREN .)
+    RBRACE          reduce using rule 19 (call -> primary LPAREN arguments RPAREN .)
+
+
+state 43
+
+    (24) arguments -> arguments COMMA . expression
+    (10) expression -> . assignment
+    (11) assignment -> . ID ASSIGN assignment
+    (12) assignment -> . assignment PLUS term
+    (13) assignment -> . assignment MINUS term
+    (14) assignment -> . term
+    (15) term -> . term TIMES factor
+    (16) term -> . term DIVIDE factor
+    (17) term -> . factor
+    (18) factor -> . call
+    (19) call -> . primary LPAREN arguments RPAREN
+    (20) call -> . primary
+    (21) primary -> . NUMBER
+    (22) primary -> . ID
+    (23) primary -> . LPAREN expression RPAREN
+
+    ID              shift and go to state 8
+    NUMBER          shift and go to state 17
+    LPAREN          shift and go to state 11
+
+    expression                     shift and go to state 46
+    assignment                     shift and go to state 12
+    term                           shift and go to state 13
+    factor                         shift and go to state 14
+    call                           shift and go to state 15
+    primary                        shift and go to state 16
+
+state 44
+
+    (27) funcDeclaration -> FUNC ID LPAREN parameter_list RPAREN . LBRACE declaration_list RBRACE
+
+    LBRACE          shift and go to state 47
+
+
+state 45
+
+    (28) parameter_list -> parameter_list COMMA . ID
+
+    ID              shift and go to state 48
+
+
+state 46
+
+    (24) arguments -> arguments COMMA expression .
+
+    RPAREN          reduce using rule 24 (arguments -> arguments COMMA expression .)
+    COMMA           reduce using rule 24 (arguments -> arguments COMMA expression .)
+
+
+state 47
+
+    (27) funcDeclaration -> FUNC ID LPAREN parameter_list RPAREN LBRACE . declaration_list RBRACE
+    (2) declaration_list -> . declaration
+    (3) declaration_list -> . declaration_list declaration
+    (4) declaration -> . varDeclaration
+    (5) declaration -> . statement
+    (6) declaration -> . funcDeclaration
+    (8) varDeclaration -> . VAR ID
+    (9) varDeclaration -> . VAR ID ASSIGN expression
+    (7) statement -> . expression
+    (27) funcDeclaration -> . FUNC ID LPAREN parameter_list RPAREN LBRACE declaration_list RBRACE
+    (10) expression -> . assignment
+    (11) assignment -> . ID ASSIGN assignment
+    (12) assignment -> . assignment PLUS term
+    (13) assignment -> . assignment MINUS term
+    (14) assignment -> . term
+    (15) term -> . term TIMES factor
+    (16) term -> . term DIVIDE factor
+    (17) term -> . factor
+    (18) factor -> . call
+    (19) call -> . primary LPAREN arguments RPAREN
+    (20) call -> . primary
+    (21) primary -> . NUMBER
+    (22) primary -> . ID
+    (23) primary -> . LPAREN expression RPAREN
+
+    VAR             shift and go to state 7
+    FUNC            shift and go to state 10
+    ID              shift and go to state 8
+    NUMBER          shift and go to state 17
+    LPAREN          shift and go to state 11
+
+    declaration_list               shift and go to state 49
+    declaration                    shift and go to state 3
+    varDeclaration                 shift and go to state 4
+    statement                      shift and go to state 5
+    funcDeclaration                shift and go to state 6
+    expression                     shift and go to state 9
+    assignment                     shift and go to state 12
+    term                           shift and go to state 13
+    factor                         shift and go to state 14
+    call                           shift and go to state 15
+    primary                        shift and go to state 16
+
+state 48
+
+    (28) parameter_list -> parameter_list COMMA ID .
+
+    RPAREN          reduce using rule 28 (parameter_list -> parameter_list COMMA ID .)
+    COMMA           reduce using rule 28 (parameter_list -> parameter_list COMMA ID .)
+
+
+state 49
+
+    (27) funcDeclaration -> FUNC ID LPAREN parameter_list RPAREN LBRACE declaration_list . RBRACE
+    (3) declaration_list -> declaration_list . declaration
+    (4) declaration -> . varDeclaration
+    (5) declaration -> . statement
+    (6) declaration -> . funcDeclaration
+    (8) varDeclaration -> . VAR ID
+    (9) varDeclaration -> . VAR ID ASSIGN expression
+    (7) statement -> . expression
+    (27) funcDeclaration -> . FUNC ID LPAREN parameter_list RPAREN LBRACE declaration_list RBRACE
+    (10) expression -> . assignment
+    (11) assignment -> . ID ASSIGN assignment
+    (12) assignment -> . assignment PLUS term
+    (13) assignment -> . assignment MINUS term
+    (14) assignment -> . term
+    (15) term -> . term TIMES factor
+    (16) term -> . term DIVIDE factor
+    (17) term -> . factor
+    (18) factor -> . call
+    (19) call -> . primary LPAREN arguments RPAREN
+    (20) call -> . primary
+    (21) primary -> . NUMBER
+    (22) primary -> . ID
+    (23) primary -> . LPAREN expression RPAREN
+
+    RBRACE          shift and go to state 50
+    VAR             shift and go to state 7
+    FUNC            shift and go to state 10
+    ID              shift and go to state 8
+    NUMBER          shift and go to state 17
+    LPAREN          shift and go to state 11
+
+    declaration                    shift and go to state 18
+    varDeclaration                 shift and go to state 4
+    statement                      shift and go to state 5
+    funcDeclaration                shift and go to state 6
+    expression                     shift and go to state 9
+    assignment                     shift and go to state 12
+    term                           shift and go to state 13
+    factor                         shift and go to state 14
+    call                           shift and go to state 15
+    primary                        shift and go to state 16
+
+state 50
+
+    (27) funcDeclaration -> FUNC ID LPAREN parameter_list RPAREN LBRACE declaration_list RBRACE .
+
+    VAR             reduce using rule 27 (funcDeclaration -> FUNC ID LPAREN parameter_list RPAREN LBRACE declaration_list RBRACE .)
+    FUNC            reduce using rule 27 (funcDeclaration -> FUNC ID LPAREN parameter_list RPAREN LBRACE declaration_list RBRACE .)
+    ID              reduce using rule 27 (funcDeclaration -> FUNC ID LPAREN parameter_list RPAREN LBRACE declaration_list RBRACE .)
+    NUMBER          reduce using rule 27 (funcDeclaration -> FUNC ID LPAREN parameter_list RPAREN LBRACE declaration_list RBRACE .)
+    LPAREN          reduce using rule 27 (funcDeclaration -> FUNC ID LPAREN parameter_list RPAREN LBRACE declaration_list RBRACE .)
+    $end            reduce using rule 27 (funcDeclaration -> FUNC ID LPAREN parameter_list RPAREN LBRACE declaration_list RBRACE .)
+    RBRACE          reduce using rule 27 (funcDeclaration -> FUNC ID LPAREN parameter_list RPAREN LBRACE declaration_list RBRACE .)
 
 WARNING: 
 WARNING: Conflicts:
 WARNING: 
-WARNING: shift/reduce conflict for PLUS in state 22 resolved as shift
-WARNING: shift/reduce conflict for MINUS in state 22 resolved as shift
+WARNING: shift/reduce conflict for LPAREN in state 16 resolved as shift
+WARNING: shift/reduce conflict for PLUS in state 29 resolved as shift
+WARNING: shift/reduce conflict for MINUS in state 29 resolved as shift

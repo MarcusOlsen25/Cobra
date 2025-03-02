@@ -6,9 +6,9 @@ _tabversion = '3.10'
 
 _lr_method = 'LALR'
 
-_lr_signature = 'ASSIGN COMMA DIVIDE FUNC ID IF LPAREN MINUS NUMBER PLUS RPAREN THEN TIMES VARprogram : declaration_listdeclaration_list : declaration\n                        | declaration_list declarationdeclaration : varDeclaration\n                   | statementstatement : expressionvarDeclaration : VAR IDvarDeclaration : VAR ID ASSIGN expressionexpression : ID ASSIGN expressionexpression : expression PLUS termexpression : expression MINUS termexpression : termterm : term TIMES factorterm : term DIVIDE factorterm : factorfactor : NUMBERfactor : IDfactor : LPAREN expression RPAREN'
+_lr_signature = 'ASSIGN COMMA DIVIDE FUNC ID IF LBRACE LPAREN MINUS NUMBER PLUS RBRACE RETURN RPAREN THEN TIMES VARprogram : declaration_listdeclaration_list : declaration\n                        | declaration_list declarationdeclaration : varDeclaration\n                   | statement\n                   | funcDeclarationstatement : expressionvarDeclaration : VAR IDvarDeclaration : VAR ID ASSIGN expressionexpression : assignmentassignment : ID ASSIGN assignmentassignment : assignment PLUS termassignment : assignment MINUS termassignment : termterm : term TIMES factorterm : term DIVIDE factorterm : factorfactor : callcall : primary LPAREN arguments RPARENcall : primaryprimary : NUMBERprimary : IDprimary : LPAREN expression RPARENarguments : arguments COMMA expressionarguments : expressionarguments : funcDeclaration : FUNC ID LPAREN parameter_list RPAREN LBRACE declaration_list RBRACEparameter_list : parameter_list COMMA IDparameter_list : IDparameter_list :'
     
-_lr_action_items = {'VAR':([0,2,3,4,5,7,8,9,10,11,13,14,22,23,24,25,26,27,28,29,],[6,6,-2,-4,-5,-17,-6,-12,-15,-16,-3,-7,-9,-10,-17,-11,-13,-14,-18,-8,]),'ID':([0,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,21,22,23,24,25,26,27,28,29,],[7,7,-2,-4,-5,14,-17,-6,-12,-15,-16,7,-3,-7,7,24,24,24,24,7,-9,-10,-17,-11,-13,-14,-18,-8,]),'NUMBER':([0,2,3,4,5,7,8,9,10,11,12,13,14,15,16,17,18,19,21,22,23,24,25,26,27,28,29,],[11,11,-2,-4,-5,-17,-6,-12,-15,-16,11,-3,-7,11,11,11,11,11,11,-9,-10,-17,-11,-13,-14,-18,-8,]),'LPAREN':([0,2,3,4,5,7,8,9,10,11,12,13,14,15,16,17,18,19,21,22,23,24,25,26,27,28,29,],[12,12,-2,-4,-5,-17,-6,-12,-15,-16,12,-3,-7,12,12,12,12,12,12,-9,-10,-17,-11,-13,-14,-18,-8,]),'$end':([1,2,3,4,5,7,8,9,10,11,13,14,22,23,24,25,26,27,28,29,],[0,-1,-2,-4,-5,-17,-6,-12,-15,-16,-3,-7,-9,-10,-17,-11,-13,-14,-18,-8,]),'ASSIGN':([7,14,],[15,21,]),'TIMES':([7,9,10,11,23,24,25,26,27,28,],[-17,18,-15,-16,18,-17,18,-13,-14,-18,]),'DIVIDE':([7,9,10,11,23,24,25,26,27,28,],[-17,19,-15,-16,19,-17,19,-13,-14,-18,]),'PLUS':([7,8,9,10,11,20,22,23,24,25,26,27,28,29,],[-17,16,-12,-15,-16,16,16,-10,-17,-11,-13,-14,-18,16,]),'MINUS':([7,8,9,10,11,20,22,23,24,25,26,27,28,29,],[-17,17,-12,-15,-16,17,17,-10,-17,-11,-13,-14,-18,17,]),'RPAREN':([7,9,10,11,20,22,23,24,25,26,27,28,],[-17,-12,-15,-16,28,-9,-10,-17,-11,-13,-14,-18,]),}
+_lr_action_items = {'VAR':([0,2,3,4,5,6,8,9,12,13,14,15,16,17,18,19,29,31,32,33,34,35,36,39,42,47,49,50,],[7,7,-2,-4,-5,-6,-22,-7,-10,-14,-17,-18,-20,-21,-3,-8,-11,-23,-12,-22,-13,-15,-16,-9,-19,7,7,-27,]),'FUNC':([0,2,3,4,5,6,8,9,12,13,14,15,16,17,18,19,29,31,32,33,34,35,36,39,42,47,49,50,],[10,10,-2,-4,-5,-6,-22,-7,-10,-14,-17,-18,-20,-21,-3,-8,-11,-23,-12,-22,-13,-15,-16,-9,-19,10,10,-27,]),'ID':([0,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,23,24,25,26,27,28,29,30,31,32,33,34,35,36,39,42,43,45,47,49,50,],[8,8,-2,-4,-5,-6,19,-22,-7,21,8,-10,-14,-17,-18,-20,-21,-3,-8,8,33,33,33,33,8,8,-11,40,-23,-12,-22,-13,-15,-16,-9,-19,8,48,8,8,-27,]),'NUMBER':([0,2,3,4,5,6,8,9,11,12,13,14,15,16,17,18,19,20,23,24,25,26,27,28,29,31,32,33,34,35,36,39,42,43,47,49,50,],[17,17,-2,-4,-5,-6,-22,-7,17,-10,-14,-17,-18,-20,-21,-3,-8,17,17,17,17,17,17,17,-11,-23,-12,-22,-13,-15,-16,-9,-19,17,17,17,-27,]),'LPAREN':([0,2,3,4,5,6,8,9,11,12,13,14,15,16,17,18,19,20,21,23,24,25,26,27,28,29,31,32,33,34,35,36,39,42,43,47,49,50,],[11,11,-2,-4,-5,-6,-22,-7,11,-10,-14,-17,-18,27,-21,-3,-8,11,30,11,11,11,11,11,11,-11,-23,-12,-22,-13,-15,-16,-9,-19,11,11,11,-27,]),'$end':([1,2,3,4,5,6,8,9,12,13,14,15,16,17,18,19,29,31,32,33,34,35,36,39,42,50,],[0,-1,-2,-4,-5,-6,-22,-7,-10,-14,-17,-18,-20,-21,-3,-8,-11,-23,-12,-22,-13,-15,-16,-9,-19,-27,]),'RBRACE':([3,4,5,6,8,9,12,13,14,15,16,17,18,19,29,31,32,33,34,35,36,39,42,49,50,],[-2,-4,-5,-6,-22,-7,-10,-14,-17,-18,-20,-21,-3,-8,-11,-23,-12,-22,-13,-15,-16,-9,-19,50,-27,]),'ASSIGN':([8,19,],[20,28,]),'TIMES':([8,13,14,15,16,17,31,32,33,34,35,36,42,],[-22,25,-17,-18,-20,-21,-23,25,-22,25,-15,-16,-19,]),'DIVIDE':([8,13,14,15,16,17,31,32,33,34,35,36,42,],[-22,26,-17,-18,-20,-21,-23,26,-22,26,-15,-16,-19,]),'PLUS':([8,12,13,14,15,16,17,29,31,32,33,34,35,36,42,],[-22,23,-14,-17,-18,-20,-21,23,-23,-12,-22,-13,-15,-16,-19,]),'MINUS':([8,12,13,14,15,16,17,29,31,32,33,34,35,36,42,],[-22,24,-14,-17,-18,-20,-21,24,-23,-12,-22,-13,-15,-16,-19,]),'RPAREN':([8,12,13,14,15,16,17,22,27,29,30,31,32,33,34,35,36,37,38,40,41,42,46,48,],[-22,-10,-14,-17,-18,-20,-21,31,-26,-11,-30,-23,-12,-22,-13,-15,-16,42,-25,-29,44,-19,-24,-28,]),'COMMA':([8,12,13,14,15,16,17,27,29,30,31,32,33,34,35,36,37,38,40,41,42,46,48,],[-22,-10,-14,-17,-18,-20,-21,-26,-11,-30,-23,-12,-22,-13,-15,-16,43,-25,-29,45,-19,-24,-28,]),'LBRACE':([44,],[47,]),}
 
 _lr_action = {}
 for _k, _v in _lr_action_items.items():
@@ -17,7 +17,7 @@ for _k, _v in _lr_action_items.items():
       _lr_action[_x][_k] = _y
 del _lr_action_items
 
-_lr_goto_items = {'program':([0,],[1,]),'declaration_list':([0,],[2,]),'declaration':([0,2,],[3,13,]),'varDeclaration':([0,2,],[4,4,]),'statement':([0,2,],[5,5,]),'expression':([0,2,12,15,21,],[8,8,20,22,29,]),'term':([0,2,12,15,16,17,21,],[9,9,9,9,23,25,9,]),'factor':([0,2,12,15,16,17,18,19,21,],[10,10,10,10,10,10,26,27,10,]),}
+_lr_goto_items = {'program':([0,],[1,]),'declaration_list':([0,47,],[2,49,]),'declaration':([0,2,47,49,],[3,18,3,18,]),'varDeclaration':([0,2,47,49,],[4,4,4,4,]),'statement':([0,2,47,49,],[5,5,5,5,]),'funcDeclaration':([0,2,47,49,],[6,6,6,6,]),'expression':([0,2,11,27,28,43,47,49,],[9,9,22,38,39,46,9,9,]),'assignment':([0,2,11,20,27,28,43,47,49,],[12,12,12,29,12,12,12,12,12,]),'term':([0,2,11,20,23,24,27,28,43,47,49,],[13,13,13,13,32,34,13,13,13,13,13,]),'factor':([0,2,11,20,23,24,25,26,27,28,43,47,49,],[14,14,14,14,14,14,35,36,14,14,14,14,14,]),'call':([0,2,11,20,23,24,25,26,27,28,43,47,49,],[15,15,15,15,15,15,15,15,15,15,15,15,15,]),'primary':([0,2,11,20,23,24,25,26,27,28,43,47,49,],[16,16,16,16,16,16,16,16,16,16,16,16,16,]),'arguments':([27,],[37,]),'parameter_list':([30,],[41,]),}
 
 _lr_goto = {}
 for _k, _v in _lr_goto_items.items():
@@ -27,22 +27,34 @@ for _k, _v in _lr_goto_items.items():
 del _lr_goto_items
 _lr_productions = [
   ("S' -> program","S'",1,None,None,None),
-  ('program -> declaration_list','program',1,'p_program','Parser.py',6),
-  ('declaration_list -> declaration','declaration_list',1,'p_declaration_list','Parser.py',10),
-  ('declaration_list -> declaration_list declaration','declaration_list',2,'p_declaration_list','Parser.py',11),
-  ('declaration -> varDeclaration','declaration',1,'p_declaration','Parser.py',18),
-  ('declaration -> statement','declaration',1,'p_declaration','Parser.py',19),
-  ('statement -> expression','statement',1,'p_statement','Parser.py',23),
-  ('varDeclaration -> VAR ID','varDeclaration',2,'p_varDeclaration_uninitialized','Parser.py',26),
-  ('varDeclaration -> VAR ID ASSIGN expression','varDeclaration',4,'p_varDeclaration_initialized','Parser.py',30),
-  ('expression -> ID ASSIGN expression','expression',3,'p_expression_assign','Parser.py',34),
-  ('expression -> expression PLUS term','expression',3,'p_expression_plus','Parser.py',38),
-  ('expression -> expression MINUS term','expression',3,'p_expression_minus','Parser.py',42),
-  ('expression -> term','expression',1,'p_expression_term','Parser.py',46),
-  ('term -> term TIMES factor','term',3,'p_term_times','Parser.py',50),
-  ('term -> term DIVIDE factor','term',3,'p_term_div','Parser.py',54),
-  ('term -> factor','term',1,'p_term_factor','Parser.py',58),
-  ('factor -> NUMBER','factor',1,'p_factor_num','Parser.py',62),
-  ('factor -> ID','factor',1,'p_factor_var','Parser.py',66),
-  ('factor -> LPAREN expression RPAREN','factor',3,'p_factor_expr','Parser.py',70),
+  ('program -> declaration_list','program',1,'p_program','Parser.py',7),
+  ('declaration_list -> declaration','declaration_list',1,'p_declaration_list','Parser.py',12),
+  ('declaration_list -> declaration_list declaration','declaration_list',2,'p_declaration_list','Parser.py',13),
+  ('declaration -> varDeclaration','declaration',1,'p_declaration','Parser.py',21),
+  ('declaration -> statement','declaration',1,'p_declaration','Parser.py',22),
+  ('declaration -> funcDeclaration','declaration',1,'p_declaration','Parser.py',23),
+  ('statement -> expression','statement',1,'p_statement','Parser.py',29),
+  ('varDeclaration -> VAR ID','varDeclaration',2,'p_varDeclaration_uninitialized','Parser.py',34),
+  ('varDeclaration -> VAR ID ASSIGN expression','varDeclaration',4,'p_varDeclaration_initialized','Parser.py',40),
+  ('expression -> assignment','expression',1,'p_expression_assignment','Parser.py',45),
+  ('assignment -> ID ASSIGN assignment','assignment',3,'p_assignment','Parser.py',51),
+  ('assignment -> assignment PLUS term','assignment',3,'p_expression_plus','Parser.py',56),
+  ('assignment -> assignment MINUS term','assignment',3,'p_expression_minus','Parser.py',61),
+  ('assignment -> term','assignment',1,'p_expression_term','Parser.py',66),
+  ('term -> term TIMES factor','term',3,'p_term_times','Parser.py',71),
+  ('term -> term DIVIDE factor','term',3,'p_term_div','Parser.py',76),
+  ('term -> factor','term',1,'p_term_factor','Parser.py',81),
+  ('factor -> call','factor',1,'p_factor_num','Parser.py',86),
+  ('call -> primary LPAREN arguments RPAREN','call',4,'p_call_func','Parser.py',91),
+  ('call -> primary','call',1,'p_call_other','Parser.py',96),
+  ('primary -> NUMBER','primary',1,'p_primary_number','Parser.py',101),
+  ('primary -> ID','primary',1,'p_primary_ID','Parser.py',106),
+  ('primary -> LPAREN expression RPAREN','primary',3,'p_primary','Parser.py',111),
+  ('arguments -> arguments COMMA expression','arguments',3,'p_arguments_multiple','Parser.py',117),
+  ('arguments -> expression','arguments',1,'p_arguments_single','Parser.py',121),
+  ('arguments -> <empty>','arguments',0,'p_arguments_empty','Parser.py',125),
+  ('funcDeclaration -> FUNC ID LPAREN parameter_list RPAREN LBRACE declaration_list RBRACE','funcDeclaration',8,'p_funcDeclaration_statement','Parser.py',131),
+  ('parameter_list -> parameter_list COMMA ID','parameter_list',3,'p_parameter_list_multiple','Parser.py',137),
+  ('parameter_list -> ID','parameter_list',1,'p_parameter_list_single','Parser.py',141),
+  ('parameter_list -> <empty>','parameter_list',0,'p_parameter_list_empty','Parser.py',145),
 ]

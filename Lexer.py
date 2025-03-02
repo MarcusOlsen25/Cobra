@@ -5,7 +5,8 @@ import ply.lex as lex
 reserved = {"if": "IF",
             "then": "THEN",
             "func": "FUNC",
-            "var": "VAR"
+            "var": "VAR",
+            "return": "RETURN"
             }
 
 tokens = [
@@ -18,7 +19,9 @@ tokens = [
    'RPAREN',
    'ID',
    'COMMA',
-   'ASSIGN'
+   'ASSIGN',
+   'LBRACE',
+   'RBRACE'
 ] + list(reserved.values())
 
 # Regular expression rules for simple tokens
@@ -30,6 +33,8 @@ t_LPAREN  = r'\('
 t_RPAREN  = r'\)'
 t_COMMA   = r','
 t_ASSIGN  = r'='
+t_LBRACE  = r'{'
+t_RBRACE  = r'}'
 
 # A regular expression rule with some action code
 def t_NUMBER(t):
