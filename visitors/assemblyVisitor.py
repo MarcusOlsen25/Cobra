@@ -1,8 +1,12 @@
 from .visitor import Visitor
 from ASTexpressions import *
+from scope.SymbolTable import *
+from ASTstatements import *
 
 class AssemblyVisitor(Visitor):
 
+    def __init__(self, table: SymbolTable):
+        self.table = table
     
     def visitBinaryExpression(self, expr: BinaryExpression):
 
@@ -15,6 +19,22 @@ class AssemblyVisitor(Visitor):
     def visitNumberExpression(self, expr: NumberExpression):
         return str(expr.value)
     
+    def visitVarExpression(self, expr: VarExpression):
+        value = str(self.table.lookup(expr.var))
+        return str(value)
+    
+    def visitAssignExpression(self, expr: AssignExpression):
+        pass
+    
+    def visitVarDeclaration(self, stmt: VarDeclaration):
+        if stmt.initializer != None:
+            initializer = stmt.initializer.accept(self)
+            return f"{initializer}\npushq %rax\n"
+        else:
+            return f"subq $8, %rsp\n"
+
+    
+   
     def popAddSubNumber(self, operator: str):
         if operator == "+":
             operator = "addq"

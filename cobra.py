@@ -6,6 +6,7 @@ from visitors.evalVisitor import EvalVisitor
 from visitors.assemblyVisitor import AssemblyVisitor
 from visitors.nodeVisitor import NodeVisitor
 from visitors.scopeVisitor import ScopeVisitor
+from scope.SymbolTable import *
 
 lexer = lex.lex()
 
@@ -30,19 +31,24 @@ var f = a + b
 '''
 
 data = '''
-var a = 4
-var b = 3
-var c = 2
-a+b*c
+var a = 3+4
+a = 1+2
 '''
 
 result = parser.parse(data)
 
+table = SymbolTable(None)
+
 printVisitor = PrintVisitor()
-assemblyVisitor = AssemblyVisitor()
 evalVisitor = EvalVisitor()
 nodeVisitor = NodeVisitor()
-scopeVisitor = ScopeVisitor()
+
+scopeVisitor = ScopeVisitor(table)
+assemblyVisitor = AssemblyVisitor(table)
+
 for statement in result:
-    res = statement.accept(evalVisitor)
-    print(res) 
+    res = statement.accept(scopeVisitor)
+
+for s in result:
+    res2 = s.accept(assemblyVisitor)
+    print(res2)

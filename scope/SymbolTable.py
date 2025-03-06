@@ -5,11 +5,16 @@ class SymbolTable:
     via the parent reference.
     """
     def __init__(self, parent):
+        self.counter = 0
         self._tab = {}
         self.parent = parent
 
     def insert(self, name, value):
         self._tab[name] = value
+
+    def insertExisting(self, name, value):
+        entry = self.lookup(name)
+        self._tab[name] = Value(value, entry.position)
 
     def lookup(self, name):
         if name in self._tab:
@@ -18,3 +23,12 @@ class SymbolTable:
             return self.parent.lookup(name)
         else:
             return None
+        
+    def decrementCounter(self):
+        self.counter -= 8
+        return self.counter
+        
+class Value:
+    def __init__(self, value, position):
+        self.value = value
+        self.position = position
