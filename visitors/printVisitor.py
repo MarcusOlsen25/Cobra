@@ -29,7 +29,7 @@ class PrintVisitor(Visitor):
         body = []
         for s in stmt.body:
             body.append(s.accept(self))
-        return f"({stmt.var}, {stmt.params}, {body})"
+        return f"({stmt.var}, {[param.accept(self) for param in stmt.params]} : {body})"
     
     def visitCallExpression(self, expr: CallExpression):
         var = expr.var.accept(self)

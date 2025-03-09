@@ -36,4 +36,10 @@ class EvalVisitor(Visitor):
     
     def visitAssignExpression(self, expr: AssignExpression):
         self.table.insert(expr.var, expr.value.accept(self))
+
+    def visitFunctionDeclaration(self, stmt: FunctionDeclaration):
+        pass
+
+    def visitCallExpression(self, expr: CallExpression):
+        pass
     

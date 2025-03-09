@@ -31,24 +31,35 @@ var f = a + b
 '''
 
 data = '''
-var a = 3+4
-a = 1+2
+func add(x,y) {
+    func div(a,b) {
+        func three(e,r) {
+            add(1,2)
+            div(1,2)
+            three(1,2)
+        }
+    }
+}
+func four(f,g) {
+    f + g
+}
+four(1,2)
+
+
 '''
 
 result = parser.parse(data)
 
-table = SymbolTable(None)
 
 printVisitor = PrintVisitor()
 evalVisitor = EvalVisitor()
 nodeVisitor = NodeVisitor()
 
+table = SymbolTable(None)
+
 scopeVisitor = ScopeVisitor(table)
+
 assemblyVisitor = AssemblyVisitor(table)
 
 for statement in result:
     res = statement.accept(scopeVisitor)
-
-for s in result:
-    res2 = s.accept(assemblyVisitor)
-    print(res2)

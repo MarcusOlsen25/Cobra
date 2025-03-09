@@ -19,18 +19,47 @@ class ScopeVisitor(Visitor):
         return self.table.lookup(expr.var)
     
     def visitAssignExpression(self, expr: AssignExpression):
-        value = expr.value.accept(self)
-        self.table.insertExisting(expr.var, value)
-        print(str(expr.var) + " : " + str(self.table.lookup(expr.var).value) + " : " + str(self.table.lookup(expr.var).position))
+        pass
     
     def visitVarDeclaration(self, stmt: VarDeclaration):
-        if stmt.initializer != None:
-            initializer = stmt.initializer.accept(self)
-            self.table.insert(stmt.var, Value(initializer, self.table.decrementCounter()))
-            print("var " + str(stmt.var) + " : " + str(self.table.lookup(stmt.var).position))
-        else:
-            self.table.insert(stmt.var, Value(None, self.table.decrementCounter()))
-            print("var " + str(stmt.var) + " : " + "uninitialized")
+        #int by default
+        self.table.insert(stmt, "int", None)
+
+    #Using func as a type
+    def visitFunctionDeclaration(self, stmt: FunctionDeclaration):
+        newTable = SymbolTable(self.table)
+        self.table.insert(stmt, "func", newTable)
+        self.table = newTable
+
+        for param in stmt.params:
+            param.accept(self)
+
+        for s in stmt.body:
+            s.accept(self)
+        
+        self.table = self.table.parent
+
+
+    def visitCallExpression(self, expr: CallExpression):
+        entry = expr.var.accept(self)
+
+        #Debugging
+        print(f"Function symbol: {entry.name}, {entry.params}, Level: {entry.level}")
+        
+        correctParams = len(entry.params) == len(expr.arguments)
+
+        for arg in expr.arguments:
+            arg.accept(self)
+
+        
+
+        
+
+
+
+
+        
+
 
 
     

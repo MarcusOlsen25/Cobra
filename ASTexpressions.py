@@ -35,7 +35,7 @@ class AssignExpression(Expr):
         return visitor.visitAssignExpression(self)
 
 class CallExpression(Expr):
-    def __init__(self, var: str, arguments: list[str]):
+    def __init__(self, var: str, arguments: list[Expr]):
         self.var = var
         self.arguments = arguments
 

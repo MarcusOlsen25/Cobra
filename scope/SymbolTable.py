@@ -1,3 +1,6 @@
+from ASTstatements import *
+
+
 class SymbolTable:
     """Implements a classic symbol table for static nested
     scope. Names for each scope are collected in a
@@ -8,15 +11,18 @@ class SymbolTable:
         self.counter = 0
         self._tab = {}
         self.parent = parent
+        if parent != None:
+            self.level = parent.level + 1
+        else:
+            self.level = 0
 
-    def insert(self, name, value):
-        self._tab[name] = value
+    def insert(self, stmt: Stmt, type: str, newTable: 'SymbolTable'):
+        if isinstance(stmt, VarDeclaration):
+            self._tab[stmt.var] = SymbolTable.VariableValue(type, self.decrementCounter())
+        else:
+            self._tab[stmt.var] = SymbolTable.FunctionValue(stmt, self, newTable)
 
-    def insertExisting(self, name, value):
-        entry = self.lookup(name)
-        self._tab[name] = Value(value, entry.position)
-
-    def lookup(self, name):
+    def lookup(self, name: str):
         if name in self._tab:
             return self._tab[name]
         elif self.parent:
@@ -28,7 +34,20 @@ class SymbolTable:
         self.counter -= 8
         return self.counter
         
-class Value:
-    def __init__(self, value, position):
-        self.value = value
-        self.position = position
+    class VariableValue:
+        def __init__(self, type: str, offset: int):
+            self.type = type
+            self.offset = offset
+
+    class FunctionValue:
+        def __init__(self, stmt: FunctionDeclaration, currentTable: 'SymbolTable', newTable: 'SymbolTable'):
+            self.name = stmt.var
+            self.params = stmt.params
+            self.body = stmt.body
+            #int by default
+            self.returnType = "int"
+            self.level = currentTable.level
+            self.table = newTable
+
+
+

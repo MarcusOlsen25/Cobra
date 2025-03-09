@@ -1,11 +1,11 @@
-from ASTexpressions import Expr
+from ASTexpressions import *
 
 class Stmt:
     pass
 
 class VarDeclaration(Stmt):
     #Add type
-    def __init__(self, var: str, initializer: str ):
+    def __init__(self, var: str, initializer: Expr):
         self.var = var
         self.initializer = initializer
 
@@ -13,7 +13,7 @@ class VarDeclaration(Stmt):
         return visitor.visitVarDeclaration(self)
     
 class FunctionDeclaration(Stmt):
-    def __init__(self, var: str, params: list[str], body: list[Stmt], returnValue: Expr):
+    def __init__(self, var: str, params: list[VarDeclaration], body: list[Stmt], returnValue: Expr):
         self.var = var
         self.params = params
         self.body = body
