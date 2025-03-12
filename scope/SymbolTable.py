@@ -8,14 +8,14 @@ class SymbolTable:
     via the parent reference.
     """
     def __init__(self, parent):
-        self.counter = 0
+        self.counter = 8
         self._tab = {}
         self.parent = parent
         if parent != None:
             self.level = parent.level + 1
         else:
             self.level = 0
-
+            
     def insert(self, stmt: Stmt, type: str, newTable: 'SymbolTable'):
         if isinstance(stmt, VarDeclaration):
             self._tab[stmt.var] = SymbolTable.VariableValue(type, self.decrementCounter())
@@ -31,7 +31,7 @@ class SymbolTable:
             return None
         
     def decrementCounter(self):
-        self.counter -= 8
+        self.counter += 8
         return self.counter
         
     class VariableValue:

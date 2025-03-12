@@ -4,21 +4,24 @@ form:
         .string	"%d\n"
 
 .text
-
+add:
+        pushq %rbp
+        movq %rsp, %rbp
+        movq 24(%rbp), %rax
+        pushq %rax
+        movq 16(%rbp), %rax
+        popq %rbx
+        addq %rbx, %rax
+        popq %rbp
+        ret
 .globl main
 main:
-
-movq $10, %rax
-movq $4, %rdx
-imulq %rdx, %rax
+movq $3, %rax
 pushq %rax
-movq $8, %rax
-movq $2, %rbx
-movq $0, %rdx
-idivq %rbx
-popq %rbx
-subq %rax, %rbx
-
+movq $2, %rax
+pushq %rax
+call add
+addq $16, %rsp
 
 leaq form(%rip), %rdi	# Passing string address (1. argument)
 	movq %rax,%rsi		# Passing %rax (2. argument)
@@ -36,4 +39,4 @@ endsba:
 
 				# Callee epilogue
         movq $0, %rax           # Return "no error" exit code
-	ret			# Return from call
+	ret		# Return from call

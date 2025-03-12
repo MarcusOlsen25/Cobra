@@ -32,18 +32,9 @@ var f = a + b
 
 data = '''
 func add(x,y) {
-    func div(a,b) {
-        func three(e,r) {
-            add(1,2)
-            div(1,2)
-            three(1,2)
-        }
-    }
+    x + y
 }
-func four(f,g) {
-    f + g
-}
-four(1,2)
+add(2,3)
 
 
 '''
@@ -61,5 +52,22 @@ scopeVisitor = ScopeVisitor(table)
 
 assemblyVisitor = AssemblyVisitor(table)
 
+#Scope check
 for statement in result:
     res = statement.accept(scopeVisitor)
+
+#Code generation
+for s in result:
+    s.accept(assemblyVisitor)
+
+#Append functions and main
+program = []
+
+for function in assemblyVisitor.functions.values():
+    program.extend(function)
+
+program += assemblyVisitor.main
+program += ["popq %rbp\nret"]
+
+for p in program:
+    print(p)

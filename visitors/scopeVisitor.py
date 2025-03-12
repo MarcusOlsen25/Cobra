@@ -42,9 +42,6 @@ class ScopeVisitor(Visitor):
 
     def visitCallExpression(self, expr: CallExpression):
         entry = expr.var.accept(self)
-
-        #Debugging
-        print(f"Function symbol: {entry.name}, {entry.params}, Level: {entry.level}")
         
         correctParams = len(entry.params) == len(expr.arguments)
 

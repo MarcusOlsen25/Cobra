@@ -7,108 +7,91 @@ class AssemblyVisitor(Visitor):
 
     def __init__(self, table: SymbolTable):
         self.table = table
+        self.main = [".globl main", "main:", "pushq %rbp", "movq %rsp, %rbp"]
+        self.functions = {"text": [".text"]}
+        self.functionStack = []
+
+    def generateCode(self, output: str):
+        if len(self.functionStack) == 0:
+            self.main.append(output)
+        else:
+            current_function = self.functionStack[-1]
+            self.functions[current_function].append("\t" + output)
     
     def visitBinaryExpression(self, expr: BinaryExpression):
+        expr.right.accept(self)
+        self.generateCode("pushq %rax")
+        expr.left.accept(self)
+        self.generateCode("popq %rbx")
 
-        if expr.operator == "*" or expr.operator == "/":
-            return self.mult_div_operators(expr)
-        
-        elif expr.operator == "+" or expr.operator == "-":
-            return self.add_sub_operators(expr)
+        match expr.operator:
+            case "+":
+                self.generateCode("addq %rbx, %rax")
+            case "-":
+                self.generateCode("subq %rbx, %rax")
+            case "*":
+                self.generateCode("imulq %rbx, %rax")
+            case "/":
+                self.generateCode("movq $0, %rdx")
+                self.generateCode("idivq %rbx")
 
     def visitNumberExpression(self, expr: NumberExpression):
-        return str(expr.value)
+        output = f"movq ${expr.value}, %rax"
+        self.generateCode(output)
     
     def visitVarExpression(self, expr: VarExpression):
-        value = str(self.table.lookup(expr.var))
-        return str(value)
+        entry = self.table.lookup(expr.var)
+        if isinstance(entry, SymbolTable.FunctionValue):
+            return entry
+        else:
+            self.generateCode(f"movq {entry.offset}(%rbp), %rax")
     
     def visitAssignExpression(self, expr: AssignExpression):
         pass
     
     def visitVarDeclaration(self, stmt: VarDeclaration):
         if stmt.initializer != None:
-            initializer = stmt.initializer.accept(self)
-            return f"{initializer}\npushq %rax\n"
+            stmt.initializer.accept(self)
+            self.generateCode("pushq %rax")
         else:
-            return f"subq $8, %rsp\n"
-
-    
-   
-    def popAddSubNumber(self, operator: str):
-        if operator == "+":
-            operator = "addq"
-        else:
-            operator = "subq"
-        return f"popq %rbx\n{operator} %rax, %rbx\n"
-    
-    def popMultDivNumber(self, operator: str):
-        if operator == "*":
-            operator = "imulq"
-        else:
-            operator = "idivq"
-        return f"popq %rdx\n{operator} %rdx, %rax\n"
-    
-    def pushExpression(self):
-        return "pushq %rax\n"
-    
-    def addSub(self, x: int, operator: str):
-        if operator == "+":
-            operator = "add"
-        else:
-            operator = "sub"
-        return f"{operator}q ${x}, %rax\n"
-    
-    def addSubBoth(self, x: int, y: int, operator: str): 
-        if operator == "+":
-            operator = "addq"
-        else:
-            operator = "subq"
-        return f"movq ${x}, %rax\n{operator} ${y}, %rax\n"
-    
-    def multDivBoth(self, x: int, y: int, operator: str):
-        if operator == "*":
-            return f"movq ${x}, %rax\nmovq ${y}, %rdx\nimulq %rdx, %rax\n"
-        else:
-            return f"movq ${x}, %rax\nmovq ${y}, %rbx\nmovq $0, %rdx\nidivq %rbx\n"
-    
-    def multDiv(self, x: int, operator: str):
-        if operator == "*":    
-            return f"movq ${x}, %rdx\nimulq %rdx, %rax\n"
-        else:
-            return f"movq ${x}, %rbx\nmovq $0, %rdx\nidivq %rbx\n"
-    
-    def add_sub_operators(self, expr: BinaryExpression):
-
-        left = expr.left.accept(self)
-        right = expr.right.accept(self)
-
-        if isinstance(expr.left, NumberExpression) and isinstance(expr.right, NumberExpression):
-            return self.addSubBoth(left, right, expr.operator)
+            self.generateCode("subq $8, %rsp")
         
-        elif isinstance(expr.right, NumberExpression):
-            return left + self.addSub(right, expr.operator)
+    def visitFunctionDeclaration(self, stmt: FunctionDeclaration):
+        self.functionStack.append(stmt.var)
 
-        elif isinstance(expr.left, NumberExpression):
-            return right + self.addSub(left, expr.operator)
-        
-        else:
-            return left + self.pushExpression() + right + self.popAddSubNumber(expr.operator)
-        
+        self.functions[stmt.var] = [f"{stmt.var}:"]
 
-    def mult_div_operators(self, expr: BinaryExpression):
+        self.startFunction()
 
-        left = expr.left.accept(self)
-        right = expr.right.accept(self)
+        entry = self.table.lookup(stmt.var)
+        self.table = entry.table
 
-        if isinstance(expr.left, NumberExpression) and isinstance(expr.right, NumberExpression):
-            return self.multDivBoth(left, right, expr.operator)
-        
-        elif isinstance(expr.right, NumberExpression):
-            return left + self.multDiv(right, expr.operator)
+        for s in stmt.body:
+            s.accept(self)
 
-        elif isinstance(expr.left, NumberExpression):
-            return right + self.multDiv(left, expr.operator)
-        
-        else:
-            return left + self.pushExpression() + right + self.popMultDivNumber(expr.operator)
+        self.endFunction(len(stmt.params))
+
+        self.table = self.table.parent
+
+        self.functionStack.pop()
+
+    def visitCallExpression(self, expr: CallExpression):
+        entry = expr.var.accept(self)
+
+        for i in range(len(expr.arguments)-1, -1, -1):
+            expr.arguments[i].accept(self)
+            self.generateCode("pushq %rax")
+
+        self.generateCode(f"call {entry.name}")
+        self.generateCode(self.popArgs(len(expr.arguments)))
+
+    def startFunction(self):
+        self.generateCode("pushq %rbp\n\tmovq %rsp, %rbp")
+
+    def endFunction(self, args: int):
+        self.generateCode("popq %rbp")
+        self.generateCode("ret")
+
+    def popArgs(self, args: int):
+        argsToPop = 8 * args
+        return f"addq ${argsToPop}, %rsp"
