@@ -7,7 +7,7 @@ class AssemblyVisitor(Visitor):
 
     def __init__(self, table: SymbolTable):
         self.table = table
-        self.main = [".globl main", "main:", "pushq %rbp", "movq %rsp, %rbp"]
+        self.main = [".globl main", "main:", "pushq %rbp\t\t\t# Save base pointer", "movq %rsp, %rbp\t\t\t# Make stack pointer new base pointer"]
         self.functions = {"text": [".text"]}
         self.functionStack = []
 
@@ -20,31 +20,30 @@ class AssemblyVisitor(Visitor):
     
     def visitBinaryExpression(self, expr: BinaryExpression):
         expr.right.accept(self)
-        self.generateCode("pushq %rax")
+        self.generateCode("pushq %rax\t\t\t# Push right side to stack")
         expr.left.accept(self)
-        self.generateCode("popq %rbx")
+        self.generateCode("popq %rbx\t\t\t# Pop right side into %rbx")
 
         match expr.operator:
             case "+":
-                self.generateCode("addq %rbx, %rax")
+                self.generateCode("addq %rbx, %rax\t\t\t# Add both sides")
             case "-":
-                self.generateCode("subq %rbx, %rax")
+                self.generateCode("subq %rbx, %rax\t\t\t# Subtract both sides")
             case "*":
-                self.generateCode("imulq %rbx, %rax")
+                self.generateCode("imulq %rbx, %rax\t\t# Multiply both sides")
             case "/":
-                self.generateCode("movq $0, %rdx")
-                self.generateCode("idivq %rbx")
+                self.generateCode("movq $0, %rdx\t\t\t# Put a 0 in %rdx to prepare for the division")
+                self.generateCode("idivq %rbx\t\t\t# Divide both sides")
 
     def visitNumberExpression(self, expr: NumberExpression):
-        output = f"movq ${expr.value}, %rax"
-        self.generateCode(output)
+        self.generateCode(f"movq ${expr.value}, %rax\t\t\t# Put a number in %rax")
     
     def visitVarExpression(self, expr: VarExpression):
         entry = self.table.lookup(expr.var)
         if isinstance(entry, SymbolTable.FunctionValue):
             return entry
         else:
-            self.generateCode(f"movq {entry.offset}(%rbp), %rax")
+            self.generateCode(f"movq {entry.offset}(%rbp), %rax\t\t# Assign an argument to %rax")
     
     def visitAssignExpression(self, expr: AssignExpression):
         pass
@@ -52,9 +51,9 @@ class AssemblyVisitor(Visitor):
     def visitVarDeclaration(self, stmt: VarDeclaration):
         if stmt.initializer != None:
             stmt.initializer.accept(self)
-            self.generateCode("pushq %rax")
+            self.generateCode("pushq %rax\t\t\t# Push the newly declared value unto the stack")
         else:
-            self.generateCode("subq $8, %rsp")
+            self.generateCode("subq $8, %rsp\t\t\t# Move the stack pointer to make room for an uninitialised variable")
         
     def visitFunctionDeclaration(self, stmt: FunctionDeclaration):
         self.functionStack.append(stmt.var)
@@ -80,18 +79,19 @@ class AssemblyVisitor(Visitor):
 
         for i in range(len(expr.arguments)-1, -1, -1):
             expr.arguments[i].accept(self)
-            self.generateCode("pushq %rax")
+            self.generateCode(f"pushq %rax\t\t\t# Push argument number {i+1} to stack")
 
-        self.generateCode(f"call {entry.name}")
+        self.generateCode(f"call {entry.name}\t\t\t# Call the {entry.name} function ")
         self.generateCode(self.popArgs(len(expr.arguments)))
 
     def startFunction(self):
-        self.generateCode("pushq %rbp\n\tmovq %rsp, %rbp")
+        self.generateCode("pushq %rbp\t\t\t# Save base pointer\n\tmovq %rsp, %rbp\t\t\t# Make stack pointer new base pointer")
 
     def endFunction(self, args: int):
-        self.generateCode("popq %rbp")
-        self.generateCode("ret")
+        self.generateCode("popq %rbp\t\t\t# Restore base pointer")
+        self.generateCode("ret\t\t\t\t# Return from the function")
 
+    """Moves the stack pointer back to nullify the arguments pushed to the stack."""
     def popArgs(self, args: int):
         argsToPop = 8 * args
-        return f"addq ${argsToPop}, %rsp"
+        return f"addq ${argsToPop}, %rsp\t\t\t# Pop the arguments pushed to the stack"
