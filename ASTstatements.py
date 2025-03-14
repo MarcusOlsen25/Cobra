@@ -21,5 +21,13 @@ class FunctionDeclaration(Stmt):
 
     def accept(self, visitor):
         return visitor.visitFunctionDeclaration(self)
+    
+class ParameterStatement(Stmt):
+    def __init__(self, var: str):
+        self.var = var
+
+    def accept(self, visitor):
+        return visitor.visitParameterStatement(self)
+        
 
     

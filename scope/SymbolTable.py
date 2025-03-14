@@ -8,7 +8,8 @@ class SymbolTable:
     via the parent reference.
     """
     def __init__(self, parent):
-        self.counter = 8
+        self.paramCounter = 8
+        self.varCounter = 0
         self._tab = {}
         self.parent = parent
         if parent != None:
@@ -18,7 +19,9 @@ class SymbolTable:
             
     def insert(self, stmt: Stmt, type: str, newTable: 'SymbolTable'):
         if isinstance(stmt, VarDeclaration):
-            self._tab[stmt.var] = SymbolTable.VariableValue(type, self.decrementCounter())
+            self._tab[stmt.var] = SymbolTable.VariableValue(type, self.incrementVarCounter())
+        elif isinstance(stmt, ParameterStatement):
+            self._tab[stmt.var] = SymbolTable.VariableValue(type, self.incrementParamCounter())
         else:
             self._tab[stmt.var] = SymbolTable.FunctionValue(stmt, self, newTable)
 
@@ -30,9 +33,13 @@ class SymbolTable:
         else:
             return None
         
-    def decrementCounter(self):
-        self.counter += 8
-        return self.counter
+    def incrementVarCounter(self):
+        self.varCounter += 8
+        return self.varCounter
+    
+    def incrementParamCounter(self):
+        self.paramCounter += 8
+        return self.paramCounter
         
     class VariableValue:
         def __init__(self, type: str, offset: int):
@@ -48,6 +55,3 @@ class SymbolTable:
             self.returnType = "int"
             self.level = currentTable.level
             self.table = newTable
-
-
-

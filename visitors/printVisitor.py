@@ -23,7 +23,7 @@ class PrintVisitor(Visitor):
         if stmt.initializer == None:
             return f"var {stmt.var} = " + str(None)
         else:
-            return f"var {stmt.var} = {stmt.initializer.accept(self)}"
+            return f"var {stmt.var} = {stmt.initializer.accept(self)}"  
         
     def visitFunctionDeclaration(self, stmt: FunctionDeclaration):
         body = []

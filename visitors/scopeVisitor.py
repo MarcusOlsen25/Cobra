@@ -49,8 +49,9 @@ class ScopeVisitor(Visitor):
             arg.accept(self)
 
         
+    def visitParameterStatement(self, stmt: ParameterStatement):
 
-        
+        self.table.insert(stmt, "int", None)
 
 
 

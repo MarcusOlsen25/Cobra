@@ -51,25 +51,26 @@ class AssemblyVisitor(Visitor):
     
     def visitVarDeclaration(self, stmt: VarDeclaration):
         if stmt.initializer != None:
+            entry = self.table.lookup(stmt.var)
             stmt.initializer.accept(self)
-            self.generateCode("pushq %rax")
+            self.generateCode(f"movq %rax, {-entry.offset}(%rbp)")
         else:
-            self.generateCode("subq $8, %rsp")
+            pass
         
     def visitFunctionDeclaration(self, stmt: FunctionDeclaration):
         self.functionStack.append(stmt.var)
 
         self.functions[stmt.var] = [f"{stmt.var}:"]
 
-        self.startFunction()
-
         entry = self.table.lookup(stmt.var)
         self.table = entry.table
+
+        self.startFunction(self.table.varCounter)
 
         for s in stmt.body:
             s.accept(self)
 
-        self.endFunction(len(stmt.params))
+        self.endFunction(len(stmt.params), self.table.varCounter)
 
         self.table = self.table.parent
 
@@ -85,10 +86,16 @@ class AssemblyVisitor(Visitor):
         self.generateCode(f"call {entry.name}")
         self.generateCode(self.popArgs(len(expr.arguments)))
 
-    def startFunction(self):
+    def visitParameterStatement(self, stmt: ParameterStatement):
+        pass
+
+    def startFunction(self, varSpace: int):
         self.generateCode("pushq %rbp\n\tmovq %rsp, %rbp")
 
-    def endFunction(self, args: int):
+        self.generateCode(f"subq ${varSpace}, %rsp")
+
+    def endFunction(self, args: int, varSpace: int):
+        self.generateCode(f"addq ${varSpace}, %rsp")
         self.generateCode("popq %rbp")
         self.generateCode("ret")
 

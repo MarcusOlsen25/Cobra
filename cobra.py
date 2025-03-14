@@ -32,15 +32,17 @@ var f = a + b
 
 data = '''
 func add(x,y) {
-    x + y
+    x+y
+    var a = 5
+    func sub(r,t) {
+        r - t
+    }
+    sub(5,1)
 }
 add(2,3)
-
-
 '''
 
 result = parser.parse(data)
-
 
 printVisitor = PrintVisitor()
 evalVisitor = EvalVisitor()
@@ -66,8 +68,9 @@ program = []
 for function in assemblyVisitor.functions.values():
     program.extend(function)
 
+assemblyVisitor.generateCode(f"addq ${assemblyVisitor.table.varCounter}, %rsp")
 program += assemblyVisitor.main
-program += ["popq %rbp\nret"]
+#program += ["popq %rbp\nret"]
 
 for p in program:
     print(p)
