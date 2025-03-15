@@ -54,6 +54,43 @@ class ScopeVisitor(Visitor):
         self.table.insert(stmt, "int", None)
 
 
+    def visitIfStatement(self, stmt: IfStatement):
+        stmt.condition.accept(self)
+        
+        # Create a new symbol table and visit the statements in the thenStatement
+        newTable = SymbolTable(self.table)
+        self.table = newTable
+
+        for s in stmt.thenStatement:
+            s.accept(self)
+            
+        self.table = self.table.parent
+
+        if stmt.elseStatement != None:
+            
+            # Create a new symbol table and visit the statements in the elseStatement 
+            newTable = SymbolTable(self.table)
+            self.table = newTable
+
+            for s in stmt.elseStatement:
+                s.accept(self)
+                
+            self.table = self.table.parent
+        
+            
+    def visitWhileStatement(self, stmt: WhileStatement):
+        stmt.condition.accept(self)
+        
+        # Create a new symbol table and visit the statements in the thenStatement
+        newTable = SymbolTable(self.table)
+        self.table = newTable
+
+        for s in stmt.thenStatement:
+            s.accept(self)
+            
+        self.table = self.table.parent
+           
+ 
 
 
         
