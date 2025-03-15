@@ -26,8 +26,24 @@ def p_declaration(p):
 #Statements
 #Statement -> expression
 def p_statement(p):
-    '''statement : expression'''
+    '''statement : expression
+                 | ifStatement
+                 | whileStatement''' 
     p[0] = p[1]
+    
+#If statements
+def p_ifStatement_single(p):
+    """ifStatement : IF expression THEN declaration_list"""
+    p[0] = IfStatement(p[2], p[4], None)
+    
+def p_ifStatement_else(p):
+    """ifStatement : IF expression THEN declaration_list ELSE declaration_list"""
+    p[0] = IfStatement(p[2], p[4], p[6])   
+    
+#While statement
+def p_whileStatement(p):
+    """whileStatement : WHILE expression THEN declaration_list"""
+    p[0] = WhileStatement(p[2], p[4])
 
 #Variable declaration uninitialized
 def p_varDeclaration_uninitialized(p):
