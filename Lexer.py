@@ -4,6 +4,8 @@ import ply.lex as lex
 
 reserved = {"if": "IF",
             "then": "THEN",
+            "else": "ELSE",
+            "while": "WHILE",
             "func": "FUNC",
             "var": "VAR",
             "return": "RETURN"
