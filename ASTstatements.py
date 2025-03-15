@@ -29,5 +29,19 @@ class ParameterStatement(Stmt):
     def accept(self, visitor):
         return visitor.visitParameterStatement(self)
         
-
+class IfStatement(Stmt):
+    def __init__(self, condition: Expr, thenStatement: list[Stmt], elseStatement: list[Stmt]):
+        self.condition = condition
+        self.thenStatement = thenStatement
+        self.elseStatement = elseStatement
+        
+    def accept(self, visitor):
+        return visitor.visitIfStatement(self)
+     
+class WhileStatement(Stmt):
+    def __init__(self, condition: Expr, thenStatement: list[Stmt]):
+        self.condition = condition
+        self.thenStatement = thenStatement
     
+    def accept(self, visitor):
+        return visitor.visitWhileStatement(self)
