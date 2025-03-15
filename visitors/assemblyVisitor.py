@@ -10,6 +10,8 @@ class AssemblyVisitor(Visitor):
         self.main = [".globl main", "main:", "pushq %rbp\t\t\t# Save base pointer", "movq %rsp, %rbp\t\t\t# Make stack pointer new base pointer"]
         self.functions = {"text": [".text"]}
         self.functionStack = []
+        self.ifLabelCounter = 0
+        self.whileLabelCounter = 0
 
     def generateCode(self, output: str):
         if len(self.functionStack) == 0:
@@ -52,7 +54,7 @@ class AssemblyVisitor(Visitor):
         if stmt.initializer != None:
             entry = self.table.lookup(stmt.var)
             stmt.initializer.accept(self)
-            self.generateCode(f"movq %rax, {-entry.offset}(%rbp)\t\t\t# Move initialized value into space on stack")
+            self.generateCode(f"movq %rax, {-entry.offset}(%rbp)\t\t# Move initialized value into space on stack")
         else:
             pass
         
@@ -98,7 +100,52 @@ class AssemblyVisitor(Visitor):
         self.generateCode("popq %rbp\t\t\t# Restore base pointer")
         self.generateCode("ret\t\t\t\t# Return from the function")
 
-    """Moves the stack pointer back to nullify the arguments pushed to the stack."""
     def popArgs(self, args: int):
         argsToPop = 8 * args
         return f"addq ${argsToPop}, %rsp\t\t\t# Pop the arguments pushed to the stack"
+    
+    def visitIfStatement(self, stmt: IfStatement):
+        # For now 0 is false and everything else is true
+        stmt.condition.accept(self)
+        self.generateCode("cmp $0, %rax\t\t\t# Check the condition")
+        
+        if stmt.elseStatement == None:
+
+            self.generateCode(f"je end_if_{self.ifLabelCounter}\t\t\t# Skip if the condition is false")
+            
+            for s in stmt.thenStatement:
+                s.accept(self)
+            
+            self.generateCode(f"end_if_{self.ifLabelCounter}:")
+        
+        else:
+        
+            self.generateCode(f"je else_part_{self.ifLabelCounter}\t\t\t# Skip to the else if the condition is false")
+            
+            for s in stmt.thenStatement:
+                s.accept(self)
+            self.generateCode(f"jmp end_if_{self.ifLabelCounter}\t\t\t# Skip the else")
+                
+            self.generateCode(f"else_part_{self.ifLabelCounter}:")
+            
+            for s in stmt.elseStatement:
+                s.accept(self)
+                
+            self.generateCode(f"end_if_{self.ifLabelCounter}:")
+        
+        self.ifLabelCounter += 1
+        
+    def visitWhileStatement(self, stmt: WhileStatement):
+        self.generateCode(f"while_loop_{self.whileLabelCounter}:")
+        
+        # For now 0 is false and everything else is true
+        stmt.condition.accept(self)
+        self.generateCode("cmp $0, %rax\t\t\t# Check the condition")
+        self.generateCode(f"je end_while_{self.whileLabelCounter}\t\t\t# Skip if the condition is false")
+        
+        for s in stmt.thenStatement:
+                s.accept(self)
+        
+        self.generateCode(f"jmp while_loop_{self.whileLabelCounter}\t\t# Restart the loop")
+        self.generateCode(f"end_while_{self.whileLabelCounter}:")
+        self.whileLabelCounter += 1
