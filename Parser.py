@@ -33,17 +33,17 @@ def p_statement(p):
     
 #If statements
 def p_ifStatement_single(p):
-    """ifStatement : IF expression THEN declaration_list"""
-    p[0] = IfStatement(p[2], p[4], None)
+    """ifStatement : IF expression THEN LBRACE declaration_list RBRACE"""
+    p[0] = IfStatement(p[2], p[5], None)
     
 def p_ifStatement_else(p):
-    """ifStatement : IF expression THEN declaration_list ELSE declaration_list"""
-    p[0] = IfStatement(p[2], p[4], p[6])   
+    """ifStatement : IF expression THEN LBRACE declaration_list RBRACE ELSE LBRACE declaration_list RBRACE"""
+    p[0] = IfStatement(p[2], p[5], p[9])   
     
 #While statement
 def p_whileStatement(p):
-    """whileStatement : WHILE expression THEN declaration_list"""
-    p[0] = WhileStatement(p[2], p[4])
+    """whileStatement : WHILE expression THEN LBRACE declaration_list RBRACE"""
+    p[0] = WhileStatement(p[2], p[5])
 
 #Variable declaration uninitialized
 def p_varDeclaration_uninitialized(p):
