@@ -33,63 +33,108 @@ def p_statement(p):
     
 #If statements
 def p_ifStatement_single(p):
-    """ifStatement : IF expression THEN LBRACE declaration_list RBRACE"""
-    p[0] = IfStatement(p[2], p[5], None)
+    '''ifStatement : IF expression THEN LBRACE declaration_list RBRACE'''
+    p[0] = IfStatement(p[2], p[5], None, None, None)
     
 def p_ifStatement_else(p):
-    """ifStatement : IF expression THEN LBRACE declaration_list RBRACE ELSE LBRACE declaration_list RBRACE"""
-    p[0] = IfStatement(p[2], p[5], p[9])   
+    '''ifStatement : IF expression THEN LBRACE declaration_list RBRACE ELSE LBRACE declaration_list RBRACE'''
+    p[0] = IfStatement(p[2], p[5], p[9], None, None)   
     
 #While statement
 def p_whileStatement(p):
-    """whileStatement : WHILE expression THEN LBRACE declaration_list RBRACE"""
-    p[0] = WhileStatement(p[2], p[5])
+    '''whileStatement : WHILE expression THEN LBRACE declaration_list RBRACE'''
+    p[0] = WhileStatement(p[2], p[5], None)
 
 #Variable declaration uninitialized
 def p_varDeclaration_uninitialized(p):
-    'varDeclaration : VAR ID'
+    '''varDeclaration : VAR ID'''
     p[0] = VarDeclaration(p[2], None)
 
 #Variable declaration initialized
 #Add multiple assignment
 def p_varDeclaration_initialized(p):
-    'varDeclaration : VAR ID ASSIGN expression'
+    '''varDeclaration : VAR ID ASSIGN expression'''
     p[0] = VarDeclaration(p[2], p[4])
 
 #Expression -> assignment
 def p_expression_assignment(p):
-    'expression : assignment'
+    '''expression : assignment'''
     p[0] = p[1]
 
 #Expression - assignment
 #Add multiple assignment
 def p_assignment(p):
-    'assignment : ID ASSIGN assignment'
+    '''assignment : ID ASSIGN assignment'''
     p[0] = AssignExpression(p[1], p[3])
-
-#Expression - plus
-def p_expression_plus(p):
-    'assignment : assignment PLUS term'
+    
+#Assignment -> logical
+def p_assignment_logical(p):
+    '''assignment : logical'''
+    p[0] = p[1]
+    
+#Logical - or
+def p_logical_or(p):
+    '''logical : logical OR equality'''
+    p[0] = BinaryExpression(p[1], p[2], p[3])
+    
+#Logical - and
+def p_logical_and(p):
+    '''logical : logical AND equality'''
+    p[0] = BinaryExpression(p[1], p[2], p[3])
+    
+#LogicAnd -> equality
+def p_logical_equality(p):
+    '''logical : equality'''
+    p[0] = p[1]
+    
+#Equality - equals
+def p_equality_equals(p):
+    '''equality : equality EQUALS comparison'''
     p[0] = BinaryExpression(p[1], p[2], p[3])
 
-#Expression - minus
-def p_expression_minus(p):
-    'assignment : assignment MINUS term'
+#Equality - not equals
+def p_equality_not_equals(p):
+    '''equality : equality NOTEQUALS comparison'''
+    p[0] = BinaryExpression(p[1], p[2], p[3])
+    
+#Equality -> comparison
+def p_equality_comparison(p):
+    '''equality : comparison'''
+    p[0] = p[1]
+    
+#Comparison - greater 
+def p_comparison_greater(p):
+    '''comparison : comparison GREATER term'''
     p[0] = BinaryExpression(p[1], p[2], p[3])
 
-#Expression -> term
-def p_expression_term(p):
-    'assignment : term'
+#Comparison - less
+def p_comparison_less(p):
+    '''comparison : comparison LESS term'''
+    p[0] = BinaryExpression(p[1], p[2], p[3])
+
+#Comparison - greater or equal
+def p_comparison_greater_or_equal(p):
+    '''comparison : comparison GREATEROREQUAL term'''
+    p[0] = BinaryExpression(p[1], p[2], p[3])
+
+#Comparison - less or equal
+def p_comparison_less_or_equal(p):
+    '''comparison : comparison LESSOREQUAL term'''
+    p[0] = BinaryExpression(p[1], p[2], p[3])
+    
+#Comparison -> term
+def p_comparison_term(p):
+    '''comparison : term'''
     p[0] = p[1]
 
-#Expression - multiplication
-def p_term_times(p):
-    'term : term TIMES factor'
+#Term - plus
+def p_term_plus(p):
+    '''term : term PLUS factor'''
     p[0] = BinaryExpression(p[1], p[2], p[3])
 
-#Expression - division
-def p_term_div(p):
-    'term : term DIVIDE factor'
+#Term - minus
+def p_term_minus(p):
+    '''term : term MINUS factor'''
     p[0] = BinaryExpression(p[1], p[2], p[3])
 
 #Term -> factor
@@ -97,9 +142,29 @@ def p_term_factor(p):
     '''term : factor'''
     p[0] = p[1]
 
-#Factor -> call
-def p_factor_num(p):
-    'factor : call'
+#Factor - multiplication
+def p_factor_times(p):
+    '''factor : factor TIMES unary'''
+    p[0] = BinaryExpression(p[1], p[2], p[3])
+
+#Factor - division
+def p_factor_div(p):
+    '''factor : factor DIVIDE unary'''
+    p[0] = BinaryExpression(p[1], p[2], p[3])
+    
+#Factor -> unary
+def p_factor_unary(p):
+    '''factor : unary'''
+    p[0] = p[1]
+    
+#Factor -> unary
+def p_unary(p):
+    '''unary : NOT unary'''
+    p[0] = UnaryExpression(p[2])
+
+#Unary -> call
+def p_unary_num(p):
+    '''unary : call'''
     p[0] = p[1]
 
 #Expression - call function
@@ -145,7 +210,7 @@ def p_arguments_empty(p):
 #Add return statements
 def p_funcDeclaration_statement(p):
     '''funcDeclaration : FUNC ID LPAREN parameter_list RPAREN LBRACE declaration_list RBRACE'''
-    p[0] = FunctionDeclaration(p[2], p[4], p[7], None)
+    p[0] = FunctionDeclaration(p[2], p[4], p[7], None) 
 
 #Parameters
 

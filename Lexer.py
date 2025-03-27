@@ -8,7 +8,9 @@ reserved = {"if": "IF",
             "while": "WHILE",
             "func": "FUNC",
             "var": "VAR",
-            "return": "RETURN"
+            "return": "RETURN",
+            "or": "OR",
+            "and": "AND"
             }
 
 tokens = [
@@ -23,20 +25,34 @@ tokens = [
    'COMMA',
    'ASSIGN',
    'LBRACE',
-   'RBRACE'
+   'RBRACE',
+   'NOT',
+   'EQUALS',
+   'NOTEQUALS',
+   'GREATER',
+   'LESS',
+   'GREATEROREQUAL',
+   'LESSOREQUAL'
 ] + list(reserved.values())
 
 # Regular expression rules for simple tokens
-t_PLUS    = r'\+'
-t_MINUS   = r'-'
-t_TIMES   = r'\*'
-t_DIVIDE  = r'/'
-t_LPAREN  = r'\('
-t_RPAREN  = r'\)'
-t_COMMA   = r','
-t_ASSIGN  = r'='
-t_LBRACE  = r'{'
-t_RBRACE  = r'}'
+t_PLUS              = r'\+'
+t_MINUS             = r'-'
+t_TIMES             = r'\*'
+t_DIVIDE            = r'/'
+t_LPAREN            = r'\('
+t_RPAREN            = r'\)'
+t_COMMA             = r','
+t_ASSIGN            = r'='
+t_LBRACE            = r'{'
+t_RBRACE            = r'}'
+t_NOT               = r'!'
+t_EQUALS            = r'=='
+t_NOTEQUALS         = r'!='
+t_GREATER           = r'>'
+t_LESS              = r'<'
+t_GREATEROREQUAL    = r'>='
+t_LESSOREQUAL       = r'<='
 
 # A regular expression rule with some action code
 def t_NUMBER(t):

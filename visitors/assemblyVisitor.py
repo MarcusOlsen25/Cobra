@@ -48,7 +48,9 @@ class AssemblyVisitor(Visitor):
             self.generateCode(f"movq {entry.offset}(%rbp), %rax\t\t# Assign an argument to %rax")
     
     def visitAssignExpression(self, expr: AssignExpression):
-        pass
+        expr.value.accept(self)
+        entry = self.table.lookup(expr.var)
+        self.generateCode(f"movq %rax, {entry.offset}(%rbp)")
     
     def visitVarDeclaration(self, stmt: VarDeclaration):
         if stmt.initializer != None:
@@ -66,12 +68,13 @@ class AssemblyVisitor(Visitor):
         entry = self.table.lookup(stmt.var)
         self.table = entry.table
 
-        self.startFunction(self.table.varCounter)
+        self.startScope(self.table.varCounter)
 
         for s in stmt.body:
             s.accept(self)
 
-        self.endFunction(len(stmt.params), self.table.varCounter)
+        self.endScope(self.table.varCounter)
+        # self.endScope(len(stmt.params), self.table.varCounter)
 
         self.table = self.table.parent
 
@@ -90,21 +93,27 @@ class AssemblyVisitor(Visitor):
     def visitParameterStatement(self, stmt: ParameterStatement):
         pass
 
-    def startFunction(self, varSpace: int):
+    def startScope(self, varSpace: int):
         self.generateCode("pushq %rbp\t\t\t# Save base pointer\n\tmovq %rsp, %rbp\t\t\t# Make stack pointer new base pointer")
 
         self.generateCode(f"subq ${varSpace}, %rsp\t\t\t# Allocate space for local variables on the stack")
 
-    def endFunction(self, args: int, varSpace: int):
+    # def endScope(self, args: int, varSpace: int):
+    def endScope(self, varSpace: int):
         self.generateCode(f"addq ${varSpace}, %rsp\t\t\t# Deallocate space for local variables on the stack")
         self.generateCode("popq %rbp\t\t\t# Restore base pointer")
-        self.generateCode("ret\t\t\t\t# Return from the function")
+        self.generateCode("ret\t\t\t\t# Return from the function or scope")
 
     def popArgs(self, args: int):
         argsToPop = 8 * args
         return f"addq ${argsToPop}, %rsp\t\t\t# Pop the arguments pushed to the stack"
     
     def visitIfStatement(self, stmt: IfStatement):
+        
+        # Enter a new scope
+        self.table = stmt.thenTable
+        self.startScope(self.table.varCounter)
+
         # For now 0 is false and everything else is true
         stmt.condition.accept(self)
         self.generateCode("cmp $0, %rax\t\t\t# Check the condition")
@@ -119,7 +128,12 @@ class AssemblyVisitor(Visitor):
             self.generateCode(f"end_if_{self.ifLabelCounter}:")
         
         else:
-        
+            
+            # Switch the scope
+            self.table = stmt.elseTable
+            self.endScope(self.table.varCounter)
+            self.startScope(self.table.varCounter)
+
             self.generateCode(f"je else_part_{self.ifLabelCounter}\t\t\t# Skip to the else if the condition is false")
             
             for s in stmt.thenStatement:
@@ -135,7 +149,16 @@ class AssemblyVisitor(Visitor):
         
         self.ifLabelCounter += 1
         
+        # Exit the scope 
+        self.endScope(self.table.varCounter)
+        self.table = self.table.parent
+        
     def visitWhileStatement(self, stmt: WhileStatement):
+        
+        # Enter a new scope
+        self.table = stmt.table
+        self.startScope(self.table.varCounter)
+
         self.generateCode(f"while_loop_{self.whileLabelCounter}:")
         
         # For now 0 is false and everything else is true
@@ -149,3 +172,7 @@ class AssemblyVisitor(Visitor):
         self.generateCode(f"jmp while_loop_{self.whileLabelCounter}\t\t# Restart the loop")
         self.generateCode(f"end_while_{self.whileLabelCounter}:")
         self.whileLabelCounter += 1
+
+        # Exit the scope
+        self.endScope(self.table.varCounter)
+        self.table = self.table.parent

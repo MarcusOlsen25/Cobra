@@ -31,15 +31,17 @@ var f = a + b
 '''
 
 data = '''
-func add(x,y) {
-    x+y
-    var a = 5
-    func sub(r,t) {
-        r - t
-    }
-    sub(5,1)
+func red(x,y) {
+    var a = 0
+    while x then {
+        var gogo = x + y
+        x = x - y
+        a = gogo
+        }
+    a = a
 }
-add(2,3)
+red(20,5)
+
 '''
 
 result = parser.parse(data)
@@ -51,7 +53,6 @@ nodeVisitor = NodeVisitor()
 table = SymbolTable(None)
 
 scopeVisitor = ScopeVisitor(table)
-
 assemblyVisitor = AssemblyVisitor(table)
 
 #Scope check

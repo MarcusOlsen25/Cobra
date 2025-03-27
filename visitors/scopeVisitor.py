@@ -59,7 +59,8 @@ class ScopeVisitor(Visitor):
         
         # Create a new symbol table and visit the statements in the thenStatement
         newTable = SymbolTable(self.table)
-        self.table = newTable
+        stmt.thenTable = newTable
+        self.table = stmt.thenTable
 
         for s in stmt.thenStatement:
             s.accept(self)
@@ -70,7 +71,8 @@ class ScopeVisitor(Visitor):
             
             # Create a new symbol table and visit the statements in the elseStatement 
             newTable = SymbolTable(self.table)
-            self.table = newTable
+            stmt.elseTable = newTable
+            self.table = stmt.elseTable
 
             for s in stmt.elseStatement:
                 s.accept(self)
@@ -83,7 +85,8 @@ class ScopeVisitor(Visitor):
         
         # Create a new symbol table and visit the statements in the thenStatement
         newTable = SymbolTable(self.table)
-        self.table = newTable
+        stmt.table = newTable
+        self.table = stmt.table
 
         for s in stmt.thenStatement:
             s.accept(self)

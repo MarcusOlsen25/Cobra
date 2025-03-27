@@ -10,6 +10,13 @@ class BinaryExpression(Expr):
         
     def accept(self, visitor):
         return visitor.visitBinaryExpression(self)
+    
+class UnaryExpression(Expr):
+    def __init__(self, expr: Expr):
+        self.expr = expr
+    
+    def accept(self, visitor):
+        return visitor.visitUnaryExpression(self)        
 
 class NumberExpression(Expr):
     def __init__(self, value: int):
