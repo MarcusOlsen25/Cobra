@@ -57,11 +57,22 @@ assemblyVisitor = AssemblyVisitor(table)
 
 #Scope check
 for statement in result:
-    res = statement.accept(scopeVisitor)
+    statement.accept(scopeVisitor)
 
 #Code generation
+
+assemblyVisitor = AssemblyVisitor(table)
+
+#Function prologue for main
+assemblyVisitor.startScope(table.varCounter)
+
 for s in result:
     s.accept(assemblyVisitor)
+
+#Function epilogue for main
+#To be changed with
+#assemblyVisitor.endScope(assemblyVisitor.table.varCounter)
+assemblyVisitor.generateCode(f"addq ${assemblyVisitor.table.varCounter}, %rsp\t\t\t# Deallocate global variables")
 
 #Append functions and main
 program = []
@@ -69,9 +80,7 @@ program = []
 for function in assemblyVisitor.functions.values():
     program.extend(function)
 
-assemblyVisitor.generateCode(f"addq ${assemblyVisitor.table.varCounter}, %rsp")
 program += assemblyVisitor.main
-#program += ["popq %rbp\nret"]
 
 for p in program:
     print(p)
