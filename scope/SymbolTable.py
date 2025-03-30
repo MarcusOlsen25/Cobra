@@ -7,8 +7,9 @@ class SymbolTable:
     Python dictionary. The parent scope can be accessed
     via the parent reference.
     """
-    def __init__(self, parent):
-        self.paramCounter = 8
+    def __init__(self, parent, name):
+        self.name = name
+        self.paramCounter = 16
         self.varCounter = 0
         self._tab = {}
         self.parent = parent
@@ -19,9 +20,9 @@ class SymbolTable:
             
     def insert(self, stmt: Stmt, type: str, newTable: 'SymbolTable'):
         if isinstance(stmt, VarDeclaration):
-            self._tab[stmt.var] = SymbolTable.VariableValue(type, self.incrementVarCounter())
+            self._tab[stmt.var] = SymbolTable.VariableValue(type, self.decrementVarCounter(), self.level)
         elif isinstance(stmt, ParameterStatement):
-            self._tab[stmt.var] = SymbolTable.VariableValue(type, self.incrementParamCounter())
+            self._tab[stmt.var] = SymbolTable.VariableValue(type, self.incrementParamCounter(), self.level)
         else:
             self._tab[stmt.var] = SymbolTable.FunctionValue(stmt, self, newTable)
 
@@ -32,9 +33,24 @@ class SymbolTable:
             return self.parent.lookup(name)
         else:
             return None
+    
+    def findStaticLink(self, name: str):
+        current_table = self
+        while current_table: 
+            if name in current_table._tab: 
+                return current_table 
+            current_table = current_table.parent 
+        return None 
         
-    def incrementVarCounter(self):
-        self.varCounter += 8
+    def findScope(self, name: str):
+        if self.name == name:
+            print("ASD")
+            return self
+        else:
+            return self.findScope(self.parent.name)
+        
+    def decrementVarCounter(self):
+        self.varCounter -= 8
         return self.varCounter
     
     def incrementParamCounter(self):
@@ -42,9 +58,10 @@ class SymbolTable:
         return self.paramCounter
         
     class VariableValue:
-        def __init__(self, type: str, offset: int):
+        def __init__(self, type: str, offset: int, level: int):
             self.type = type
             self.offset = offset
+            self.level = level
 
     class FunctionValue:
         def __init__(self, stmt: FunctionDeclaration, currentTable: 'SymbolTable', newTable: 'SymbolTable'):

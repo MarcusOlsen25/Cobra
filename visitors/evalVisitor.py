@@ -5,7 +5,7 @@ from scope.SymbolTable import SymbolTable
 
 class EvalVisitor(Visitor):
 
-    table = SymbolTable(None)
+    table = SymbolTable(None, "main")
 
     def visitBinaryExpression(self, expr: BinaryExpression):
         left = expr.left.accept(self)

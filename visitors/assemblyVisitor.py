@@ -7,7 +7,7 @@ class AssemblyVisitor(Visitor):
 
     def __init__(self, table: SymbolTable):
         self.table = table
-        self.main = [".globl main", "main:", "pushq %rbp\t\t\t# Save base pointer", "movq %rsp, %rbp\t\t\t# Make stack pointer new base pointer"]
+        self.main = [".globl main", "main:"]
         self.functions = {"text": [".text"]}
         self.functionStack = []
         self.ifLabelCounter = 0
@@ -15,7 +15,7 @@ class AssemblyVisitor(Visitor):
 
     def generateCode(self, output: str):
         if len(self.functionStack) == 0:
-            self.main.append(output)
+            self.main.append("\t" + output)
         else:
             current_function = self.functionStack[-1]
             self.functions[current_function].append("\t" + output)
@@ -45,24 +45,26 @@ class AssemblyVisitor(Visitor):
         if isinstance(entry, SymbolTable.FunctionValue):
             return entry
         else:
-            self.generateCode(f"movq {entry.offset}(%rbp), %rax\t\t# Assign an argument to %rax")
+            self.accessVar(entry)
+            self.generateCode(f"movq {entry.offset}(%rax), %rax\t\t# Assign value to %rax")  
     
     def visitAssignExpression(self, expr: AssignExpression):
         expr.value.accept(self)
+        self.generateCode(f"movq %rax, %rdx")
         entry = self.table.lookup(expr.var)
-        self.generateCode(f"movq %rax, {entry.offset}(%rbp)")
+        self.accessVar(entry)
+        self.generateCode(f"movq %rdx, {entry.offset}(%rax)")
     
     def visitVarDeclaration(self, stmt: VarDeclaration):
         if stmt.initializer != None:
             entry = self.table.lookup(stmt.var)
             stmt.initializer.accept(self)
-            self.generateCode(f"movq %rax, {-entry.offset}(%rbp)\t\t# Move initialized value into space on stack")
+            self.generateCode(f"movq %rax, {entry.offset}(%rbp)\t\t# Move initialized value into space on stack")
         else:
             pass
         
     def visitFunctionDeclaration(self, stmt: FunctionDeclaration):
         self.functionStack.append(stmt.var)
-
         self.functions[stmt.var] = [f"{stmt.var}:"]
 
         entry = self.table.lookup(stmt.var)
@@ -76,8 +78,9 @@ class AssemblyVisitor(Visitor):
         self.endScope(self.table.varCounter)
         # self.endScope(len(stmt.params), self.table.varCounter)
 
-        self.table = self.table.parent
+        self.generateCode("ret\t\t\t\t# Return from the function")
 
+        self.table = self.table.parent
         self.functionStack.pop()
 
     def visitCallExpression(self, expr: CallExpression):
@@ -87,22 +90,39 @@ class AssemblyVisitor(Visitor):
             expr.arguments[i].accept(self)
             self.generateCode(f"pushq %rax\t\t\t# Push argument number {i+1} to stack")
 
+        self.setStaticLink(self.table.level - entry.level)
+
         self.generateCode(f"call {entry.name}\t\t\t# Call the {entry.name} function ")
+
+        self.generateCode("addq $8, %rsp\t\t\t# Deallocate space on stack for static link")
+
         self.generateCode(self.popArgs(len(expr.arguments)))
 
     def visitParameterStatement(self, stmt: ParameterStatement):
         pass
 
+
+    def accessVar(self, entry: SymbolTable.VariableValue):
+            currentTable = self.table
+            self.generateCode("movq %rbp, %rax")
+            while currentTable.level - entry.level > 0:
+                self.generateCode("movq 16(%rax), %rax")
+                currentTable = currentTable.findStaticLink(currentTable.name)   
+
+    def setStaticLink(self, levelDifference: int):
+        self.generateCode(f"movq %rbp, %rax\t\t\t# Prepare static link")
+        for i in range(levelDifference):
+            self.generateCode(f"movq 16(%rax), %rax\t\t\t# Traverse static link once")
+        self.generateCode("pushq %rax\t\t\t# Push static link")       
+
     def startScope(self, varSpace: int):
         self.generateCode("pushq %rbp\t\t\t# Save base pointer\n\tmovq %rsp, %rbp\t\t\t# Make stack pointer new base pointer")
-
-        self.generateCode(f"subq ${varSpace}, %rsp\t\t\t# Allocate space for local variables on the stack")
+        self.generateCode(f"subq ${abs(varSpace)}, %rsp\t\t\t# Allocate space for local variables on the stack")
 
     # def endScope(self, args: int, varSpace: int):
     def endScope(self, varSpace: int):
-        self.generateCode(f"addq ${varSpace}, %rsp\t\t\t# Deallocate space for local variables on the stack")
+        self.generateCode(f"addq ${abs(varSpace)}, %rsp\t\t\t# Deallocate space for local variables on the stack")
         self.generateCode("popq %rbp\t\t\t# Restore base pointer")
-        self.generateCode("ret\t\t\t\t# Return from the function or scope")
 
     def popArgs(self, args: int):
         argsToPop = 8 * args

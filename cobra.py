@@ -23,34 +23,45 @@ parser = yacc.yacc()
 
 parserData = '''
 var a = 4
-var b = 5
-c = 2
-d = 3
-var e = (4+5)-5*6
-var f = a + b
+func one() {
+    func five() {
+        a
+    }
+ 
+    func two() {
+        a = 3
+        func six() {
+            five()
+        }
+        func three() {
+            func four() {
+                six()
+            }
+            four()
+            six()
+        }
+        three()
+    }
+    two()
+}
+one()
 '''
 
 data = '''
-func red(x,y) {
-    var a = 0
-    while x then {
-        var gogo = x + y
-        x = x - y
-        a = gogo
-        }
-    a = a
+if 3 then {
+    var c = 2
 }
-red(20,5)
+
 
 '''
 
-result = parser.parse(data)
+result = parser.parse(parserData)
 
 printVisitor = PrintVisitor()
 evalVisitor = EvalVisitor()
 nodeVisitor = NodeVisitor()
 
-table = SymbolTable(None)
+table = SymbolTable(None, "main")
 
 scopeVisitor = ScopeVisitor(table)
 assemblyVisitor = AssemblyVisitor(table)
@@ -58,6 +69,7 @@ assemblyVisitor = AssemblyVisitor(table)
 #Scope check
 for statement in result:
     statement.accept(scopeVisitor)
+
 
 #Code generation
 
@@ -72,7 +84,7 @@ for s in result:
 #Function epilogue for main
 #To be changed with
 #assemblyVisitor.endScope(assemblyVisitor.table.varCounter)
-assemblyVisitor.generateCode(f"addq ${assemblyVisitor.table.varCounter}, %rsp\t\t\t# Deallocate global variables")
+assemblyVisitor.generateCode(f"addq ${abs(assemblyVisitor.table.varCounter)}, %rsp\t\t\t# Deallocate global variables")
 
 #Append functions and main
 program = []
