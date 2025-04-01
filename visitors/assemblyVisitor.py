@@ -194,7 +194,7 @@ class AssemblyVisitor(Visitor):
             expr.arguments[i].accept(self)
             self.generateCode(f"pushq %rax\t\t\t# Push argument number {i+1} to stack")
 
-        self.setStaticLink(entry)
+        self.setStaticLink(entry.level - self.table.level)
 
         self.generateCode(f"call {entry.name}\t\t\t# Call the {entry.name} function ")
 
@@ -210,14 +210,10 @@ class AssemblyVisitor(Visitor):
         for i in range(self.table.level - entry.level):
             self.generateCode(f"movq 16(%rax), %rax\t\t\t# Traverse static link once")   
 
-    def setStaticLink(self, entry):
-        if isinstance(entry, SymbolTable.FunctionValue):
-            offset = 16
-        else:
-            offset = 8
+    def setStaticLink(self, levelDifference):
         self.generateCode("movq %rbp, %rax\t\t\t# Prepare static link")
-        for i in range(self.table.level - entry.level):
-            self.generateCode(f"movq {offset}(%rax), %rax\t\t\t# Traverse static link once")
+        for i in range(levelDifference):
+            self.generateCode(f"movq 16(%rax), %rax\t\t\t# Traverse static link once")
         self.generateCode("pushq %rax\t\t\t# Push static link")       
 
     def startScope(self, varSpace: int):
@@ -236,7 +232,8 @@ class AssemblyVisitor(Visitor):
     def visitIfStatement(self, stmt: IfStatement):
         # Enter a new scope
         self.table = stmt.thenTable
-        self.setStaticLink(0, False)
+        self.setStaticLink(0)
+        self.generateCode("subq $8, %rsp")
         self.startScope(self.table.varCounter)
 
         # For now 0 is false and everything else is true
@@ -263,8 +260,10 @@ class AssemblyVisitor(Visitor):
             # Switch the scope
             self.table = stmt.elseTable
             self.generateCode("addq $8, %rsp\t\t\t# Deallocate space on stack for static link")
+            self.generateCode("addq $8, %rsp")
             self.endScope(self.table.varCounter)
-            self.setStaticLink(0, False)
+            self.setStaticLink(0)
+            self.generateCode("subq $8, %rsp")
             self.startScope(self.table.varCounter)
                 
             self.generateCode(f"else_part_{self.ifLabelCounter}:")
@@ -278,13 +277,15 @@ class AssemblyVisitor(Visitor):
         
         # Exit the scope 
         self.generateCode("addq $8, %rsp\t\t\t# Deallocate space on stack for static link")
+        self.generateCode("addq $8, %rsp")
         self.endScope(self.table.varCounter)
         self.table = self.table.parent
         
     def visitWhileStatement(self, stmt: WhileStatement):
         # Enter a new scope
         self.table = stmt.table
-        self.setStaticLink(0, False)
+        self.setStaticLink(0)
+        self.generateCode("subq $8, %rsp")
         self.startScope(self.table.varCounter)
 
         self.generateCode(f"while_loop_{self.whileLabelCounter}:")
@@ -303,6 +304,7 @@ class AssemblyVisitor(Visitor):
 
         # Exit the scope
         self.generateCode("addq $8, %rsp\t\t\t# Deallocate space on stack for static link")
+        self.generateCode("addq $8, %rsp")
         self.endScope(self.table.varCounter)
         self.table = self.table.parent
         
