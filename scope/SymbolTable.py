@@ -7,8 +7,7 @@ class SymbolTable:
     Python dictionary. The parent scope can be accessed
     via the parent reference.
     """
-    def __init__(self, parent, name):
-        self.name = name
+    def __init__(self, parent):
         self.paramCounter = 16
         self.varCounter = 0
         self._tab = {}

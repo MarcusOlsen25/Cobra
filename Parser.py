@@ -49,7 +49,7 @@ def p_whileStatement(p):
 #Print statement
 def p_printStatement(p):
     '''printStatement : PRINT expression'''
-    p[0] = p[2]
+    p[0] = PrintStatement(p[2])
 
 #Variable declaration uninitialized
 def p_varDeclaration_uninitialized(p):

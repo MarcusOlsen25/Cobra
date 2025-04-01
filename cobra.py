@@ -23,37 +23,38 @@ parser = yacc.yacc()
 
 parserData = '''
 var b = 4
+print b
+var c = 87
 func one() {
     var a = 2
     func two() {
-        b
+        print b
     }
     func three() {
         var a = 3
+        print a
         two()
     }
     three()
+    print c
 }
 one()
 '''
 
 data = '''
-var a = 2
+var a = 3
+var b = 2
 print a
-print a 
-print a
-var b = 0
-a = 4
-a
+print b
 '''
 
-result = parser.parse(data)
+result = parser.parse(parserData)
 
 printVisitor = PrintVisitor()
 evalVisitor = EvalVisitor()
 nodeVisitor = NodeVisitor()
 
-table = SymbolTable(None, "main")
+table = SymbolTable(None)
 
 scopeVisitor = ScopeVisitor(table)
 assemblyVisitor = AssemblyVisitor(table)
@@ -75,8 +76,9 @@ for s in result:
 
 #Function epilogue for main
 #To be changed with
-#assemblyVisitor.endScope(assemblyVisitor.table.varCounter)
-assemblyVisitor.generateCode(f"addq ${abs(assemblyVisitor.table.varCounter)}, %rsp\t\t\t# Deallocate global variables")
+assemblyVisitor.endScope(assemblyVisitor.table.varCounter)
+assemblyVisitor.generateCode("movq $0, %rax\t\t\t# End with error code 0")
+assemblyVisitor.generateCode("ret\t\t\t# Return from main")
 
 #Append functions and main
 program = []

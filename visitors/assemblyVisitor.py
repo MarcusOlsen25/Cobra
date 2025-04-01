@@ -194,7 +194,7 @@ class AssemblyVisitor(Visitor):
             expr.arguments[i].accept(self)
             self.generateCode(f"pushq %rax\t\t\t# Push argument number {i+1} to stack")
 
-        self.setStaticLink(self.table.level - entry.level, True)
+        self.setStaticLink(entry)
 
         self.generateCode(f"call {entry.name}\t\t\t# Call the {entry.name} function ")
 
@@ -205,21 +205,18 @@ class AssemblyVisitor(Visitor):
     def visitParameterStatement(self, stmt: ParameterStatement):
         pass
 
-    # Problem!!!! How does it know if it is within a function scope or not?
     def accessVar(self, entry: SymbolTable.VariableValue):
-        # offset = 8
-        # if isFunction:
-        #     offset = 16
         self.generateCode("movq %rbp, %rax\t\t\t# Prepare to access variable from another scope")
         for i in range(self.table.level - entry.level):
             self.generateCode(f"movq 16(%rax), %rax\t\t\t# Traverse static link once")   
 
-    def setStaticLink(self, levelDifference: int, isFunction: bool):
-        offset = 8
-        if isFunction:
+    def setStaticLink(self, entry):
+        if isinstance(entry, SymbolTable.FunctionValue):
             offset = 16
+        else:
+            offset = 8
         self.generateCode("movq %rbp, %rax\t\t\t# Prepare static link")
-        for i in range(levelDifference):
+        for i in range(self.table.level - entry.level):
             self.generateCode(f"movq {offset}(%rax), %rax\t\t\t# Traverse static link once")
         self.generateCode("pushq %rax\t\t\t# Push static link")       
 
@@ -229,7 +226,7 @@ class AssemblyVisitor(Visitor):
 
     # def endScope(self, args: int, varSpace: int):
     def endScope(self, varSpace: int):
-        self.generateCode(f"addq ${abs(varSpace)}, %rsp\t\t\t# Deallocate space for local variables on the stack")
+        self.generateCode(f"addq ${abs(varSpace)}, %rsp\t\t\t# Deallocate space for variables on the stack")
         self.generateCode("popq %rbp\t\t\t# Restore base pointer")
 
     def popArgs(self, args: int):
