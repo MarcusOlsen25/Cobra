@@ -49,3 +49,10 @@ class WhileStatement(Stmt):
     
     def accept(self, visitor):
         return visitor.visitWhileStatement(self)
+
+class PrintStatement(Stmt):
+    def __init__(self, value: Expr):
+        self.value = value
+    
+    def accept(self, visitor):
+        return visitor.visitPrintStatement(self)

@@ -13,6 +13,7 @@ class AssemblyVisitor(Visitor):
         self.ifLabelCounter = 0
         self.whileLabelCounter = 0
         self.binaryLabelCounter = 0
+        self.printLabelCounter = 0
 
     def generateCode(self, output: str):
         if len(self.functionStack) == 0:
@@ -193,7 +194,7 @@ class AssemblyVisitor(Visitor):
             expr.arguments[i].accept(self)
             self.generateCode(f"pushq %rax\t\t\t# Push argument number {i+1} to stack")
 
-        self.setStaticLink(self.table.level - entry.level)
+        self.setStaticLink(self.table.level - entry.level, True)
 
         self.generateCode(f"call {entry.name}\t\t\t# Call the {entry.name} function ")
 
@@ -204,16 +205,22 @@ class AssemblyVisitor(Visitor):
     def visitParameterStatement(self, stmt: ParameterStatement):
         pass
 
-
+    # Problem!!!! How does it know if it is within a function scope or not?
     def accessVar(self, entry: SymbolTable.VariableValue):
-        self.generateCode("movq %rbp, %rax")
+        # offset = 8
+        # if isFunction:
+        #     offset = 16
+        self.generateCode("movq %rbp, %rax\t\t\t# Prepare to access variable from another scope")
         for i in range(self.table.level - entry.level):
-            self.generateCode("movq 16(%rax), %rax")   
+            self.generateCode(f"movq 16(%rax), %rax\t\t\t# Traverse static link once")   
 
-    def setStaticLink(self, levelDifference: int):
-        self.generateCode(f"movq %rbp, %rax\t\t\t# Prepare static link")
+    def setStaticLink(self, levelDifference: int, isFunction: bool):
+        offset = 8
+        if isFunction:
+            offset = 16
+        self.generateCode("movq %rbp, %rax\t\t\t# Prepare static link")
         for i in range(levelDifference):
-            self.generateCode(f"movq 16(%rax), %rax\t\t\t# Traverse static link once")
+            self.generateCode(f"movq {offset}(%rax), %rax\t\t\t# Traverse static link once")
         self.generateCode("pushq %rax\t\t\t# Push static link")       
 
     def startScope(self, varSpace: int):
@@ -230,16 +237,12 @@ class AssemblyVisitor(Visitor):
         return f"addq ${argsToPop}, %rsp\t\t\t# Pop the arguments pushed to the stack"
     
     def visitIfStatement(self, stmt: IfStatement):
- 
-
-         # Enter a new scope
+        # Enter a new scope
         self.table = stmt.thenTable
-        
-        self.setStaticLink(0)
-
+        self.setStaticLink(0, False)
         self.startScope(self.table.varCounter)
 
-          # For now 0 is false and everything else is true
+        # For now 0 is false and everything else is true
         stmt.condition.accept(self)
         self.generateCode("cmp $0, %rax\t\t\t# Check the condition")
         
@@ -264,7 +267,7 @@ class AssemblyVisitor(Visitor):
             self.table = stmt.elseTable
             self.generateCode("addq $8, %rsp\t\t\t# Deallocate space on stack for static link")
             self.endScope(self.table.varCounter)
-            self.setStaticLink(0)
+            self.setStaticLink(0, False)
             self.startScope(self.table.varCounter)
                 
             self.generateCode(f"else_part_{self.ifLabelCounter}:")
@@ -284,6 +287,7 @@ class AssemblyVisitor(Visitor):
     def visitWhileStatement(self, stmt: WhileStatement):
         # Enter a new scope
         self.table = stmt.table
+        self.setStaticLink(0, False)
         self.startScope(self.table.varCounter)
 
         self.generateCode(f"while_loop_{self.whileLabelCounter}:")
@@ -301,5 +305,24 @@ class AssemblyVisitor(Visitor):
         self.whileLabelCounter += 1
 
         # Exit the scope
+        self.generateCode("addq $8, %rsp\t\t\t# Deallocate space on stack for static link")
         self.endScope(self.table.varCounter)
         self.table = self.table.parent
+        
+    def visitPrintStatement(self, stmt: PrintStatement):
+        stmt.value.accept(self)
+        self.generateCode("\t\t\t# Start print statement")
+        self.generateCode("leaq form(%rip), %rdi\t\t\t# Passing string address (1. argument)")
+        self.generateCode("movq %rax, %rsi\t\t\t# Passing %rax (2. argument)")
+        self.generateCode("movq $0, %rax\t\t\t# No floating point registers used")
+        self.generateCode("testq $15, %rsp\t\t\t# Test for 16 byte alignment")
+        self.generateCode(f"jz print_align_{self.printLabelCounter}\t\t\t# Jump if aligned")
+        self.generateCode("addq $-8, %rsp\t\t\t# 16 byte aligning")
+        self.generateCode("callq printf@plt\t\t\t# Call printf")
+        self.generateCode("addq $8, %rsp\t\t\t# Reverting alignment")
+        self.generateCode(f"jmp end_print_{self.printLabelCounter}")
+        self.generateCode(f"print_align_{self.printLabelCounter}:")
+        self.generateCode("callq printf@plt\t\t\t# Call printf")
+        self.generateCode(f"end_print_{self.printLabelCounter}:")
+        self.generateCode("\t\t\t# End print statement")
+        self.printLabelCounter += 1

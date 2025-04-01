@@ -39,11 +39,12 @@ one()
 
 data = '''
 var a = 2
-if 3 then {
-    a
-}
-
-
+print a
+print a 
+print a
+var b = 0
+a = 4
+a
 '''
 
 result = parser.parse(data)

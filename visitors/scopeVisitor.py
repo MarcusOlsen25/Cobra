@@ -93,13 +93,5 @@ class ScopeVisitor(Visitor):
             
         self.table = self.table.parent
            
- 
-
-
-        
-
-
-
-    
-
-    
+    def visitPrintStatement(self, stmt: PrintStatement):
+        stmt.value.accept(self)

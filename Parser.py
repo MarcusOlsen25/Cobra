@@ -28,7 +28,8 @@ def p_declaration(p):
 def p_statement(p):
     '''statement : expression
                  | ifStatement
-                 | whileStatement''' 
+                 | whileStatement
+                 | printStatement''' 
     p[0] = p[1]
     
 #If statements
@@ -44,6 +45,11 @@ def p_ifStatement_else(p):
 def p_whileStatement(p):
     '''whileStatement : WHILE expression THEN LBRACE declaration_list RBRACE'''
     p[0] = WhileStatement(p[2], p[5], None)
+
+#Print statement
+def p_printStatement(p):
+    '''printStatement : PRINT expression'''
+    p[0] = p[2]
 
 #Variable declaration uninitialized
 def p_varDeclaration_uninitialized(p):

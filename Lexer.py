@@ -10,7 +10,8 @@ reserved = {"if": "IF",
             "var": "VAR",
             "return": "RETURN",
             "or": "OR",
-            "and": "AND"
+            "and": "AND",
+            "print": "PRINT"
             }
 
 tokens = [
