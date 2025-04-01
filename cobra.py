@@ -22,29 +22,11 @@ lexer.input(lexerData)
 parser = yacc.yacc()
 
 parserData = '''
-var a = 4
-func one() {
-    func five() {
-        a
-    }
- 
-    func two() {
-        a = 3
-        func six() {
-            five()
-        }
-        func three() {
-            func four() {
-                six()
-            }
-            four()
-            six()
-        }
-        three()
-    }
-    two()
+if 3 then {
+    var c = 2
+} else {
+    var d = 5
 }
-one()
 '''
 
 data = '''

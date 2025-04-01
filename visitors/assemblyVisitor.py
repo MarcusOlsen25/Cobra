@@ -12,6 +12,7 @@ class AssemblyVisitor(Visitor):
         self.functionStack = []
         self.ifLabelCounter = 0
         self.whileLabelCounter = 0
+        self.binaryLabelCounter = 0
 
     def generateCode(self, output: str):
         if len(self.functionStack) == 0:
@@ -36,6 +37,108 @@ class AssemblyVisitor(Visitor):
             case "/":
                 self.generateCode("movq $0, %rdx\t\t\t# Put a 0 in %rdx to prepare for the division")
                 self.generateCode("idivq %rbx\t\t\t# Divide both sides")
+            case "==":
+                self.equalityComparison()
+            case "!=":
+                self.inequalityComparison()
+            case ">":
+                self.greaterComparison()
+            case "<":
+                self.lessComparison()
+            case ">=":
+                self.greaterOrEqualComparison()
+            case "<=":
+                self.lessOrEqualComparison()
+            case "and":
+                self.andLogical()
+            case "or":
+                self.orLogical()
+    
+    def equalityComparison(self):
+        self.generateCode("cmp %rax, %rbx\t\t\t# Compare both sides")
+        self.generateCode(f"jne comp_skip_{self.binaryLabelCounter}\t\t\t# Skip if they are not equal")
+        self.generateCode("movq $1, %rax\t\t\t# Put TRUE in %rax")
+        self.generateCode(f"jmp comp_end_{self.binaryLabelCounter}\t\t\t# Skip the alternative branch")
+        self.generateCode(f"comp_skip_{self.binaryLabelCounter}:")
+        self.generateCode("movq $0, %rax\t\t\t# Put FALSE in %rax")
+        self.generateCode(f"comp_end_{self.binaryLabelCounter}:")
+        self.binaryLabelCounter += 1
+        
+    def inequalityComparison(self):
+        self.generateCode("cmp %rax, %rbx\t\t\t# Compare both sides")
+        self.generateCode(f"je comp_skip_{self.binaryLabelCounter}\t\t\t# Skip if they are equal")
+        self.generateCode("movq $1, %rax\t\t\t# Put TRUE in %rax")
+        self.generateCode(f"jmp comp_end_{self.binaryLabelCounter}\t\t\t# Skip the alternative branch")
+        self.generateCode(f"comp_skip_{self.binaryLabelCounter}:")
+        self.generateCode("movq $0, %rax\t\t\t# Put FALSE in %rax")
+        self.generateCode(f"comp_end_{self.binaryLabelCounter}:")
+        self.binaryLabelCounter += 1
+        
+    def greaterComparison(self):
+        self.generateCode("cmp %rax, %rbx\t\t\t# Compare both sides")
+        self.generateCode(f"jge comp_skip_{self.binaryLabelCounter}\t\t\t# Skip if right side is greater or equal")
+        self.generateCode("movq $1, %rax\t\t\t# Put TRUE in %rax")
+        self.generateCode(f"jmp comp_end_{self.binaryLabelCounter}\t\t\t# Skip the alternative branch")
+        self.generateCode(f"comp_skip_{self.binaryLabelCounter}:")
+        self.generateCode("movq $0, %rax\t\t\t# Put FALSE in %rax")
+        self.generateCode(f"comp_end_{self.binaryLabelCounter}:")
+        self.binaryLabelCounter += 1
+        
+    def lessComparison(self):
+        self.generateCode("cmp %rax, %rbx\t\t\t# Compare both sides")
+        self.generateCode(f"jle comp_skip_{self.binaryLabelCounter}\t\t\t# Skip if right side is less or equal")
+        self.generateCode("movq $1, %rax\t\t\t# Put TRUE in %rax")
+        self.generateCode(f"jmp comp_end_{self.binaryLabelCounter}\t\t\t# Skip the alternative branch")
+        self.generateCode(f"comp_skip_{self.binaryLabelCounter}:")
+        self.generateCode("movq $0, %rax\t\t\t# Put FALSE in %rax")
+        self.generateCode(f"comp_end_{self.binaryLabelCounter}:")
+        self.binaryLabelCounter += 1
+        
+    def greaterOrEqualComparison(self):
+        self.generateCode("cmp %rax, %rbx\t\t\t# Compare both sides")
+        self.generateCode(f"jg comp_skip_{self.binaryLabelCounter}\t\t\t# Skip if right side is greater")
+        self.generateCode("movq $1, %rax\t\t\t# Put TRUE in %rax")
+        self.generateCode(f"jmp comp_end_{self.binaryLabelCounter}\t\t\t# Skip the alternative branch")
+        self.generateCode(f"comp_skip_{self.binaryLabelCounter}:")
+        self.generateCode("movq $0, %rax\t\t\t# Put FALSE in %rax")
+        self.generateCode(f"comp_end_{self.binaryLabelCounter}:")
+        self.binaryLabelCounter += 1
+        
+    def lessOrEqualComparison(self):
+        self.generateCode("cmp %rax, %rbx\t\t\t# Compare both sides")
+        self.generateCode(f"jl comp_skip_{self.binaryLabelCounter}\t\t\t# Skip if right side is less")
+        self.generateCode("movq $1, %rax\t\t\t# Put TRUE in %rax")
+        self.generateCode(f"jmp comp_end_{self.binaryLabelCounter}\t\t\t# Skip the alternative branch")
+        self.generateCode(f"comp_skip_{self.binaryLabelCounter}:")
+        self.generateCode("movq $0, %rax\t\t\t# Put FALSE in %rax")
+        self.generateCode(f"comp_end_{self.binaryLabelCounter}:")
+        self.binaryLabelCounter += 1
+        
+    def andLogical(self):
+        self.generateCode("movq $0, %rdx\t\t\t# Put FALSE in %rdx")
+        self.generateCode("cmp %rax, %rdx\t\t\t# Check if the left side is false")
+        self.generateCode(f"je logical_false_{self.binaryLabelCounter}\t\t# Skip to the false")
+        self.generateCode("cmp %rbx, %rdx\t\t\t# Check if the right side is false")
+        self.generateCode(f"je logical_false_{self.binaryLabelCounter}\t\t# Skip to the false")
+        self.generateCode("movq $1, %rax\t\t\t# Put TRUE in %rax")
+        self.generateCode(f"jmp logical_end_{self.binaryLabelCounter}\t\t# Skip to the end")
+        self.generateCode(f"logical_false_{self.binaryLabelCounter}:")
+        self.generateCode("movq $0, %rax\t\t\t# Put FALSE in %rax")
+        self.generateCode(f"logical_end_{self.binaryLabelCounter}:")
+        self.binaryLabelCounter += 1
+        
+    def orLogical(self):
+        self.generateCode("movq $0, %rdx\t\t\t# Put FALSE in %rdx")
+        self.generateCode("cmp %rax, %rdx\t\t\t# Check if the left side is false")
+        self.generateCode(f"jne logical_true_{self.binaryLabelCounter}\t\t# Skip to the true") 
+        self.generateCode("cmp %rbx, %rdx\t\t\t# Check if the right side is false")
+        self.generateCode(f"jne logical_true_{self.binaryLabelCounter}\t\t# Skip to the true") 
+        self.generateCode("movq $0, %rax\t\t\t# Put FALSE in %rax")
+        self.generateCode(f"jmp logical_end_{self.binaryLabelCounter}\t\t# Skip to the end")
+        self.generateCode(f"logical_true_{self.binaryLabelCounter}:")
+        self.generateCode("movq $1, %rax\t\t\t# Put TRUE in %rax")
+        self.generateCode(f"logical_end_{self.binaryLabelCounter}:")
+        self.binaryLabelCounter += 1
 
     def visitNumberExpression(self, expr: NumberExpression):
         self.generateCode(f"movq ${expr.value}, %rax\t\t\t# Put a number in %rax")
@@ -129,7 +232,6 @@ class AssemblyVisitor(Visitor):
         return f"addq ${argsToPop}, %rsp\t\t\t# Pop the arguments pushed to the stack"
     
     def visitIfStatement(self, stmt: IfStatement):
-        
         # Enter a new scope
         self.table = stmt.thenTable
         self.startScope(self.table.varCounter)
@@ -148,17 +250,17 @@ class AssemblyVisitor(Visitor):
             self.generateCode(f"end_if_{self.ifLabelCounter}:")
         
         else:
-            
-            # Switch the scope
-            self.table = stmt.elseTable
-            self.endScope(self.table.varCounter)
-            self.startScope(self.table.varCounter)
 
             self.generateCode(f"je else_part_{self.ifLabelCounter}\t\t\t# Skip to the else if the condition is false")
             
             for s in stmt.thenStatement:
                 s.accept(self)
             self.generateCode(f"jmp end_if_{self.ifLabelCounter}\t\t\t# Skip the else")
+            
+            # Switch the scope
+            self.table = stmt.elseTable
+            self.endScope(self.table.varCounter)
+            self.startScope(self.table.varCounter)
                 
             self.generateCode(f"else_part_{self.ifLabelCounter}:")
             
@@ -174,7 +276,6 @@ class AssemblyVisitor(Visitor):
         self.table = self.table.parent
         
     def visitWhileStatement(self, stmt: WhileStatement):
-        
         # Enter a new scope
         self.table = stmt.table
         self.startScope(self.table.varCounter)
