@@ -10,28 +10,25 @@ form:
 main:
         pushq %rbp                      # Save base pointer
         movq %rsp, %rbp                 # Make stack pointer new base pointer
-        subq $0, %rsp                   # Allocate space for local variables on the stack
-        pushq %rbp                      # Save base pointer
-        movq %rsp, %rbp                 # Make stack pointer new base pointer
         subq $8, %rsp                   # Allocate space for local variables on the stack
-        movq $0, %rax                   # Put a number in %rax
-        cmp $0, %rax                    # Check the condition
-        je else_part_0                  # Skip to the else if the condition is false
         movq $2, %rax                   # Put a number in %rax
         movq %rax, -8(%rbp)             # Move initialized value into space on stack
-        jmp end_if_0                    # Skip the else
-        addq $8, %rsp                   # Deallocate space for local variables on the stack
-        popq %rbp                       # Restore base pointer
+        movq %rbp, %rax                 # Prepare static link
+        pushq %rax                      # Push static link
         pushq %rbp                      # Save base pointer
         movq %rsp, %rbp                 # Make stack pointer new base pointer
-        subq $8, %rsp                   # Allocate space for local variables on the stack
-        else_part_0:
-        movq $5, %rax                   # Put a number in %rax
-        movq %rax, -8(%rbp)             # Move initialized value into space on stack
+        subq $0, %rsp                   # Allocate space for local variables on the stack
+        movq $3, %rax                   # Put a number in %rax
+        cmp $0, %rax                    # Check the condition
+        je end_if_0                     # Skip if the condition is false
+        movq %rbp, %rax
+        movq 8(%rax), %rax
+        movq -8(%rax), %rax             # Assign value to %rax
         end_if_0:
-        addq $8, %rsp                   # Deallocate space for local variables on the stack
+        addq $8, %rsp                   # Deallocate space on stack for static link
+        addq $0, %rsp                   # Deallocate space for local variables on the stack
         popq %rbp                       # Restore base pointer
-        addq $0, %rsp                   # Deallocate global variables
+        addq $8, %rsp                   # Deallocate global variables
 
 # Paste before this line
 

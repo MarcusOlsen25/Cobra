@@ -206,11 +206,9 @@ class AssemblyVisitor(Visitor):
 
 
     def accessVar(self, entry: SymbolTable.VariableValue):
-            currentTable = self.table
-            self.generateCode("movq %rbp, %rax")
-            while currentTable.level - entry.level > 0:
-                self.generateCode("movq 16(%rax), %rax")
-                currentTable = currentTable.findStaticLink(currentTable.name)   
+        self.generateCode("movq %rbp, %rax")
+        for i in range(self.table.level - entry.level):
+            self.generateCode("movq 16(%rax), %rax")   
 
     def setStaticLink(self, levelDifference: int):
         self.generateCode(f"movq %rbp, %rax\t\t\t# Prepare static link")
@@ -232,11 +230,16 @@ class AssemblyVisitor(Visitor):
         return f"addq ${argsToPop}, %rsp\t\t\t# Pop the arguments pushed to the stack"
     
     def visitIfStatement(self, stmt: IfStatement):
-        # Enter a new scope
+ 
+
+         # Enter a new scope
         self.table = stmt.thenTable
+        
+        self.setStaticLink(0)
+
         self.startScope(self.table.varCounter)
 
-        # For now 0 is false and everything else is true
+          # For now 0 is false and everything else is true
         stmt.condition.accept(self)
         self.generateCode("cmp $0, %rax\t\t\t# Check the condition")
         
@@ -259,7 +262,9 @@ class AssemblyVisitor(Visitor):
             
             # Switch the scope
             self.table = stmt.elseTable
+            self.generateCode("addq $8, %rsp\t\t\t# Deallocate space on stack for static link")
             self.endScope(self.table.varCounter)
+            self.setStaticLink(0)
             self.startScope(self.table.varCounter)
                 
             self.generateCode(f"else_part_{self.ifLabelCounter}:")
@@ -272,6 +277,7 @@ class AssemblyVisitor(Visitor):
         self.ifLabelCounter += 1
         
         # Exit the scope 
+        self.generateCode("addq $8, %rsp\t\t\t# Deallocate space on stack for static link")
         self.endScope(self.table.varCounter)
         self.table = self.table.parent
         

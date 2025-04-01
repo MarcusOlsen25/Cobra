@@ -22,22 +22,31 @@ lexer.input(lexerData)
 parser = yacc.yacc()
 
 parserData = '''
-if 3 then {
-    var c = 2
-} else {
-    var d = 5
+var b = 4
+func one() {
+    var a = 2
+    func two() {
+        b
+    }
+    func three() {
+        var a = 3
+        two()
+    }
+    three()
 }
+one()
 '''
 
 data = '''
+var a = 2
 if 3 then {
-    var c = 2
+    a
 }
 
 
 '''
 
-result = parser.parse(parserData)
+result = parser.parse(data)
 
 printVisitor = PrintVisitor()
 evalVisitor = EvalVisitor()
