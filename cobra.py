@@ -30,21 +30,29 @@ while a < 10 then {
 '''
 
 data = '''
-var a = 2
-func one(x,y) {
-    print x
-    func two() {
-        print a
-    }
-    func three(s) {
-        if a + s then {
-            print a + s
+var a = 1
+var b = 2
+var c = 3
+var d = 4
+var e = 5
+if 3 then {
+    print a
+    if 3 then {
+        print b
+        if 0 then {
+            print c
+            if 0 then {
+                print d
+            }
+            print c
         }
-        two()
+        if 3 then {
+            print e
+        }
+        print b
     }
-    three(y)
+    print a
 }
-one(a,3)
 '''
 
 result = parser.parse(data)

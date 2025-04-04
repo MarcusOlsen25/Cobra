@@ -56,90 +56,106 @@ class AssemblyVisitor(Visitor):
                 self.orLogical()
     
     def equalityComparison(self):
-        self.generateCode("cmp %rax, %rbx\t\t\t# Compare both sides")
-        self.generateCode(f"jne comp_skip_{self.binaryLabelCounter}\t\t\t# Skip if they are not equal")
-        self.generateCode("movq $1, %rax\t\t\t# Put TRUE in %rax")
-        self.generateCode(f"jmp comp_end_{self.binaryLabelCounter}\t\t\t# Skip the alternative branch")
-        self.generateCode(f"comp_skip_{self.binaryLabelCounter}:")
-        self.generateCode("movq $0, %rax\t\t\t# Put FALSE in %rax")
-        self.generateCode(f"comp_end_{self.binaryLabelCounter}:")
+        # Save label counter and update it
+        label = self.binaryLabelCounter
         self.binaryLabelCounter += 1
+        self.generateCode("cmp %rax, %rbx\t\t\t# Compare both sides")
+        self.generateCode(f"jne comp_skip_{label}\t\t\t# Skip if they are not equal")
+        self.generateCode("movq $1, %rax\t\t\t# Put TRUE in %rax")
+        self.generateCode(f"jmp comp_end_{label}\t\t\t# Skip the alternative branch")
+        self.generateCode(f"comp_skip_{label}:")
+        self.generateCode("movq $0, %rax\t\t\t# Put FALSE in %rax")
+        self.generateCode(f"comp_end_{label}:")
         
     def inequalityComparison(self):
-        self.generateCode("cmp %rax, %rbx\t\t\t# Compare both sides")
-        self.generateCode(f"je comp_skip_{self.binaryLabelCounter}\t\t\t# Skip if they are equal")
-        self.generateCode("movq $1, %rax\t\t\t# Put TRUE in %rax")
-        self.generateCode(f"jmp comp_end_{self.binaryLabelCounter}\t\t\t# Skip the alternative branch")
-        self.generateCode(f"comp_skip_{self.binaryLabelCounter}:")
-        self.generateCode("movq $0, %rax\t\t\t# Put FALSE in %rax")
-        self.generateCode(f"comp_end_{self.binaryLabelCounter}:")
+        # Save label counter and update it
+        label = self.binaryLabelCounter
         self.binaryLabelCounter += 1
+        self.generateCode("cmp %rax, %rbx\t\t\t# Compare both sides")
+        self.generateCode(f"je comp_skip_{label}\t\t\t# Skip if they are equal")
+        self.generateCode("movq $1, %rax\t\t\t# Put TRUE in %rax")
+        self.generateCode(f"jmp comp_end_{label}\t\t\t# Skip the alternative branch")
+        self.generateCode(f"comp_skip_{label}:")
+        self.generateCode("movq $0, %rax\t\t\t# Put FALSE in %rax")
+        self.generateCode(f"comp_end_{label}:")
         
     def greaterComparison(self):
-        self.generateCode("cmp %rax, %rbx\t\t\t# Compare both sides")
-        self.generateCode(f"jge comp_skip_{self.binaryLabelCounter}\t\t\t# Skip if right side is greater or equal")
-        self.generateCode("movq $1, %rax\t\t\t# Put TRUE in %rax")
-        self.generateCode(f"jmp comp_end_{self.binaryLabelCounter}\t\t\t# Skip the alternative branch")
-        self.generateCode(f"comp_skip_{self.binaryLabelCounter}:")
-        self.generateCode("movq $0, %rax\t\t\t# Put FALSE in %rax")
-        self.generateCode(f"comp_end_{self.binaryLabelCounter}:")
+        # Save label counter and update it
+        label = self.binaryLabelCounter
         self.binaryLabelCounter += 1
+        self.generateCode("cmp %rax, %rbx\t\t\t# Compare both sides")
+        self.generateCode(f"jge comp_skip_{label}\t\t\t# Skip if right side is greater or equal")
+        self.generateCode("movq $1, %rax\t\t\t# Put TRUE in %rax")
+        self.generateCode(f"jmp comp_end_{label}\t\t\t# Skip the alternative branch")
+        self.generateCode(f"comp_skip_{label}:")
+        self.generateCode("movq $0, %rax\t\t\t# Put FALSE in %rax")
+        self.generateCode(f"comp_end_{label}:")
         
     def lessComparison(self):
-        self.generateCode("cmp %rax, %rbx\t\t\t# Compare both sides")
-        self.generateCode(f"jle comp_skip_{self.binaryLabelCounter}\t\t\t# Skip if right side is less or equal")
-        self.generateCode("movq $1, %rax\t\t\t# Put TRUE in %rax")
-        self.generateCode(f"jmp comp_end_{self.binaryLabelCounter}\t\t\t# Skip the alternative branch")
-        self.generateCode(f"comp_skip_{self.binaryLabelCounter}:")
-        self.generateCode("movq $0, %rax\t\t\t# Put FALSE in %rax")
-        self.generateCode(f"comp_end_{self.binaryLabelCounter}:")
+        # Save label counter and update it
+        label = self.binaryLabelCounter
         self.binaryLabelCounter += 1
+        self.generateCode("cmp %rax, %rbx\t\t\t# Compare both sides")
+        self.generateCode(f"jle comp_skip_{label}\t\t\t# Skip if right side is less or equal")
+        self.generateCode("movq $1, %rax\t\t\t# Put TRUE in %rax")
+        self.generateCode(f"jmp comp_end_{label}\t\t\t# Skip the alternative branch")
+        self.generateCode(f"comp_skip_{label}:")
+        self.generateCode("movq $0, %rax\t\t\t# Put FALSE in %rax")
+        self.generateCode(f"comp_end_{label}:")
         
     def greaterOrEqualComparison(self):
-        self.generateCode("cmp %rax, %rbx\t\t\t# Compare both sides")
-        self.generateCode(f"jg comp_skip_{self.binaryLabelCounter}\t\t\t# Skip if right side is greater")
-        self.generateCode("movq $1, %rax\t\t\t# Put TRUE in %rax")
-        self.generateCode(f"jmp comp_end_{self.binaryLabelCounter}\t\t\t# Skip the alternative branch")
-        self.generateCode(f"comp_skip_{self.binaryLabelCounter}:")
-        self.generateCode("movq $0, %rax\t\t\t# Put FALSE in %rax")
-        self.generateCode(f"comp_end_{self.binaryLabelCounter}:")
+        # Save label counter and update it
+        label = self.binaryLabelCounter
         self.binaryLabelCounter += 1
+        self.generateCode("cmp %rax, %rbx\t\t\t# Compare both sides")
+        self.generateCode(f"jg comp_skip_{label}\t\t\t# Skip if right side is greater")
+        self.generateCode("movq $1, %rax\t\t\t# Put TRUE in %rax")
+        self.generateCode(f"jmp comp_end_{label}\t\t\t# Skip the alternative branch")
+        self.generateCode(f"comp_skip_{label}:")
+        self.generateCode("movq $0, %rax\t\t\t# Put FALSE in %rax")
+        self.generateCode(f"comp_end_{label}:")
         
     def lessOrEqualComparison(self):
-        self.generateCode("cmp %rax, %rbx\t\t\t# Compare both sides")
-        self.generateCode(f"jl comp_skip_{self.binaryLabelCounter}\t\t\t# Skip if right side is less")
-        self.generateCode("movq $1, %rax\t\t\t# Put TRUE in %rax")
-        self.generateCode(f"jmp comp_end_{self.binaryLabelCounter}\t\t\t# Skip the alternative branch")
-        self.generateCode(f"comp_skip_{self.binaryLabelCounter}:")
-        self.generateCode("movq $0, %rax\t\t\t# Put FALSE in %rax")
-        self.generateCode(f"comp_end_{self.binaryLabelCounter}:")
+        # Save label counter and update it
+        label = self.binaryLabelCounter
         self.binaryLabelCounter += 1
+        self.generateCode("cmp %rax, %rbx\t\t\t# Compare both sides")
+        self.generateCode(f"jl comp_skip_{label}\t\t\t# Skip if right side is less")
+        self.generateCode("movq $1, %rax\t\t\t# Put TRUE in %rax")
+        self.generateCode(f"jmp comp_end_{label}\t\t\t# Skip the alternative branch")
+        self.generateCode(f"comp_skip_{label}:")
+        self.generateCode("movq $0, %rax\t\t\t# Put FALSE in %rax")
+        self.generateCode(f"comp_end_{label}:")
         
     def andLogical(self):
+        # Save label counter and update it
+        label = self.binaryLabelCounter
+        self.binaryLabelCounter += 1
         self.generateCode("movq $0, %rdx\t\t\t# Put FALSE in %rdx")
         self.generateCode("cmp %rax, %rdx\t\t\t# Check if the left side is false")
-        self.generateCode(f"je logical_false_{self.binaryLabelCounter}\t\t# Skip to the false")
+        self.generateCode(f"je logical_false_{label}\t\t# Skip to the false")
         self.generateCode("cmp %rbx, %rdx\t\t\t# Check if the right side is false")
-        self.generateCode(f"je logical_false_{self.binaryLabelCounter}\t\t# Skip to the false")
+        self.generateCode(f"je logical_false_{label}\t\t# Skip to the false")
         self.generateCode("movq $1, %rax\t\t\t# Put TRUE in %rax")
-        self.generateCode(f"jmp logical_end_{self.binaryLabelCounter}\t\t# Skip to the end")
-        self.generateCode(f"logical_false_{self.binaryLabelCounter}:")
+        self.generateCode(f"jmp logical_end_{label}\t\t# Skip to the end")
+        self.generateCode(f"logical_false_{label}:")
         self.generateCode("movq $0, %rax\t\t\t# Put FALSE in %rax")
-        self.generateCode(f"logical_end_{self.binaryLabelCounter}:")
-        self.binaryLabelCounter += 1
+        self.generateCode(f"logical_end_{label}:")
         
     def orLogical(self):
+        # Save label counter and update it
+        label = self.binaryLabelCounter
+        self.binaryLabelCounter += 1
         self.generateCode("movq $0, %rdx\t\t\t# Put FALSE in %rdx")
         self.generateCode("cmp %rax, %rdx\t\t\t# Check if the left side is false")
-        self.generateCode(f"jne logical_true_{self.binaryLabelCounter}\t\t# Skip to the true") 
+        self.generateCode(f"jne logical_true_{label}\t\t# Skip to the true") 
         self.generateCode("cmp %rbx, %rdx\t\t\t# Check if the right side is false")
-        self.generateCode(f"jne logical_true_{self.binaryLabelCounter}\t\t# Skip to the true") 
+        self.generateCode(f"jne logical_true_{label}\t\t# Skip to the true") 
         self.generateCode("movq $0, %rax\t\t\t# Put FALSE in %rax")
-        self.generateCode(f"jmp logical_end_{self.binaryLabelCounter}\t\t# Skip to the end")
-        self.generateCode(f"logical_true_{self.binaryLabelCounter}:")
+        self.generateCode(f"jmp logical_end_{label}\t\t# Skip to the end")
+        self.generateCode(f"logical_true_{label}:")
         self.generateCode("movq $1, %rax\t\t\t# Put TRUE in %rax")
-        self.generateCode(f"logical_end_{self.binaryLabelCounter}:")
-        self.binaryLabelCounter += 1
+        self.generateCode(f"logical_end_{label}:")
 
     def visitNumberExpression(self, expr: NumberExpression):
         self.generateCode(f"movq ${expr.value}, %rax\t\t\t# Put a number in %rax")
@@ -208,12 +224,12 @@ class AssemblyVisitor(Visitor):
     def accessVar(self, entry: SymbolTable.VariableValue):
         self.generateCode("movq %rbp, %rax\t\t\t# Prepare to access variable from another scope")
         for i in range(self.table.level - entry.level):
-            self.generateCode(f"movq 16(%rax), %rax\t\t\t# Traverse static link once")   
+            self.generateCode(f"movq 16(%rax), %rax\t\t# Traverse static link once")   
 
     def setStaticLink(self, levelDifference):
         self.generateCode("movq %rbp, %rax\t\t\t# Prepare static link")
         for i in range(levelDifference):
-            self.generateCode(f"movq 16(%rax), %rax\t\t\t# Traverse static link once")
+            self.generateCode(f"movq 16(%rax), %rax\t\t# Traverse static link once")
         self.generateCode("pushq %rax\t\t\t# Push static link")       
 
     def startScope(self, varSpace: int):
@@ -230,6 +246,10 @@ class AssemblyVisitor(Visitor):
         return f"addq ${argsToPop}, %rsp\t\t\t# Pop the arguments pushed to the stack"
     
     def visitIfStatement(self, stmt: IfStatement):
+        # Save label counter and update it
+        label = self.ifLabelCounter
+        self.ifLabelCounter += 1
+
         # Enter a new scope
         self.table = stmt.thenTable
         self.setStaticLink(0)
@@ -242,20 +262,20 @@ class AssemblyVisitor(Visitor):
         
         if stmt.elseStatement == None:
 
-            self.generateCode(f"je end_if_{self.ifLabelCounter}\t\t\t# Skip if the condition is false")
+            self.generateCode(f"je end_if_{label}\t\t\t# Skip if the condition is false")
             
             for s in stmt.thenStatement:
                 s.accept(self)
             
-            self.generateCode(f"end_if_{self.ifLabelCounter}:")
+            self.generateCode(f"end_if_{label}:")
         
         else:
 
-            self.generateCode(f"je else_part_{self.ifLabelCounter}\t\t\t# Skip to the else if the condition is false")
+            self.generateCode(f"je else_part_{label}\t\t\t# Skip to the else if the condition is false")
             
             for s in stmt.thenStatement:
                 s.accept(self)
-            self.generateCode(f"jmp end_if_{self.ifLabelCounter}\t\t\t# Skip the else")
+            self.generateCode(f"jmp end_if_{label}\t\t\t# Skip the else")
             
             # Switch the scope
             self.table = stmt.elseTable
@@ -266,15 +286,13 @@ class AssemblyVisitor(Visitor):
             self.generateCode("subq $8, %rsp")
             self.startScope(self.table.varCounter)
                 
-            self.generateCode(f"else_part_{self.ifLabelCounter}:")
+            self.generateCode(f"else_part_{label}:")
             
             for s in stmt.elseStatement:
                 s.accept(self)
                 
-            self.generateCode(f"end_if_{self.ifLabelCounter}:")
-        
-        self.ifLabelCounter += 1
-        
+            self.generateCode(f"end_if_{label}:")
+                
         # Exit the scope 
         self.generateCode("addq $8, %rsp\t\t\t# Deallocate space on stack for static link")
         self.generateCode("addq $8, %rsp")
@@ -282,25 +300,28 @@ class AssemblyVisitor(Visitor):
         self.table = self.table.parent
         
     def visitWhileStatement(self, stmt: WhileStatement):
+        # Save label counter and update it
+        label = self.whileLabelCounter
+        self.whileLabelCounter += 1
+        
         # Enter a new scope
         self.table = stmt.table
         self.setStaticLink(0)
         self.generateCode("subq $8, %rsp")
         self.startScope(self.table.varCounter)
 
-        self.generateCode(f"while_loop_{self.whileLabelCounter}:")
+        self.generateCode(f"while_loop_{label}:")
         
         # For now 0 is false and everything else is true
         stmt.condition.accept(self)
         self.generateCode("cmp $0, %rax\t\t\t# Check the condition")
-        self.generateCode(f"je end_while_{self.whileLabelCounter}\t\t\t# Skip if the condition is false")
+        self.generateCode(f"je end_while_{label}\t\t\t# Skip if the condition is false")
         
         for s in stmt.thenStatement:
                 s.accept(self)
         
-        self.generateCode(f"jmp while_loop_{self.whileLabelCounter}\t\t# Restart the loop")
-        self.generateCode(f"end_while_{self.whileLabelCounter}:")
-        self.whileLabelCounter += 1
+        self.generateCode(f"jmp while_loop_{label}\t\t# Restart the loop")
+        self.generateCode(f"end_while_{label}:")
 
         # Exit the scope
         self.generateCode("addq $8, %rsp\t\t\t# Deallocate space on stack for static link")
@@ -309,19 +330,22 @@ class AssemblyVisitor(Visitor):
         self.table = self.table.parent
         
     def visitPrintStatement(self, stmt: PrintStatement):
+        # Save label counter and update it
+        label = self.printLabelCounter
+        self.printLabelCounter += 1
+        
         stmt.value.accept(self)
         self.generateCode("\t\t\t# Start print statement")
-        self.generateCode("leaq form(%rip), %rdi\t\t\t# Passing string address (1. argument)")
+        self.generateCode("leaq form(%rip), %rdi\t\t# Passing string address (1. argument)")
         self.generateCode("movq %rax, %rsi\t\t\t# Passing %rax (2. argument)")
         self.generateCode("movq $0, %rax\t\t\t# No floating point registers used")
         self.generateCode("testq $15, %rsp\t\t\t# Test for 16 byte alignment")
-        self.generateCode(f"jz print_align_{self.printLabelCounter}\t\t\t# Jump if aligned")
+        self.generateCode(f"jz print_align_{label}\t\t# Jump if aligned")
         self.generateCode("addq $-8, %rsp\t\t\t# 16 byte aligning")
-        self.generateCode("callq printf@plt\t\t\t# Call printf")
+        self.generateCode("callq printf@plt\t\t# Call printf")
         self.generateCode("addq $8, %rsp\t\t\t# Reverting alignment")
-        self.generateCode(f"jmp end_print_{self.printLabelCounter}")
-        self.generateCode(f"print_align_{self.printLabelCounter}:")
-        self.generateCode("callq printf@plt\t\t\t# Call printf")
-        self.generateCode(f"end_print_{self.printLabelCounter}:")
+        self.generateCode(f"jmp end_print_{label}")
+        self.generateCode(f"print_align_{label}:")
+        self.generateCode("callq printf@plt\t\t# Call printf")
+        self.generateCode(f"end_print_{label}:")
         self.generateCode("\t\t\t# End print statement")
-        self.printLabelCounter += 1
