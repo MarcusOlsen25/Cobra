@@ -1,0 +1,17 @@
+# Makefile for compiling and running test.s with gcc
+
+# Target to compile the assembly file
+test2: test2.o
+	gcc -z noexecstack -o test2 test2.o
+
+# Rule to assemble the assembly source file
+test2.o: test2.s
+	gcc -c test2.s -o test2.o
+
+# Target to run the compiled program
+run: test2
+	./test2
+
+# Clean up the generated files
+clean:
+	rm -f test2.o test2
