@@ -217,6 +217,15 @@ def p_arguments_empty(p):
 def p_funcDeclaration_statement(p):
     '''funcDeclaration : FUNC ID LPAREN parameter_list RPAREN LBRACE declaration_list RBRACE'''
     p[0] = FunctionDeclaration(p[2], p[4], p[7], None) 
+    
+#Class declarations    
+# def p_classDeclaration_single(p):
+#     '''classDeclaration : CLASS ID LBRACE classFields RBRACE'''
+#     p[0] = ClassDeclaration(p[2], None, p[4])
+    
+# def p_classDeclaration_extended(p):
+#     '''classDeclaration : CLASS ID EXTENDS ID LBRACE classFields RBRACE'''
+#     p[0] = ClassDeclaration(p[2], p[4], p[6])
 
 #Parameters
 

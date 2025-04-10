@@ -16,38 +16,121 @@ if d == -15 then {
 }
 
 if 0 then {
-    print 6
+    print -1
 }
 
 if 1 then {
-    print 7
+    print 6
 }
 
 var zero = 0
 var one = 1
 
 if zero then {
-    print 8
+    print -1
 }
 
 if one then {
-    print 9
+    print 7
 }
 
 if zero then {
     print -1
 } else {
-    print 10
+    print 8
 }
 
 if one then {
-    print 11
+    print 9
 } else {
     print -1
 }
 
 if 1 then {
     var h = 9
-    var j = 12
+    var j = 10
     print j
+} else {
+    var y = 78
+    print y
+}
+
+if 0 then {
+    var h = 6
+    var t = 0
+    print h
+} else {
+    g = 11
+    print g
+}
+
+if 6 < 3 then {
+    print -1
+}
+
+if 3 < 6 then {
+    print 12
+}
+
+if 6 > 3 then {
+    print 13
+}
+
+if 3 > 8 then {
+    print -1
+}
+
+if 7 >= 9 then {
+    print -1
+}
+
+if 9 >= 2 then {
+    print 14
+}
+
+if 6 >= 6 then {
+    print 15
+}
+
+if 4 <= 2 then {
+    print -1
+}
+
+if 2 <= 4 then {
+    print 16
+}
+
+if 2 <= 2 then {
+    print 17
+}
+
+if 8 == 8 then {
+    print 18
+}
+
+if 8 == 9 then {
+    print -1 
+}
+
+if 8 != 5 then {
+    print 19
+}
+
+if 8 != 8 then {
+    print -1
+}
+
+var banan = 20
+while banan <= 25 then {
+    print banan
+    banan = banan + 1
+}
+
+var agurk = 26 
+while agurk + banan != 55 then {
+    print agurk
+    agurk = agurk + 1
 } 
+
+
+
