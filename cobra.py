@@ -31,28 +31,19 @@ while a < 10 then {
 
 data = '''
 var a = 1
-var b = 2
-var c = 3
-var d = 4
-var e = 5
-if 3 then {
-    print a
-    if 3 then {
-        print b
-        if 0 then {
-            print c
-            if 0 then {
-                print d
-            }
-            print c
-        }
-        if 3 then {
-            print e
-        }
-        print b
-    }
-    print a
-}
+print a
+
+var b = a + 1
+print b
+
+a = 3
+print a
+
+var c = a - b * 3 + 7
+print c
+
+var d = c / 9 - 3 * (b + a)
+print d
 '''
 
 result = parser.parse(data)

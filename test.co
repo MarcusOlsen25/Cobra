@@ -1,0 +1,53 @@
+var a = 1
+print a
+
+var b = a + 1
+print b
+
+a = 3
+print a
+
+var c = a - b * 3 + 7
+print c
+
+var d = c / 9 - 3 * (b + a)
+if d == -15 then {
+    print 5
+}
+
+if 0 then {
+    print 6
+}
+
+if 1 then {
+    print 7
+}
+
+var zero = 0
+var one = 1
+
+if zero then {
+    print 8
+}
+
+if one then {
+    print 9
+}
+
+if zero then {
+    print -1
+} else {
+    print 10
+}
+
+if one then {
+    print 11
+} else {
+    print -1
+}
+
+if 1 then {
+    var h = 9
+    var j = 12
+    print j
+} 

@@ -249,13 +249,7 @@ class AssemblyVisitor(Visitor):
         # Save label counter and update it
         label = self.ifLabelCounter
         self.ifLabelCounter += 1
-
-        # Enter a new scope
-        self.table = stmt.thenTable
-        self.setStaticLink(0)
-        self.generateCode("subq $8, %rsp")
-        self.startScope(self.table.varCounter)
-
+        
         # For now 0 is false and everything else is true
         stmt.condition.accept(self)
         self.generateCode("cmp $0, %rax\t\t\t# Check the condition")
@@ -263,25 +257,45 @@ class AssemblyVisitor(Visitor):
         if stmt.elseStatement == None:
 
             self.generateCode(f"je end_if_{label}\t\t\t# Skip if the condition is false")
+                
+            # Enter a new scope
+            self.table = stmt.thenTable
+            self.setStaticLink(0)
+            self.generateCode("subq $8, %rsp\t\t\t# Set dummy")
+            self.startScope(self.table.varCounter)
             
             for s in stmt.thenStatement:
                 s.accept(self)
             
             self.generateCode(f"end_if_{label}:")
+            
+            # Exit the scope 
+            self.endScope(self.table.varCounter)
+            self.generateCode("addq $8, %rsp\t\t\t# Remove dummy")
+            self.generateCode("addq $8, %rsp\t\t\t# Deallocate space on stack for static link")
+            self.table = self.table.parent
         
         else:
 
             self.generateCode(f"je else_part_{label}\t\t\t# Skip to the else if the condition is false")
             
+            # Enter a new scope
+            self.table = stmt.thenTable
+            self.setStaticLink(0)
+            self.generateCode("subq $8, %rsp\t\t\t# Set dummy")
+            self.startScope(self.table.varCounter)
+            
             for s in stmt.thenStatement:
                 s.accept(self)
+            
+            # End the then scope
+            self.endScope(self.table.varCounter)
+            self.generateCode("addq $8, %rsp\t\t\t# Remove dummy")
+            self.generateCode("addq $8, %rsp\t\t\t# Deallocate space on stack for static link")
             self.generateCode(f"jmp end_if_{label}\t\t\t# Skip the else")
             
-            # Switch the scope
+            # Switch to the else scope
             self.table = stmt.elseTable
-            self.generateCode("addq $8, %rsp\t\t\t# Deallocate space on stack for static link")
-            self.generateCode("addq $8, %rsp")
-            self.endScope(self.table.varCounter)
             self.setStaticLink(0)
             self.generateCode("subq $8, %rsp")
             self.startScope(self.table.varCounter)
@@ -290,14 +304,16 @@ class AssemblyVisitor(Visitor):
             
             for s in stmt.elseStatement:
                 s.accept(self)
-                
+            
+            # Exit the scope 
+            self.endScope(self.table.varCounter)
+            self.generateCode("addq $8, %rsp\t\t\t# Remove dummy")
+            self.generateCode("addq $8, %rsp\t\t\t# Deallocate space on stack for static link")
+            
             self.generateCode(f"end_if_{label}:")
+            self.table = self.table.parent
                 
-        # Exit the scope 
-        self.generateCode("addq $8, %rsp\t\t\t# Deallocate space on stack for static link")
-        self.generateCode("addq $8, %rsp")
-        self.endScope(self.table.varCounter)
-        self.table = self.table.parent
+        
         
     def visitWhileStatement(self, stmt: WhileStatement):
         # Save label counter and update it
