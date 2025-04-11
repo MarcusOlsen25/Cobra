@@ -166,7 +166,11 @@ def p_factor_unary(p):
 #Factor -> unary
 def p_unary(p):
     '''unary : NOT unary'''
-    p[0] = UnaryExpression(p[2])
+    p[0] = UnaryExpression(p[1], p[2])
+
+def p_unary_minus(p):
+    '''unary : MINUS unary'''
+    p[0] = UnaryExpression(p[1], p[2])
 
 #Unary -> call
 def p_unary_num(p):

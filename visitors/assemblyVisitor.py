@@ -21,6 +21,13 @@ class AssemblyVisitor(Visitor):
         else:
             current_function = self.functionStack[-1]
             self.functions[current_function].append("\t" + output)
+
+    def addLabel(self, output: str):
+        if len(self.functionStack) == 0:
+            self.main.append(output)
+        else:
+            current_function = self.functionStack[-1]
+            self.functions[current_function].append(output)
     
     def visitBinaryExpression(self, expr: BinaryExpression):
         expr.right.accept(self)
@@ -159,6 +166,12 @@ class AssemblyVisitor(Visitor):
 
     def visitNumberExpression(self, expr: NumberExpression):
         self.generateCode(f"movq ${expr.value}, %rax\t\t\t# Put a number in %rax")
+
+    def visitUnaryExpression(self, expr: UnaryExpression):
+        expr.value.accept(self)
+        if expr.operator == "-":
+            self.generateCode("negq %rax\t\t\t# Negate value")
+
     
     def visitVarExpression(self, expr: VarExpression):
         entry = self.table.lookup(expr.var)
@@ -232,14 +245,23 @@ class AssemblyVisitor(Visitor):
             self.generateCode(f"movq 16(%rax), %rax\t\t# Traverse static link once")
         self.generateCode("pushq %rax\t\t\t# Push static link")       
 
-    def startScope(self, varSpace: int):
-        self.generateCode("pushq %rbp\t\t\t# Save base pointer\n\tmovq %rsp, %rbp\t\t\t# Make stack pointer new base pointer")
-        self.generateCode(f"subq ${abs(varSpace)}, %rsp\t\t\t# Allocate space for local variables on the stack")
+    def startFunctionScope(self):
+        self.generateCode("pushq %rbp\t\t\t# Save base pointer")
+        self.generateCode("movq %rsp, %rbp\t\t\t# Make stack pointer new base pointer")
+        self.generateCode(f"subq ${abs(self.table.varCounter)}, %rsp\t\t\t# Allocate space for local variables on the stack")
 
     # def endScope(self, args: int, varSpace: int):
-    def endScope(self, varSpace: int):
-        self.generateCode(f"addq ${abs(varSpace)}, %rsp\t\t\t# Deallocate space for variables on the stack")
+    def endFunctionScope(self):
+        self.generateCode(f"addq ${abs(self.table.varCounter)}, %rsp\t\t\t# Deallocate space for variables on the stack")
         self.generateCode("popq %rbp\t\t\t# Restore base pointer")
+
+    def startScope(self):
+        self.generateCode("subq $8, %rsp\t\t\t# Set dummy")
+        self.startFunctionScope()
+
+    def endScope(self):
+        self.endFunctionScope()
+        self.generateCode("addq $8, %rsp\t\t\t# Remove dummy")
 
     def popArgs(self, args: int):
         argsToPop = 8 * args
@@ -253,67 +275,49 @@ class AssemblyVisitor(Visitor):
         # For now 0 is false and everything else is true
         stmt.condition.accept(self)
         self.generateCode("cmp $0, %rax\t\t\t# Check the condition")
-        
-        if stmt.elseStatement == None:
 
-            self.generateCode(f"je end_if_{label}\t\t\t# Skip if the condition is false")
-                
-            # Enter a new scope
-            self.table = stmt.thenTable
-            self.setStaticLink(0)
-            self.generateCode("subq $8, %rsp\t\t\t# Set dummy")
-            self.startScope(self.table.varCounter)
-            
-            for s in stmt.thenStatement:
-                s.accept(self)
-            
-            self.generateCode(f"end_if_{label}:")
-            
-            # Exit the scope 
-            self.endScope(self.table.varCounter)
-            self.generateCode("addq $8, %rsp\t\t\t# Remove dummy")
-            self.generateCode("addq $8, %rsp\t\t\t# Deallocate space on stack for static link")
-            self.table = self.table.parent
-        
-        else:
-
+        if stmt.elseStatement:
             self.generateCode(f"je else_part_{label}\t\t\t# Skip to the else if the condition is false")
-            
-            # Enter a new scope
-            self.table = stmt.thenTable
-            self.setStaticLink(0)
-            self.generateCode("subq $8, %rsp\t\t\t# Set dummy")
-            self.startScope(self.table.varCounter)
-            
-            for s in stmt.thenStatement:
-                s.accept(self)
-            
-            # End the then scope
-            self.endScope(self.table.varCounter)
-            self.generateCode("addq $8, %rsp\t\t\t# Remove dummy")
-            self.generateCode("addq $8, %rsp\t\t\t# Deallocate space on stack for static link")
-            self.generateCode(f"jmp end_if_{label}\t\t\t# Skip the else")
-            
-            # Switch to the else scope
+        else:
+            self.generateCode(f"je end_{label}\t\t\t# Skip if the condition is false")
+        
+        self.table = stmt.thenTable
+
+        #Prologue for then block
+        self.setStaticLink(0)
+        self.startScope()
+
+        for s in stmt.thenStatement:
+            s.accept(self)
+
+        #Epilogue for then block
+        self.addLabel(f"end_then_{label}:\t\t\t# Clean up then block stack frame")
+        self.endScope()
+        self.generateCode("addq $8, %rsp\t\t\t# Deallocate space on stack for static link")
+
+        self.generateCode(f"jmp end_{label}\t\t\t# Skip the else")
+
+        if stmt.elseStatement:
+            self.addLabel(f"else_part_{label}:")
+
             self.table = stmt.elseTable
+
+            #Prologue for else block
             self.setStaticLink(0)
-            self.generateCode("subq $8, %rsp")
-            self.startScope(self.table.varCounter)
-                
-            self.generateCode(f"else_part_{label}:")
-            
+            self.startScope()
+
             for s in stmt.elseStatement:
                 s.accept(self)
             
-            # Exit the scope 
-            self.endScope(self.table.varCounter)
-            self.generateCode("addq $8, %rsp\t\t\t# Remove dummy")
+            #Epilogue for else block
+            self.addLabel(f"end_else_{label}:")
+            self.endScope()
             self.generateCode("addq $8, %rsp\t\t\t# Deallocate space on stack for static link")
             
-            self.generateCode(f"end_if_{label}:")
-            self.table = self.table.parent
-                
-        
+        self.addLabel(f"end_{label}:")
+
+        self.table = self.table.parent
+    
         
     def visitWhileStatement(self, stmt: WhileStatement):
         # Save label counter and update it
@@ -323,8 +327,7 @@ class AssemblyVisitor(Visitor):
         # Enter a new scope
         self.table = stmt.table
         self.setStaticLink(0)
-        self.generateCode("subq $8, %rsp")
-        self.startScope(self.table.varCounter)
+        self.startScope()
 
         self.generateCode(f"while_loop_{label}:")
         
@@ -335,16 +338,15 @@ class AssemblyVisitor(Visitor):
         
         for s in stmt.thenStatement:
                 s.accept(self)
-        
+
         self.generateCode(f"jmp while_loop_{label}\t\t# Restart the loop")
         self.generateCode(f"end_while_{label}:")
 
         # Exit the scope
+        self.endScope()
         self.generateCode("addq $8, %rsp\t\t\t# Deallocate space on stack for static link")
-        self.generateCode("addq $8, %rsp")
-        self.endScope(self.table.varCounter)
         self.table = self.table.parent
-        
+
     def visitPrintStatement(self, stmt: PrintStatement):
         # Save label counter and update it
         label = self.printLabelCounter

@@ -56,3 +56,10 @@ class PrintStatement(Stmt):
     
     def accept(self, visitor):
         return visitor.visitPrintStatement(self)
+    
+class ReturnStatement(Stmt):
+    def __init__(self, value: Expr):
+        self.value = value
+
+    def accept(self, visitor):
+        return visitor.visitReturnStatement(self)

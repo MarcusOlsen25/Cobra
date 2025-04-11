@@ -22,11 +22,7 @@ lexer.input(lexerData)
 parser = yacc.yacc()
 
 parserData = '''
-var a = 1
-while a < 10 then {
-    print a
-    a = a + 1
-}
+print -2
 '''
 
 data = '''
@@ -46,7 +42,10 @@ var d = c / 9 - 3 * (b + a)
 print d
 '''
 
-result = parser.parse(data)
+with open("test.co", "r") as file:
+    test = file.read()
+
+result = parser.parse(test)
 
 printVisitor = PrintVisitor()
 evalVisitor = EvalVisitor()
@@ -67,14 +66,14 @@ for statement in result:
 assemblyVisitor = AssemblyVisitor(table)
 
 #Function prologue for main
-assemblyVisitor.startScope(table.varCounter)
+assemblyVisitor.startFunctionScope()
 
 for s in result:
     s.accept(assemblyVisitor)
 
 #Function epilogue for main
 #To be changed with
-assemblyVisitor.endScope(assemblyVisitor.table.varCounter)
+assemblyVisitor.endFunctionScope()
 assemblyVisitor.generateCode("movq $0, %rax\t\t\t# End with error code 0")
 assemblyVisitor.generateCode("ret\t\t\t# Return from main")
 
@@ -87,4 +86,11 @@ for function in assemblyVisitor.functions.values():
 program += assemblyVisitor.main
 
 for p in program:
-    print(p)
+     print(p)
+
+with open("assembly/test2.s", "w") as file:
+        file.write(".data\nform:\n\t.string \"%d\\n\"\n")
+        for p in program:
+            file.write(p)
+            file.write("\n")
+

@@ -8,6 +8,9 @@ class ScopeVisitor(Visitor):
     def __init__(self, table: SymbolTable):
         self.table = table
 
+    def visitUnaryExpression(self, expr: UnaryExpression):
+        expr.value.accept(self)
+
     def visitBinaryExpression(self, expr: BinaryExpression):
         expr.left.accept(self)
         expr.right.accept(self)
@@ -94,4 +97,7 @@ class ScopeVisitor(Visitor):
         self.table = self.table.parent
            
     def visitPrintStatement(self, stmt: PrintStatement):
+        stmt.value.accept(self)
+
+    def visitReturnStatement(self, stmt: ReturnStatement):
         stmt.value.accept(self)

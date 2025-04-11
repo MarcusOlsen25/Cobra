@@ -12,8 +12,9 @@ class BinaryExpression(Expr):
         return visitor.visitBinaryExpression(self)
     
 class UnaryExpression(Expr):
-    def __init__(self, expr: Expr):
-        self.expr = expr
+    def __init__(self, operator: str, value: Expr):
+        self.operator = operator
+        self.value = value
     
     def accept(self, visitor):
         return visitor.visitUnaryExpression(self)        
