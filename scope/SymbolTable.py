@@ -7,7 +7,7 @@ class SymbolTable:
     Python dictionary. The parent scope can be accessed
     via the parent reference.
     """
-    def __init__(self, parent):
+    def __init__(self, parent, scopeType: str):
         self.paramCounter = 16
         self.varCounter = 0
         self._tab = {}
@@ -16,6 +16,7 @@ class SymbolTable:
             self.level = parent.level + 1
         else:
             self.level = 0
+        self.scopeType = scopeType
             
     def insert(self, stmt: Stmt, type: str, newTable: 'SymbolTable'):
         if isinstance(stmt, VarDeclaration):
@@ -32,22 +33,7 @@ class SymbolTable:
             return self.parent.lookup(name)
         else:
             return None
-    
-    def findStaticLink(self, name: str):
-        current_table = self
-        while current_table: 
-            if name in current_table._tab: 
-                return current_table 
-            current_table = current_table.parent 
-        return None 
-        
-    def findScope(self, name: str):
-        if self.name == name:
-            print("ASD")
-            return self
-        else:
-            return self.findScope(self.parent.name)
-        
+   
     def decrementVarCounter(self):
         self.varCounter -= 8
         return self.varCounter

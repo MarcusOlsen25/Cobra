@@ -139,7 +139,6 @@ main:
 	je end_0			# Skip if the condition is false
 	movq %rbp, %rax			# Prepare static link
 	pushq %rax			# Push static link
-	subq $8, %rsp			# Set dummy
 	pushq %rbp			# Save base pointer
 	movq %rsp, %rbp			# Make stack pointer new base pointer
 	subq $0, %rsp			# Allocate space for local variables on the stack
@@ -161,7 +160,6 @@ main:
 end_then_0:			# Clean up then block stack frame
 	addq $0, %rsp			# Deallocate space for variables on the stack
 	popq %rbp			# Restore base pointer
-	addq $8, %rsp			# Remove dummy
 	addq $8, %rsp			# Deallocate space on stack for static link
 	jmp end_0			# Skip the else
 end_0:
@@ -170,7 +168,6 @@ end_0:
 	je end_1			# Skip if the condition is false
 	movq %rbp, %rax			# Prepare static link
 	pushq %rax			# Push static link
-	subq $8, %rsp			# Set dummy
 	pushq %rbp			# Save base pointer
 	movq %rsp, %rbp			# Make stack pointer new base pointer
 	subq $0, %rsp			# Allocate space for local variables on the stack
@@ -193,7 +190,6 @@ end_0:
 end_then_1:			# Clean up then block stack frame
 	addq $0, %rsp			# Deallocate space for variables on the stack
 	popq %rbp			# Restore base pointer
-	addq $8, %rsp			# Remove dummy
 	addq $8, %rsp			# Deallocate space on stack for static link
 	jmp end_1			# Skip the else
 end_1:
@@ -202,7 +198,6 @@ end_1:
 	je end_2			# Skip if the condition is false
 	movq %rbp, %rax			# Prepare static link
 	pushq %rax			# Push static link
-	subq $8, %rsp			# Set dummy
 	pushq %rbp			# Save base pointer
 	movq %rsp, %rbp			# Make stack pointer new base pointer
 	subq $0, %rsp			# Allocate space for local variables on the stack
@@ -224,7 +219,6 @@ end_1:
 end_then_2:			# Clean up then block stack frame
 	addq $0, %rsp			# Deallocate space for variables on the stack
 	popq %rbp			# Restore base pointer
-	addq $8, %rsp			# Remove dummy
 	addq $8, %rsp			# Deallocate space on stack for static link
 	jmp end_2			# Skip the else
 end_2:
@@ -238,7 +232,6 @@ end_2:
 	je end_3			# Skip if the condition is false
 	movq %rbp, %rax			# Prepare static link
 	pushq %rax			# Push static link
-	subq $8, %rsp			# Set dummy
 	pushq %rbp			# Save base pointer
 	movq %rsp, %rbp			# Make stack pointer new base pointer
 	subq $0, %rsp			# Allocate space for local variables on the stack
@@ -261,7 +254,6 @@ end_2:
 end_then_3:			# Clean up then block stack frame
 	addq $0, %rsp			# Deallocate space for variables on the stack
 	popq %rbp			# Restore base pointer
-	addq $8, %rsp			# Remove dummy
 	addq $8, %rsp			# Deallocate space on stack for static link
 	jmp end_3			# Skip the else
 end_3:
@@ -271,7 +263,6 @@ end_3:
 	je end_4			# Skip if the condition is false
 	movq %rbp, %rax			# Prepare static link
 	pushq %rax			# Push static link
-	subq $8, %rsp			# Set dummy
 	pushq %rbp			# Save base pointer
 	movq %rsp, %rbp			# Make stack pointer new base pointer
 	subq $0, %rsp			# Allocate space for local variables on the stack
@@ -293,7 +284,6 @@ end_3:
 end_then_4:			# Clean up then block stack frame
 	addq $0, %rsp			# Deallocate space for variables on the stack
 	popq %rbp			# Restore base pointer
-	addq $8, %rsp			# Remove dummy
 	addq $8, %rsp			# Deallocate space on stack for static link
 	jmp end_4			# Skip the else
 end_4:
@@ -303,7 +293,6 @@ end_4:
 	je else_part_5			# Skip to the else if the condition is false
 	movq %rbp, %rax			# Prepare static link
 	pushq %rax			# Push static link
-	subq $8, %rsp			# Set dummy
 	pushq %rbp			# Save base pointer
 	movq %rsp, %rbp			# Make stack pointer new base pointer
 	subq $0, %rsp			# Allocate space for local variables on the stack
@@ -326,13 +315,11 @@ end_4:
 end_then_5:			# Clean up then block stack frame
 	addq $0, %rsp			# Deallocate space for variables on the stack
 	popq %rbp			# Restore base pointer
-	addq $8, %rsp			# Remove dummy
 	addq $8, %rsp			# Deallocate space on stack for static link
 	jmp end_5			# Skip the else
 else_part_5:
 	movq %rbp, %rax			# Prepare static link
 	pushq %rax			# Push static link
-	subq $8, %rsp			# Set dummy
 	pushq %rbp			# Save base pointer
 	movq %rsp, %rbp			# Make stack pointer new base pointer
 	subq $0, %rsp			# Allocate space for local variables on the stack
@@ -354,7 +341,6 @@ else_part_5:
 end_else_5:
 	addq $0, %rsp			# Deallocate space for variables on the stack
 	popq %rbp			# Restore base pointer
-	addq $8, %rsp			# Remove dummy
 	addq $8, %rsp			# Deallocate space on stack for static link
 end_5:
 	movq %rbp, %rax			# Prepare to access variable from another scope
@@ -363,7 +349,6 @@ end_5:
 	je else_part_6			# Skip to the else if the condition is false
 	movq %rbp, %rax			# Prepare static link
 	pushq %rax			# Push static link
-	subq $8, %rsp			# Set dummy
 	pushq %rbp			# Save base pointer
 	movq %rsp, %rbp			# Make stack pointer new base pointer
 	subq $0, %rsp			# Allocate space for local variables on the stack
@@ -385,13 +370,11 @@ end_5:
 end_then_6:			# Clean up then block stack frame
 	addq $0, %rsp			# Deallocate space for variables on the stack
 	popq %rbp			# Restore base pointer
-	addq $8, %rsp			# Remove dummy
 	addq $8, %rsp			# Deallocate space on stack for static link
 	jmp end_6			# Skip the else
 else_part_6:
 	movq %rbp, %rax			# Prepare static link
 	pushq %rax			# Push static link
-	subq $8, %rsp			# Set dummy
 	pushq %rbp			# Save base pointer
 	movq %rsp, %rbp			# Make stack pointer new base pointer
 	subq $0, %rsp			# Allocate space for local variables on the stack
@@ -414,7 +397,6 @@ else_part_6:
 end_else_6:
 	addq $0, %rsp			# Deallocate space for variables on the stack
 	popq %rbp			# Restore base pointer
-	addq $8, %rsp			# Remove dummy
 	addq $8, %rsp			# Deallocate space on stack for static link
 end_6:
 	movq $1, %rax			# Put a number in %rax
@@ -422,7 +404,6 @@ end_6:
 	je else_part_7			# Skip to the else if the condition is false
 	movq %rbp, %rax			# Prepare static link
 	pushq %rax			# Push static link
-	subq $8, %rsp			# Set dummy
 	pushq %rbp			# Save base pointer
 	movq %rsp, %rbp			# Make stack pointer new base pointer
 	subq $16, %rsp			# Allocate space for local variables on the stack
@@ -449,13 +430,11 @@ end_6:
 end_then_7:			# Clean up then block stack frame
 	addq $16, %rsp			# Deallocate space for variables on the stack
 	popq %rbp			# Restore base pointer
-	addq $8, %rsp			# Remove dummy
 	addq $8, %rsp			# Deallocate space on stack for static link
 	jmp end_7			# Skip the else
 else_part_7:
 	movq %rbp, %rax			# Prepare static link
 	pushq %rax			# Push static link
-	subq $8, %rsp			# Set dummy
 	pushq %rbp			# Save base pointer
 	movq %rsp, %rbp			# Make stack pointer new base pointer
 	subq $8, %rsp			# Allocate space for local variables on the stack
@@ -480,7 +459,6 @@ else_part_7:
 end_else_7:
 	addq $8, %rsp			# Deallocate space for variables on the stack
 	popq %rbp			# Restore base pointer
-	addq $8, %rsp			# Remove dummy
 	addq $8, %rsp			# Deallocate space on stack for static link
 end_7:
 	movq $0, %rax			# Put a number in %rax
@@ -488,7 +466,6 @@ end_7:
 	je else_part_8			# Skip to the else if the condition is false
 	movq %rbp, %rax			# Prepare static link
 	pushq %rax			# Push static link
-	subq $8, %rsp			# Set dummy
 	pushq %rbp			# Save base pointer
 	movq %rsp, %rbp			# Make stack pointer new base pointer
 	subq $16, %rsp			# Allocate space for local variables on the stack
@@ -515,13 +492,11 @@ end_7:
 end_then_8:			# Clean up then block stack frame
 	addq $16, %rsp			# Deallocate space for variables on the stack
 	popq %rbp			# Restore base pointer
-	addq $8, %rsp			# Remove dummy
 	addq $8, %rsp			# Deallocate space on stack for static link
 	jmp end_8			# Skip the else
 else_part_8:
 	movq %rbp, %rax			# Prepare static link
 	pushq %rax			# Push static link
-	subq $8, %rsp			# Set dummy
 	pushq %rbp			# Save base pointer
 	movq %rsp, %rbp			# Make stack pointer new base pointer
 	subq $8, %rsp			# Allocate space for local variables on the stack
@@ -546,7 +521,6 @@ else_part_8:
 end_else_8:
 	addq $8, %rsp			# Deallocate space for variables on the stack
 	popq %rbp			# Restore base pointer
-	addq $8, %rsp			# Remove dummy
 	addq $8, %rsp			# Deallocate space on stack for static link
 end_8:
 	movq $3, %rax			# Put a number in %rax
@@ -564,7 +538,6 @@ end_8:
 	je end_9			# Skip if the condition is false
 	movq %rbp, %rax			# Prepare static link
 	pushq %rax			# Push static link
-	subq $8, %rsp			# Set dummy
 	pushq %rbp			# Save base pointer
 	movq %rsp, %rbp			# Make stack pointer new base pointer
 	subq $0, %rsp			# Allocate space for local variables on the stack
@@ -587,7 +560,6 @@ end_8:
 end_then_9:			# Clean up then block stack frame
 	addq $0, %rsp			# Deallocate space for variables on the stack
 	popq %rbp			# Restore base pointer
-	addq $8, %rsp			# Remove dummy
 	addq $8, %rsp			# Deallocate space on stack for static link
 	jmp end_9			# Skip the else
 end_9:
@@ -606,7 +578,6 @@ end_9:
 	je end_10			# Skip if the condition is false
 	movq %rbp, %rax			# Prepare static link
 	pushq %rax			# Push static link
-	subq $8, %rsp			# Set dummy
 	pushq %rbp			# Save base pointer
 	movq %rsp, %rbp			# Make stack pointer new base pointer
 	subq $0, %rsp			# Allocate space for local variables on the stack
@@ -628,7 +599,6 @@ end_9:
 end_then_10:			# Clean up then block stack frame
 	addq $0, %rsp			# Deallocate space for variables on the stack
 	popq %rbp			# Restore base pointer
-	addq $8, %rsp			# Remove dummy
 	addq $8, %rsp			# Deallocate space on stack for static link
 	jmp end_10			# Skip the else
 end_10:
@@ -647,7 +617,6 @@ end_10:
 	je end_11			# Skip if the condition is false
 	movq %rbp, %rax			# Prepare static link
 	pushq %rax			# Push static link
-	subq $8, %rsp			# Set dummy
 	pushq %rbp			# Save base pointer
 	movq %rsp, %rbp			# Make stack pointer new base pointer
 	subq $0, %rsp			# Allocate space for local variables on the stack
@@ -669,7 +638,6 @@ end_10:
 end_then_11:			# Clean up then block stack frame
 	addq $0, %rsp			# Deallocate space for variables on the stack
 	popq %rbp			# Restore base pointer
-	addq $8, %rsp			# Remove dummy
 	addq $8, %rsp			# Deallocate space on stack for static link
 	jmp end_11			# Skip the else
 end_11:
@@ -688,7 +656,6 @@ end_11:
 	je end_12			# Skip if the condition is false
 	movq %rbp, %rax			# Prepare static link
 	pushq %rax			# Push static link
-	subq $8, %rsp			# Set dummy
 	pushq %rbp			# Save base pointer
 	movq %rsp, %rbp			# Make stack pointer new base pointer
 	subq $0, %rsp			# Allocate space for local variables on the stack
@@ -711,7 +678,6 @@ end_11:
 end_then_12:			# Clean up then block stack frame
 	addq $0, %rsp			# Deallocate space for variables on the stack
 	popq %rbp			# Restore base pointer
-	addq $8, %rsp			# Remove dummy
 	addq $8, %rsp			# Deallocate space on stack for static link
 	jmp end_12			# Skip the else
 end_12:
@@ -730,7 +696,6 @@ end_12:
 	je end_13			# Skip if the condition is false
 	movq %rbp, %rax			# Prepare static link
 	pushq %rax			# Push static link
-	subq $8, %rsp			# Set dummy
 	pushq %rbp			# Save base pointer
 	movq %rsp, %rbp			# Make stack pointer new base pointer
 	subq $0, %rsp			# Allocate space for local variables on the stack
@@ -753,7 +718,6 @@ end_12:
 end_then_13:			# Clean up then block stack frame
 	addq $0, %rsp			# Deallocate space for variables on the stack
 	popq %rbp			# Restore base pointer
-	addq $8, %rsp			# Remove dummy
 	addq $8, %rsp			# Deallocate space on stack for static link
 	jmp end_13			# Skip the else
 end_13:
@@ -772,7 +736,6 @@ end_13:
 	je end_14			# Skip if the condition is false
 	movq %rbp, %rax			# Prepare static link
 	pushq %rax			# Push static link
-	subq $8, %rsp			# Set dummy
 	pushq %rbp			# Save base pointer
 	movq %rsp, %rbp			# Make stack pointer new base pointer
 	subq $0, %rsp			# Allocate space for local variables on the stack
@@ -794,7 +757,6 @@ end_13:
 end_then_14:			# Clean up then block stack frame
 	addq $0, %rsp			# Deallocate space for variables on the stack
 	popq %rbp			# Restore base pointer
-	addq $8, %rsp			# Remove dummy
 	addq $8, %rsp			# Deallocate space on stack for static link
 	jmp end_14			# Skip the else
 end_14:
@@ -813,7 +775,6 @@ end_14:
 	je end_15			# Skip if the condition is false
 	movq %rbp, %rax			# Prepare static link
 	pushq %rax			# Push static link
-	subq $8, %rsp			# Set dummy
 	pushq %rbp			# Save base pointer
 	movq %rsp, %rbp			# Make stack pointer new base pointer
 	subq $0, %rsp			# Allocate space for local variables on the stack
@@ -835,7 +796,6 @@ end_14:
 end_then_15:			# Clean up then block stack frame
 	addq $0, %rsp			# Deallocate space for variables on the stack
 	popq %rbp			# Restore base pointer
-	addq $8, %rsp			# Remove dummy
 	addq $8, %rsp			# Deallocate space on stack for static link
 	jmp end_15			# Skip the else
 end_15:
@@ -854,7 +814,6 @@ end_15:
 	je end_16			# Skip if the condition is false
 	movq %rbp, %rax			# Prepare static link
 	pushq %rax			# Push static link
-	subq $8, %rsp			# Set dummy
 	pushq %rbp			# Save base pointer
 	movq %rsp, %rbp			# Make stack pointer new base pointer
 	subq $0, %rsp			# Allocate space for local variables on the stack
@@ -877,7 +836,6 @@ end_15:
 end_then_16:			# Clean up then block stack frame
 	addq $0, %rsp			# Deallocate space for variables on the stack
 	popq %rbp			# Restore base pointer
-	addq $8, %rsp			# Remove dummy
 	addq $8, %rsp			# Deallocate space on stack for static link
 	jmp end_16			# Skip the else
 end_16:
@@ -896,7 +854,6 @@ end_16:
 	je end_17			# Skip if the condition is false
 	movq %rbp, %rax			# Prepare static link
 	pushq %rax			# Push static link
-	subq $8, %rsp			# Set dummy
 	pushq %rbp			# Save base pointer
 	movq %rsp, %rbp			# Make stack pointer new base pointer
 	subq $0, %rsp			# Allocate space for local variables on the stack
@@ -918,7 +875,6 @@ end_16:
 end_then_17:			# Clean up then block stack frame
 	addq $0, %rsp			# Deallocate space for variables on the stack
 	popq %rbp			# Restore base pointer
-	addq $8, %rsp			# Remove dummy
 	addq $8, %rsp			# Deallocate space on stack for static link
 	jmp end_17			# Skip the else
 end_17:
@@ -937,7 +893,6 @@ end_17:
 	je end_18			# Skip if the condition is false
 	movq %rbp, %rax			# Prepare static link
 	pushq %rax			# Push static link
-	subq $8, %rsp			# Set dummy
 	pushq %rbp			# Save base pointer
 	movq %rsp, %rbp			# Make stack pointer new base pointer
 	subq $0, %rsp			# Allocate space for local variables on the stack
@@ -959,7 +914,6 @@ end_17:
 end_then_18:			# Clean up then block stack frame
 	addq $0, %rsp			# Deallocate space for variables on the stack
 	popq %rbp			# Restore base pointer
-	addq $8, %rsp			# Remove dummy
 	addq $8, %rsp			# Deallocate space on stack for static link
 	jmp end_18			# Skip the else
 end_18:
@@ -978,7 +932,6 @@ end_18:
 	je end_19			# Skip if the condition is false
 	movq %rbp, %rax			# Prepare static link
 	pushq %rax			# Push static link
-	subq $8, %rsp			# Set dummy
 	pushq %rbp			# Save base pointer
 	movq %rsp, %rbp			# Make stack pointer new base pointer
 	subq $0, %rsp			# Allocate space for local variables on the stack
@@ -1000,7 +953,6 @@ end_18:
 end_then_19:			# Clean up then block stack frame
 	addq $0, %rsp			# Deallocate space for variables on the stack
 	popq %rbp			# Restore base pointer
-	addq $8, %rsp			# Remove dummy
 	addq $8, %rsp			# Deallocate space on stack for static link
 	jmp end_19			# Skip the else
 end_19:
@@ -1019,7 +971,6 @@ end_19:
 	je end_20			# Skip if the condition is false
 	movq %rbp, %rax			# Prepare static link
 	pushq %rax			# Push static link
-	subq $8, %rsp			# Set dummy
 	pushq %rbp			# Save base pointer
 	movq %rsp, %rbp			# Make stack pointer new base pointer
 	subq $0, %rsp			# Allocate space for local variables on the stack
@@ -1042,7 +993,6 @@ end_19:
 end_then_20:			# Clean up then block stack frame
 	addq $0, %rsp			# Deallocate space for variables on the stack
 	popq %rbp			# Restore base pointer
-	addq $8, %rsp			# Remove dummy
 	addq $8, %rsp			# Deallocate space on stack for static link
 	jmp end_20			# Skip the else
 end_20:
@@ -1061,7 +1011,6 @@ end_20:
 	je end_21			# Skip if the condition is false
 	movq %rbp, %rax			# Prepare static link
 	pushq %rax			# Push static link
-	subq $8, %rsp			# Set dummy
 	pushq %rbp			# Save base pointer
 	movq %rsp, %rbp			# Make stack pointer new base pointer
 	subq $0, %rsp			# Allocate space for local variables on the stack
@@ -1083,7 +1032,6 @@ end_20:
 end_then_21:			# Clean up then block stack frame
 	addq $0, %rsp			# Deallocate space for variables on the stack
 	popq %rbp			# Restore base pointer
-	addq $8, %rsp			# Remove dummy
 	addq $8, %rsp			# Deallocate space on stack for static link
 	jmp end_21			# Skip the else
 end_21:
@@ -1102,7 +1050,6 @@ end_21:
 	je end_22			# Skip if the condition is false
 	movq %rbp, %rax			# Prepare static link
 	pushq %rax			# Push static link
-	subq $8, %rsp			# Set dummy
 	pushq %rbp			# Save base pointer
 	movq %rsp, %rbp			# Make stack pointer new base pointer
 	subq $0, %rsp			# Allocate space for local variables on the stack
@@ -1125,7 +1072,6 @@ end_21:
 end_then_22:			# Clean up then block stack frame
 	addq $0, %rsp			# Deallocate space for variables on the stack
 	popq %rbp			# Restore base pointer
-	addq $8, %rsp			# Remove dummy
 	addq $8, %rsp			# Deallocate space on stack for static link
 	jmp end_22			# Skip the else
 end_22:
@@ -1133,7 +1079,6 @@ end_22:
 	movq %rax, -56(%rbp)		# Move initialized value into space on stack
 	movq %rbp, %rax			# Prepare static link
 	pushq %rax			# Push static link
-	subq $8, %rsp			# Set dummy
 	pushq %rbp			# Save base pointer
 	movq %rsp, %rbp			# Make stack pointer new base pointer
 	subq $0, %rsp			# Allocate space for local variables on the stack
@@ -1141,7 +1086,7 @@ end_22:
 	movq $25, %rax			# Put a number in %rax
 	pushq %rax			# Push right side to stack
 	movq %rbp, %rax			# Prepare to access variable from another scope
-	movq 16(%rax), %rax		# Traverse static link once
+	movq 8(%rax), %rax		# Traverse static link once
 	movq -56(%rax), %rax		# Assign value to %rax
 	popq %rbx			# Pop right side into %rbx
 	cmp %rax, %rbx			# Compare both sides
@@ -1154,7 +1099,7 @@ end_22:
 	cmp $0, %rax			# Check the condition
 	je end_while_0			# Skip if the condition is false
 	movq %rbp, %rax			# Prepare to access variable from another scope
-	movq 16(%rax), %rax		# Traverse static link once
+	movq 8(%rax), %rax		# Traverse static link once
 	movq -56(%rax), %rax		# Assign value to %rax
 				# Start print statement
 	leaq form(%rip), %rdi		# Passing string address (1. argument)
@@ -1173,25 +1118,23 @@ end_22:
 	movq $1, %rax			# Put a number in %rax
 	pushq %rax			# Push right side to stack
 	movq %rbp, %rax			# Prepare to access variable from another scope
-	movq 16(%rax), %rax		# Traverse static link once
+	movq 8(%rax), %rax		# Traverse static link once
 	movq -56(%rax), %rax		# Assign value to %rax
 	popq %rbx			# Pop right side into %rbx
 	addq %rbx, %rax			# Add both sides
 	movq %rax, %rdx
 	movq %rbp, %rax			# Prepare to access variable from another scope
-	movq 16(%rax), %rax		# Traverse static link once
+	movq 8(%rax), %rax		# Traverse static link once
 	movq %rdx, -56(%rax)
 	jmp while_loop_0		# Restart the loop
 	end_while_0:
 	addq $0, %rsp			# Deallocate space for variables on the stack
 	popq %rbp			# Restore base pointer
-	addq $8, %rsp			# Remove dummy
 	addq $8, %rsp			# Deallocate space on stack for static link
 	movq $26, %rax			# Put a number in %rax
 	movq %rax, -64(%rbp)		# Move initialized value into space on stack
 	movq %rbp, %rax			# Prepare static link
 	pushq %rax			# Push static link
-	subq $8, %rsp			# Set dummy
 	pushq %rbp			# Save base pointer
 	movq %rsp, %rbp			# Make stack pointer new base pointer
 	subq $0, %rsp			# Allocate space for local variables on the stack
@@ -1199,11 +1142,11 @@ end_22:
 	movq $55, %rax			# Put a number in %rax
 	pushq %rax			# Push right side to stack
 	movq %rbp, %rax			# Prepare to access variable from another scope
-	movq 16(%rax), %rax		# Traverse static link once
+	movq 8(%rax), %rax		# Traverse static link once
 	movq -56(%rax), %rax		# Assign value to %rax
 	pushq %rax			# Push right side to stack
 	movq %rbp, %rax			# Prepare to access variable from another scope
-	movq 16(%rax), %rax		# Traverse static link once
+	movq 8(%rax), %rax		# Traverse static link once
 	movq -64(%rax), %rax		# Assign value to %rax
 	popq %rbx			# Pop right side into %rbx
 	addq %rbx, %rax			# Add both sides
@@ -1218,7 +1161,7 @@ end_22:
 	cmp $0, %rax			# Check the condition
 	je end_while_1			# Skip if the condition is false
 	movq %rbp, %rax			# Prepare to access variable from another scope
-	movq 16(%rax), %rax		# Traverse static link once
+	movq 8(%rax), %rax		# Traverse static link once
 	movq -64(%rax), %rax		# Assign value to %rax
 				# Start print statement
 	leaq form(%rip), %rdi		# Passing string address (1. argument)
@@ -1237,19 +1180,18 @@ end_22:
 	movq $1, %rax			# Put a number in %rax
 	pushq %rax			# Push right side to stack
 	movq %rbp, %rax			# Prepare to access variable from another scope
-	movq 16(%rax), %rax		# Traverse static link once
+	movq 8(%rax), %rax		# Traverse static link once
 	movq -64(%rax), %rax		# Assign value to %rax
 	popq %rbx			# Pop right side into %rbx
 	addq %rbx, %rax			# Add both sides
 	movq %rax, %rdx
 	movq %rbp, %rax			# Prepare to access variable from another scope
-	movq 16(%rax), %rax		# Traverse static link once
+	movq 8(%rax), %rax		# Traverse static link once
 	movq %rdx, -64(%rax)
 	jmp while_loop_1		# Restart the loop
 	end_while_1:
 	addq $0, %rsp			# Deallocate space for variables on the stack
 	popq %rbp			# Restore base pointer
-	addq $8, %rsp			# Remove dummy
 	addq $8, %rsp			# Deallocate space on stack for static link
 	addq $64, %rsp			# Deallocate space for variables on the stack
 	popq %rbp			# Restore base pointer

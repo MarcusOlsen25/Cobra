@@ -14,6 +14,7 @@ class AssemblyVisitor(Visitor):
         self.whileLabelCounter = 0
         self.binaryLabelCounter = 0
         self.printLabelCounter = 0
+        self.labelStack = []
 
     def generateCode(self, output: str):
         if len(self.functionStack) == 0:
@@ -203,13 +204,13 @@ class AssemblyVisitor(Visitor):
         entry = self.table.lookup(stmt.var)
         self.table = entry.table
 
-        self.startScope(self.table.varCounter)
+        self.startScope()
 
         for s in stmt.body:
             s.accept(self)
 
-        self.endScope(self.table.varCounter)
-        # self.endScope(len(stmt.params), self.table.varCounter)
+        self.addLabel(f"end_{entry.name}:\t\t\t# End function")
+        self.endScope()
 
         self.generateCode("ret\t\t\t\t# Return from the function")
 
@@ -235,9 +236,13 @@ class AssemblyVisitor(Visitor):
         pass
 
     def accessVar(self, entry: SymbolTable.VariableValue):
+        if self.table.scopeType == "Function":
+            offset = 16
+        else:
+            offset = 8
         self.generateCode("movq %rbp, %rax\t\t\t# Prepare to access variable from another scope")
         for i in range(self.table.level - entry.level):
-            self.generateCode(f"movq 16(%rax), %rax\t\t# Traverse static link once")   
+            self.generateCode(f"movq {offset}(%rax), %rax\t\t# Traverse static link once")   
 
     def setStaticLink(self, levelDifference):
         self.generateCode("movq %rbp, %rax\t\t\t# Prepare static link")
@@ -245,23 +250,14 @@ class AssemblyVisitor(Visitor):
             self.generateCode(f"movq 16(%rax), %rax\t\t# Traverse static link once")
         self.generateCode("pushq %rax\t\t\t# Push static link")       
 
-    def startFunctionScope(self):
+    def startScope(self):
         self.generateCode("pushq %rbp\t\t\t# Save base pointer")
         self.generateCode("movq %rsp, %rbp\t\t\t# Make stack pointer new base pointer")
         self.generateCode(f"subq ${abs(self.table.varCounter)}, %rsp\t\t\t# Allocate space for local variables on the stack")
 
-    # def endScope(self, args: int, varSpace: int):
-    def endFunctionScope(self):
+    def endScope(self):
         self.generateCode(f"addq ${abs(self.table.varCounter)}, %rsp\t\t\t# Deallocate space for variables on the stack")
         self.generateCode("popq %rbp\t\t\t# Restore base pointer")
-
-    def startScope(self):
-        self.generateCode("subq $8, %rsp\t\t\t# Set dummy")
-        self.startFunctionScope()
-
-    def endScope(self):
-        self.endFunctionScope()
-        self.generateCode("addq $8, %rsp\t\t\t# Remove dummy")
 
     def popArgs(self, args: int):
         argsToPop = 8 * args
@@ -367,3 +363,17 @@ class AssemblyVisitor(Visitor):
         self.generateCode("callq printf@plt\t\t# Call printf")
         self.generateCode(f"end_print_{label}:")
         self.generateCode("\t\t\t# End print statement")
+
+    def visitReturnStatement(self, stmt: ReturnStatement):
+        stmt.value.accept(self)
+
+        match self.table.scopeType:
+            case "If":
+                self.generateCode(f"jmp end_{self.ifLabelCounter}")
+            case "Else":
+                self.generateCode(f"jmp end_else_{self.ifLabelCounter}")
+            case "While":
+                self.generateCode(f"jmp end_while_{self.whileLabelCounter}")
+            case "Function":
+                self.generateCode(f"jmp end_{self.functionStack[-1]}")
+           

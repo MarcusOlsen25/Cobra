@@ -22,7 +22,16 @@ lexer.input(lexerData)
 parser = yacc.yacc()
 
 parserData = '''
-print -2
+
+var a = 2
+
+if 0 then {
+    a = a + 3
+} else {
+    a
+}
+print a
+
 '''
 
 data = '''
@@ -51,7 +60,7 @@ printVisitor = PrintVisitor()
 evalVisitor = EvalVisitor()
 nodeVisitor = NodeVisitor()
 
-table = SymbolTable(None)
+table = SymbolTable(None, "Function")
 
 scopeVisitor = ScopeVisitor(table)
 assemblyVisitor = AssemblyVisitor(table)
@@ -66,14 +75,14 @@ for statement in result:
 assemblyVisitor = AssemblyVisitor(table)
 
 #Function prologue for main
-assemblyVisitor.startFunctionScope()
+assemblyVisitor.startScope()
 
 for s in result:
     s.accept(assemblyVisitor)
 
 #Function epilogue for main
 #To be changed with
-assemblyVisitor.endFunctionScope()
+assemblyVisitor.endScope()
 assemblyVisitor.generateCode("movq $0, %rax\t\t\t# End with error code 0")
 assemblyVisitor.generateCode("ret\t\t\t# Return from main")
 

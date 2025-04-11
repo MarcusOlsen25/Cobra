@@ -29,8 +29,13 @@ def p_statement(p):
     '''statement : expression
                  | ifStatement
                  | whileStatement
-                 | printStatement''' 
+                 | printStatement
+                 | returnStatement''' 
     p[0] = p[1]
+
+def p_returnStatement(p):
+    '''returnStatement : RETURN expression'''
+    p[0] = ReturnStatement(p[2])
     
 #If statements
 def p_ifStatement_single(p):

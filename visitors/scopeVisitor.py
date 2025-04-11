@@ -30,7 +30,7 @@ class ScopeVisitor(Visitor):
 
     #Using func as a type
     def visitFunctionDeclaration(self, stmt: FunctionDeclaration):
-        newTable = SymbolTable(self.table)
+        newTable = SymbolTable(self.table, "Function")
         self.table.insert(stmt, "func", newTable)
         self.table = newTable
 
@@ -61,7 +61,7 @@ class ScopeVisitor(Visitor):
         stmt.condition.accept(self)
         
         # Create a new symbol table and visit the statements in the thenStatement
-        newTable = SymbolTable(self.table)
+        newTable = SymbolTable(self.table, "If")
         stmt.thenTable = newTable
         self.table = stmt.thenTable
 
@@ -73,7 +73,7 @@ class ScopeVisitor(Visitor):
         if stmt.elseStatement != None:
             
             # Create a new symbol table and visit the statements in the elseStatement 
-            newTable = SymbolTable(self.table)
+            newTable = SymbolTable(self.table, "Else")
             stmt.elseTable = newTable
             self.table = stmt.elseTable
 
@@ -87,7 +87,7 @@ class ScopeVisitor(Visitor):
         stmt.condition.accept(self)
         
         # Create a new symbol table and visit the statements in the thenStatement
-        newTable = SymbolTable(self.table)
+        newTable = SymbolTable(self.table, "While")
         stmt.table = newTable
         self.table = stmt.table
 
