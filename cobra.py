@@ -22,33 +22,34 @@ lexer.input(lexerData)
 parser = yacc.yacc()
 
 parserData = '''
-
-var a = 2
-
-if 0 then {
-    a = a + 3
-} else {
-    a
+func one() {
+    func two() {
+        return 3
+    }
+    two()
 }
-print a
-
+print one()
 '''
 
 data = '''
-var a = 1
-print a
+var one = 12
 
-var b = a + 1
-print b
+class gulerod {
+    var x = -8
+    var y = one
 
-a = 3
-print a
-
-var c = a - b * 3 + 7
-print c
-
-var d = c / 9 - 3 * (b + a)
-print d
+    func one() {
+        var a = 3
+        return 3
+    }
+}
+Gulerod gul = new Gulerod()  
+class melon {
+    var x = one + 14
+    Gulerod y = new Gulerod()
+}
+Melon r = new Melon()
+gul.one()
 '''
 
 with open("test.co", "r") as file:
@@ -98,7 +99,6 @@ for p in program:
      print(p)
 
 with open("assembly/test2.s", "w") as file:
-        file.write(".data\nform:\n\t.string \"%d\\n\"\n")
         for p in program:
             file.write(p)
             file.write("\n")

@@ -132,5 +132,49 @@ while agurk + banan != 55 then {
     agurk = agurk + 1
 } 
 
+var one = 12
 
+class gulerod {
+    var x = 17
+    var y = one
+}
+Gulerod gul = new Gulerod()
+if gul.x + gul.y != 29 then {
+    print -1
+} else {
+    print gul.x + gul.y
+}
+   
+class melon {
+    var x = one + 14
+    Gulerod y = new Gulerod()
+}
 
+Melon mel = new Melon()
+
+if mel.x + mel.y.y != 38 then {
+    print -1
+} else {
+    print 30
+}
+
+class sko {
+    Gulerod x = gul
+    Melon m = mel
+}
+Sko l = new Sko()
+
+if l.x.x + l.m.x != 43 then {
+    print -1
+} else {
+    print 31
+}
+
+l.x.x = 13
+l.m.x = 14
+
+if l.x.x + l.m.x != 27 then {
+    print -1
+} else {
+    print 32
+}

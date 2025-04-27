@@ -1,58 +1,48 @@
 .data
-
+heap:
+        .space 1000
+heap_pointer:
+        .quad heap
 form:
-        .string	"%d\n"
-
-# Paste after this line
-
+        .string "%d\n"
 .text
-.globl main
-main:
+one:                    # Function
         pushq %rbp                      # Save base pointer
         movq %rsp, %rbp                 # Make stack pointer new base pointer
-        subq $8, %rsp                   # Allocate space for local variables on the stack
-        movq $2, %rax                   # Put a number in %rax
-        movq %rax, -8(%rbp)             # Move initialized value into space on stack
-        movq $0, %rax                   # Put a number in %rax
-        cmp $0, %rax                    # Check the condition
-        je else_part_0                  # Skip to the else if the condition is false
+        subq $0, %rsp                   # Allocate space for local variables on the stack
         movq %rbp, %rax                 # Prepare static link
         pushq %rax                      # Push static link
+        subq $8, %rsp                   # Dummy space
+        call two                        # Call the two function 
+        addq $8, %rsp                   # Dummy space
+        addq $8, %rsp                   # Deallocate space on stack for static link
+        addq $0, %rsp                   # Pop the arguments pushed to the stack
+end_one:                        # End function
+        addq $0, %rsp                   # Deallocate space for variables on the stack
+        popq %rbp                       # Restore base pointer
+        ret                             # Return from the function
+two:                    # Function
         pushq %rbp                      # Save base pointer
         movq %rsp, %rbp                 # Make stack pointer new base pointer
         subq $0, %rsp                   # Allocate space for local variables on the stack
         movq $3, %rax                   # Put a number in %rax
-        pushq %rax                      # Push right side to stack
-        movq %rbp, %rax                 # Prepare to access variable from another scope
-        movq 8(%rax), %rax              # Traverse static link once
-        movq -8(%rax), %rax             # Assign value to %rax
-        popq %rbx                       # Pop right side into %rbx
-        addq %rbx, %rax                 # Add both sides
-        movq %rax, %rdx
-        movq %rbp, %rax                 # Prepare to access variable from another scope
-        movq 8(%rax), %rax              # Traverse static link once
-        movq %rdx, -8(%rax)
-end_then_0:                     # Clean up then block stack frame
+        jmp end_two
+end_two:                        # End function
         addq $0, %rsp                   # Deallocate space for variables on the stack
         popq %rbp                       # Restore base pointer
-        addq $8, %rsp                   # Deallocate space on stack for static link
-        jmp end_0                       # Skip the else
-else_part_0:
-        movq %rbp, %rax                 # Prepare static link
-        pushq %rax                      # Push static link
+        ret                             # Return from the function
+.globl main
+main:
         pushq %rbp                      # Save base pointer
         movq %rsp, %rbp                 # Make stack pointer new base pointer
         subq $0, %rsp                   # Allocate space for local variables on the stack
-        movq %rbp, %rax                 # Prepare to access variable from another scope
-        movq 8(%rax), %rax              # Traverse static link once
-        movq -8(%rax), %rax             # Assign value to %rax
-end_else_0:
-        addq $0, %rsp                   # Deallocate space for variables on the stack
-        popq %rbp                       # Restore base pointer
+        movq %rbp, %rax                 # Prepare static link
+        pushq %rax                      # Push static link
+        subq $8, %rsp                   # Dummy space
+        call one                        # Call the one function 
+        addq $8, %rsp                   # Dummy space
         addq $8, %rsp                   # Deallocate space on stack for static link
-end_0:
-        movq %rbp, %rax                 # Prepare to access variable from another scope
-        movq -8(%rax), %rax             # Assign value to %rax
+        addq $0, %rsp                   # Pop the arguments pushed to the stack
                                 # Start print statement
         leaq form(%rip), %rdi           # Passing string address (1. argument)
         movq %rax, %rsi                 # Passing %rax (2. argument)
@@ -67,8 +57,8 @@ end_0:
         callq printf@plt                # Call printf
         end_print_0:
                                 # End print statement
-        addq $8, %rsp                   # Deallocate space for variables on the stack
+        addq $0, %rsp                   # Deallocate space for variables on the stack
         popq %rbp                       # Restore base pointer
         movq $0, %rax                   # End with error code 0
         ret                     # Return from main
-
+        

@@ -35,7 +35,7 @@ class VarExpression(Expr):
         return visitor.visitVarExpression(self)
     
 class AssignExpression(Expr):
-    def __init__(self, var: str, value: str):
+    def __init__(self, var: Expr, value: Expr):
         self.var = var
         self.value = value
 
@@ -49,3 +49,27 @@ class CallExpression(Expr):
 
     def accept(self, visitor):
         return visitor.visitCallExpression(self)
+
+class ConstructorExpression(Expr):
+    def __init__(self, var: VarExpression):
+        self.var = var
+
+    def accept(self, visitor):
+        return visitor.visitConstructorExpression(self)
+    
+class ObjectExpression(Expr):
+    def __init__(self, object: list[VarExpression], var: str):
+        self.object = object
+        self.var = var
+        self.isAssign = False
+
+    def accept(self, visitor):
+        return visitor.visitObjectExpression(self)
+    
+class PropertyCallExpression(Expr):
+    def __init__(self, object: list[VarExpression], call: CallExpression):
+        self.object = object
+        self.call = call
+
+    def accept(self, visitor):
+        return visitor.visitPropertyCallExpression(self)

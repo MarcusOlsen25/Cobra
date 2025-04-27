@@ -8,7 +8,7 @@ class AssemblyVisitor(Visitor):
     def __init__(self, table: SymbolTable):
         self.table = table
         self.main = [".globl main", "main:"]
-        self.functions = {"text": [".text"]}
+        self.functions = {"init": [".data\nheap:\n\t.space 1000\nheap_pointer:\n\t.quad heap\nclass_descriptor:\n\t.space 100\nform:\n\t.string \"%d\\n\"\n.text"]}
         self.functionStack = []
         self.ifLabelCounter = 0
         self.whileLabelCounter = 0
@@ -38,14 +38,14 @@ class AssemblyVisitor(Visitor):
 
         match expr.operator:
             case "+":
-                self.generateCode("addq %rbx, %rax\t\t\t# Add both sides")
+                self.generateCode("addq %rbx, %rax\t\t\t# Perform addition")
             case "-":
-                self.generateCode("subq %rbx, %rax\t\t\t# Subtract both sides")
+                self.generateCode("subq %rbx, %rax\t\t\t# Perform subtraction")
             case "*":
-                self.generateCode("imulq %rbx, %rax\t\t# Multiply both sides")
+                self.generateCode("imulq %rbx, %rax\t\t# Perform multiplication")
             case "/":
                 self.generateCode("movq $0, %rdx\t\t\t# Put a 0 in %rdx to prepare for the division")
-                self.generateCode("idivq %rbx\t\t\t# Divide both sides")
+                self.generateCode("idivq %rbx\t\t\t# Perform division")
             case "==":
                 self.equalityComparison()
             case "!=":
@@ -176,30 +176,38 @@ class AssemblyVisitor(Visitor):
     
     def visitVarExpression(self, expr: VarExpression):
         entry = self.table.lookup(expr.var)
-        if isinstance(entry, SymbolTable.FunctionValue):
+        if isinstance(entry, SymbolTable.VariableValue):
+            self.accessVar(entry)
+            self.generateCode(f"movq {entry.offset}(%rax), %rax\t\t# Move value into %rax")
+            return entry
+        elif isinstance(entry, SymbolTable.FieldValue):
+            self.accessField(entry)
             return entry
         else:
-            self.accessVar(entry)
-            self.generateCode(f"movq {entry.offset}(%rax), %rax\t\t# Assign value to %rax")  
+            return entry
     
     def visitAssignExpression(self, expr: AssignExpression):
         expr.value.accept(self)
-        self.generateCode(f"movq %rax, %rdx")
-        entry = self.table.lookup(expr.var)
-        self.accessVar(entry)
-        self.generateCode(f"movq %rdx, {entry.offset}(%rax)")
+        self.generateCode(f"movq %rax, %rdx\t\t\t# Move right side of assignment into %rdx")
+        entry = expr.var.accept(self)
+        if not isinstance(expr.var, ObjectExpression):
+            self.accessVar(entry)
+        self.generateCode(f"movq %rdx, {entry.offset}(%rax)\t\t\t# Move right side into location of left side of assign")
     
     def visitVarDeclaration(self, stmt: VarDeclaration):
         if stmt.initializer != None:
             entry = self.table.lookup(stmt.var)
             stmt.initializer.accept(self)
-            self.generateCode(f"movq %rax, {entry.offset}(%rbp)\t\t# Move initialized value into space on stack")
+            if self.table.scopeType in ("While", "If", "Function", "Else"):
+                self.generateCode(f"movq %rax, {entry.offset}(%rbp)\t\t\t# Move initialized value into space on stack")
+            else:
+                self.generateCode(f"movq %rax, {entry.offset}(%rcx)\t\t\t# Move initialized value into space on heap")
         else:
             pass
         
     def visitFunctionDeclaration(self, stmt: FunctionDeclaration):
         self.functionStack.append(stmt.var)
-        self.functions[stmt.var] = [f"{stmt.var}:"]
+        self.functions[stmt.var] = [f"{stmt.var}:\t\t\t# Function"]
 
         entry = self.table.lookup(stmt.var)
         self.table = entry.table
@@ -224,9 +232,13 @@ class AssemblyVisitor(Visitor):
             expr.arguments[i].accept(self)
             self.generateCode(f"pushq %rax\t\t\t# Push argument number {i+1} to stack")
 
-        self.setStaticLink(entry.level - self.table.level)
+        self.setStaticLink(self.table.level - entry.level)
+
+        self.generateCode("subq $8, %rsp\t\t\t# Dummy space")
 
         self.generateCode(f"call {entry.name}\t\t\t# Call the {entry.name} function ")
+
+        self.generateCode("addq $8, %rsp\t\t\t# Dummy space")
 
         self.generateCode("addq $8, %rsp\t\t\t# Deallocate space on stack for static link")
 
@@ -236,18 +248,18 @@ class AssemblyVisitor(Visitor):
         pass
 
     def accessVar(self, entry: SymbolTable.VariableValue):
-        if self.table.scopeType == "Function":
-            offset = 16
-        else:
-            offset = 8
         self.generateCode("movq %rbp, %rax\t\t\t# Prepare to access variable from another scope")
         for i in range(self.table.level - entry.level):
-            self.generateCode(f"movq {offset}(%rax), %rax\t\t# Traverse static link once")   
+            self.generateCode("movq 24(%rax), %rax\t\t# Traverse static link once") 
+        
+    def accessField(self, entry: SymbolTable.FieldValue):
+        self.generateCode(f"movq {entry.offset}(%rax), %rax\t\t# Move value into %rax")
+
 
     def setStaticLink(self, levelDifference):
         self.generateCode("movq %rbp, %rax\t\t\t# Prepare static link")
         for i in range(levelDifference):
-            self.generateCode(f"movq 16(%rax), %rax\t\t# Traverse static link once")
+            self.generateCode(f"movq 24(%rax), %rax\t\t# Traverse static link once")
         self.generateCode("pushq %rax\t\t\t# Push static link")       
 
     def startScope(self):
@@ -281,6 +293,7 @@ class AssemblyVisitor(Visitor):
 
         #Prologue for then block
         self.setStaticLink(0)
+        self.generateCode("subq $16, %rsp\t\t\t# Dummy space")
         self.startScope()
 
         for s in stmt.thenStatement:
@@ -289,6 +302,7 @@ class AssemblyVisitor(Visitor):
         #Epilogue for then block
         self.addLabel(f"end_then_{label}:\t\t\t# Clean up then block stack frame")
         self.endScope()
+        self.generateCode("addq $16, %rsp\t\t\t# Dummy space")
         self.generateCode("addq $8, %rsp\t\t\t# Deallocate space on stack for static link")
 
         self.generateCode(f"jmp end_{label}\t\t\t# Skip the else")
@@ -300,6 +314,7 @@ class AssemblyVisitor(Visitor):
 
             #Prologue for else block
             self.setStaticLink(0)
+            self.generateCode("subq $16, %rsp\t\t\t# Dummy space")
             self.startScope()
 
             for s in stmt.elseStatement:
@@ -308,6 +323,7 @@ class AssemblyVisitor(Visitor):
             #Epilogue for else block
             self.addLabel(f"end_else_{label}:")
             self.endScope()
+            self.generateCode("addq $16, %rsp\t\t\t# Dummy space")
             self.generateCode("addq $8, %rsp\t\t\t# Deallocate space on stack for static link")
             
         self.addLabel(f"end_{label}:")
@@ -323,6 +339,7 @@ class AssemblyVisitor(Visitor):
         # Enter a new scope
         self.table = stmt.table
         self.setStaticLink(0)
+        self.generateCode("subq $16, %rsp\t\t\t# Dummy space")
         self.startScope()
 
         self.generateCode(f"while_loop_{label}:")
@@ -340,6 +357,7 @@ class AssemblyVisitor(Visitor):
 
         # Exit the scope
         self.endScope()
+        self.generateCode("addq $16, %rsp\t\t\t# Dummy space")
         self.generateCode("addq $8, %rsp\t\t\t# Deallocate space on stack for static link")
         self.table = self.table.parent
 
@@ -376,4 +394,58 @@ class AssemblyVisitor(Visitor):
                 self.generateCode(f"jmp end_while_{self.whileLabelCounter}")
             case "Function":
                 self.generateCode(f"jmp end_{self.functionStack[-1]}")
+
+    def visitClassDeclaration(self, stmt: ClassDeclaration):
+        self.functionStack.append(stmt.var)
+        self.functions[stmt.var] = [f"{stmt.var}:\t\t\t# Class"]
+
+        entry = self.table.lookup(stmt.var.capitalize())
+        self.table = entry.table
+        
+        self.generateCode("pushq %rbp\t\t\t# Save base pointer")
+        self.generateCode("movq %rsp, %rbp\t\t\t# Make stack pointer new base pointer")
+
+        self.generateCode("movq 16(%rbp), %rcx\t\t\t# Move heap pointer into %rcx")
+        self.generateCode("pushq %rcx\t\t\t# Push heap pointer")
+
+        self.generateCode(f"addq ${self.table.fieldCounter + 8}, heap_pointer(%rip)\t\t\t# Add size of object to heap pointer")
+
+        for s in stmt.body:
+            s.accept(self)
+
+        self.generateCode("popq %rax\t\t\t# Pop current heap pointer into %rax")
+
+        self.generateCode("popq %rbp\t\t\t# Restore base pointer")
+
+        self.generateCode("ret\t\t\t\t# End class")
+
+        self.table = self.table.parent
+        self.functionStack.pop()
            
+    def visitConstructorExpression(self, expr: ConstructorExpression):
+        entry = expr.var.accept(self)
+
+        self.setStaticLink(self.table.level - entry.level)
+        self.generateCode("movq heap_pointer(%rip), %rax\t\t\t# Move heap pointer into %rax")
+        self.generateCode("pushq %rax\t\t\t# Push heap pointer")
+        self.generateCode(f"call {entry.name}\t\t\t# Call {entry.name} constructor")
+        self.generateCode("movq 16(%rbp), %rcx\t\t\t# Move potential heap pointer into %rcx")
+        self.generateCode("addq $8, %rsp\t\t\t# Deallocate space on stack for heap pointer")
+        self.generateCode("addq $8, %rsp\t\t\t# Deallocate space on stack for static link")
+
+
+
+    def visitObjectExpression(self, expr: ObjectExpression):
+        currentTable = self.table
+        for o in expr.object:
+            objectEntry = o.accept(self)
+            classEntry = self.table.lookup(objectEntry.type)
+            self.table = classEntry.table
+        varEntry = self.table.lookup(expr.var)
+        if not expr.isAssign:
+            self.generateCode(f"movq {varEntry.offset}(%rax), %rax\t\t# Assign value to %rax")
+        self.table = currentTable
+        return varEntry
+    
+    def visitPropertyCallExpression(self, expr: PropertyCallExpression):
+        pass

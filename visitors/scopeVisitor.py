@@ -25,12 +25,15 @@ class ScopeVisitor(Visitor):
         pass
     
     def visitVarDeclaration(self, stmt: VarDeclaration):
-        #int by default
-        self.table.insert(stmt, "int", None)
+        self.table.insert(stmt, stmt.type, None)
+        
 
     #Using func as a type
     def visitFunctionDeclaration(self, stmt: FunctionDeclaration):
-        newTable = SymbolTable(self.table, "Function")
+        if self.table.scopeType == "Class" or self.table.scopeType == "Method":
+            newTable = SymbolTable(self.table, "Method")
+        else:
+            newTable = SymbolTable(self.table, "Function")
         self.table.insert(stmt, "func", newTable)
         self.table = newTable
 
@@ -41,7 +44,6 @@ class ScopeVisitor(Visitor):
             s.accept(self)
         
         self.table = self.table.parent
-
 
     def visitCallExpression(self, expr: CallExpression):
         entry = expr.var.accept(self)
@@ -101,3 +103,36 @@ class ScopeVisitor(Visitor):
 
     def visitReturnStatement(self, stmt: ReturnStatement):
         stmt.value.accept(self)
+
+    def visitClassDeclaration(self, stmt: ClassDeclaration):
+        newTable = SymbolTable(self.table, "Class")
+        self.table.insert(stmt, "class", newTable)
+
+        self.table = newTable
+
+        for s in stmt.body:
+            s.accept(self)
+
+        self.table = self.table.parent
+    
+    def visitConstructorExpression(self, expr: ConstructorExpression):
+        entry = expr.var.accept(self)
+        
+    def visitObjectExpression(self, expr: ObjectExpression):
+        currentTable = self.table
+        for o in expr.object:
+            objectEntry = o.accept(self)
+            classEntry = self.table.lookup(objectEntry.type)
+            self.table = classEntry.table
+        varEntry = self.table.lookup(expr.var)
+        self.table = currentTable
+        return varEntry
+
+    def visitPropertyCallExpression(self, expr: PropertyCallExpression):
+        currentTable = self.table
+        for o in expr.object:
+            objectEntry = o.accept(self)
+            classEntry = self.table.lookup(objectEntry.type)
+            self.table = classEntry.table
+        self.table = currentTable
+        return

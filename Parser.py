@@ -20,7 +20,25 @@ def p_declaration_list(p):
 def p_declaration(p):
     '''declaration : varDeclaration
                    | statement
-                   | funcDeclaration'''
+                   | funcDeclaration
+                   | class'''
+    p[0] = p[1]
+
+def p_class(p):
+    '''class : CLASS ID LBRACE classDeclarationList RBRACE'''
+    p[0] = ClassDeclaration(p[2], p[4])
+
+def p_classDeclarationList_multiple(p):
+    '''classDeclarationList : classDeclarationList classDeclaration'''
+    p[0] = p[1] + [p[2]]
+
+def p_classDeclarationList_single(p):
+    '''classDeclarationList : classDeclaration'''
+    p[0] = [p[1]]
+
+def p_classDeclaration(p):
+    '''classDeclaration : varDeclaration
+                        | funcDeclaration'''
     p[0] = p[1]
 
 #Statements
@@ -58,14 +76,16 @@ def p_printStatement(p):
 
 #Variable declaration uninitialized
 def p_varDeclaration_uninitialized(p):
-    '''varDeclaration : VAR ID'''
-    p[0] = VarDeclaration(p[2], None)
+    '''varDeclaration : VAR ID
+                      | ID ID'''
+    p[0] = VarDeclaration(p[2], None, p[1])
 
 #Variable declaration initialized
 #Add multiple assignment
 def p_varDeclaration_initialized(p):
-    '''varDeclaration : VAR ID ASSIGN expression'''
-    p[0] = VarDeclaration(p[2], p[4])
+    '''varDeclaration : VAR ID ASSIGN expression
+                      | ID ID ASSIGN expression'''
+    p[0] = VarDeclaration(p[2], p[4], p[1])
 
 #Expression -> assignment
 def p_expression_assignment(p):
@@ -75,9 +95,10 @@ def p_expression_assignment(p):
 #Expression - assignment
 #Add multiple assignment
 def p_assignment(p):
-    '''assignment : ID ASSIGN assignment'''
+    '''assignment : property ASSIGN logical'''
+    p[1].isAssign = True
     p[0] = AssignExpression(p[1], p[3])
-    
+
 #Assignment -> logical
 def p_assignment_logical(p):
     '''assignment : logical'''
@@ -179,16 +200,39 @@ def p_unary_minus(p):
 
 #Unary -> call
 def p_unary_num(p):
-    '''unary : call'''
+    '''unary : property'''
     p[0] = p[1]
 
 #Expression - call function
+
+def p_call_constructor(p):
+    '''property : NEW primary LPAREN RPAREN'''
+    p[0] = ConstructorExpression(p[2])
+
+def p_property_multiple(p):
+    '''property : property_list DOT call'''
+    if isinstance(p[3], CallExpression):
+        p[0] = PropertyCallExpression(p[1], p[3])
+    else:
+        p[0] = ObjectExpression(p[1], p[3].var)
+
+def p_property_list(p):
+    '''property_list : property_list DOT primary'''
+    p[0] = p[1] + [p[3]]
+
+def p_property_single(p):
+    '''property_list : primary'''
+    p[0] = [p[1]]
+
+def p_property(p):
+    '''property : call'''
+    p[0] = p[1]
+
 def p_call_func(p):
     '''call : primary LPAREN arguments RPAREN'''
     p[0] = CallExpression(p[1], p[3])
 
-#Call -> primary
-def p_call_other(p):
+def p_call(p):
     '''call : primary'''
     p[0] = p[1]
 
@@ -206,6 +250,7 @@ def p_primary_ID(p):
 def p_primary(p):
     '''primary : LPAREN expression RPAREN'''
     p[0] = p[2]
+
 
 #Arguments
 
@@ -227,17 +272,6 @@ def p_funcDeclaration_statement(p):
     '''funcDeclaration : FUNC ID LPAREN parameter_list RPAREN LBRACE declaration_list RBRACE'''
     p[0] = FunctionDeclaration(p[2], p[4], p[7], None) 
     
-#Class declarations    
-# def p_classDeclaration_single(p):
-#     '''classDeclaration : CLASS ID LBRACE classFields RBRACE'''
-#     p[0] = ClassDeclaration(p[2], None, p[4])
-    
-# def p_classDeclaration_extended(p):
-#     '''classDeclaration : CLASS ID EXTENDS ID LBRACE classFields RBRACE'''
-#     p[0] = ClassDeclaration(p[2], p[4], p[6])
-
-#Parameters
-
 def p_parameter_list_multiple(p):
     '''parameter_list : parameter_list COMMA ID'''
     p[0] = p[1] + [ParameterStatement(p[3])]

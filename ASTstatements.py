@@ -6,9 +6,10 @@ class Stmt:
 
 class VarDeclaration(Stmt):
     #Add type
-    def __init__(self, var: str, initializer: Expr):
+    def __init__(self, var: str, initializer: Expr, type: str):
         self.var = var
         self.initializer = initializer
+        self.type = type
 
     def accept(self, visitor):
         return visitor.visitVarDeclaration(self)
@@ -63,3 +64,11 @@ class ReturnStatement(Stmt):
 
     def accept(self, visitor):
         return visitor.visitReturnStatement(self)
+    
+class ClassDeclaration(Stmt):
+    def __init__(self, var: str, body: list[Stmt]):
+        self.var = var
+        self.body = body
+
+    def accept(self, visitor):
+        return visitor.visitClassDeclaration(self)

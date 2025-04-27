@@ -10,6 +10,7 @@ class SymbolTable:
     def __init__(self, parent, scopeType: str):
         self.paramCounter = 16
         self.varCounter = 0
+        self.fieldCounter = 0
         self._tab = {}
         self.parent = parent
         if parent != None:
@@ -20,9 +21,14 @@ class SymbolTable:
             
     def insert(self, stmt: Stmt, type: str, newTable: 'SymbolTable'):
         if isinstance(stmt, VarDeclaration):
-            self._tab[stmt.var] = SymbolTable.VariableValue(type, self.decrementVarCounter(), self.level)
+            if self.scopeType == "Class":
+                self._tab[stmt.var] = SymbolTable.FieldValue(stmt, self.level, self.incrementFieldCounter())
+            else:
+                self._tab[stmt.var] = SymbolTable.VariableValue(stmt.type, self.decrementVarCounter(), self.level)
         elif isinstance(stmt, ParameterStatement):
             self._tab[stmt.var] = SymbolTable.VariableValue(type, self.incrementParamCounter(), self.level)
+        elif isinstance(stmt, ClassDeclaration):
+            self._tab[stmt.var.capitalize()] = SymbolTable.ClassValue(stmt, self, newTable)
         else:
             self._tab[stmt.var] = SymbolTable.FunctionValue(stmt, self, newTable)
 
@@ -33,6 +39,10 @@ class SymbolTable:
             return self.parent.lookup(name)
         else:
             return None
+        
+    def incrementFieldCounter(self):
+        self.fieldCounter += 8
+        return self.fieldCounter
    
     def decrementVarCounter(self):
         self.varCounter -= 8
@@ -57,3 +67,15 @@ class SymbolTable:
             self.returnType = "int"
             self.level = currentTable.level
             self.table = newTable
+
+    class ClassValue:
+        def __init__(self, stmt: ClassDeclaration, currentTable: 'SymbolTable', newTable: 'SymbolTable'):
+            self.name = stmt.var
+            self.table = newTable
+            self.level = currentTable.level
+
+    class FieldValue:
+        def __init__(self, stmt: VarDeclaration, level: int, offset: int):
+            self.level = level
+            self.offset = offset
+            self.type = stmt.type
