@@ -283,6 +283,10 @@ def p_parameter_list_single(p):
 def p_parameter_list_empty(p):
     '''parameter_list :'''
     p[0] = []
-
+    
 def p_error(p):
-    print("Syntax error at '%s'" % p.value if p else "Syntax error at EOF")
+    if p:
+        print(f"Syntax error at line {p.lineno}: Unexpected token '{p.value}'")
+    else:
+        print("Syntax error at EOF")
+

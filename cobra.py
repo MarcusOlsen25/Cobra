@@ -22,7 +22,7 @@ lexer.input(lexerData)
 parser = yacc.yacc()
 
 parserData = '''
-func one() {
+func one() { 
     func two() {
         return 3
     }
@@ -32,30 +32,17 @@ print one()
 '''
 
 data = '''
-var one = 12
+x = 4
 
-class gulerod {
-    var x = -8
-    var y = one
-
-    func one() {
-        var a = 3
-        return 3
-    }
+func one() = {
+    return 3
 }
-Gulerod gul = new Gulerod()  
-class melon {
-    var x = one + 14
-    Gulerod y = new Gulerod()
-}
-Melon r = new Melon()
-gul.one()
 '''
 
 with open("test.co", "r") as file:
     test = file.read()
 
-result = parser.parse(test)
+result = parser.parse(data)
 
 printVisitor = PrintVisitor()
 evalVisitor = EvalVisitor()

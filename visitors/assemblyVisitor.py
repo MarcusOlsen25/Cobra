@@ -433,8 +433,6 @@ class AssemblyVisitor(Visitor):
         self.generateCode("addq $8, %rsp\t\t\t# Deallocate space on stack for heap pointer")
         self.generateCode("addq $8, %rsp\t\t\t# Deallocate space on stack for static link")
 
-
-
     def visitObjectExpression(self, expr: ObjectExpression):
         currentTable = self.table
         for o in expr.object:
