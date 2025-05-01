@@ -68,14 +68,17 @@ Rule 62    arguments -> <empty>
 Rule 63    funcDeclaration -> FUNC ID LPAREN parameter_list RPAREN LBRACE declaration_list RBRACE
 Rule 64    parameter_list -> parameter_list COMMA ID
 Rule 65    parameter_list -> ID
-Rule 66    parameter_list -> <empty>
+Rule 66    parameter_list -> parameter_list COMMA ID COLON ID
+Rule 67    parameter_list -> ID COLON ID
+Rule 68    parameter_list -> <empty>
 
 Terminals, with rules where they appear
 
 AND                  : 31
 ASSIGN               : 25 26 28
 CLASS                : 8
-COMMA                : 60 64
+COLON                : 66 67
+COMMA                : 60 64 66
 DIVIDE               : 45
 DOT                  : 51 52
 ELSE                 : 20
@@ -83,7 +86,7 @@ EQUALS               : 33
 FUNC                 : 63
 GREATER              : 36
 GREATEROREQUAL       : 38
-ID                   : 8 23 24 24 25 26 26 58 63 64 65
+ID                   : 8 23 24 24 25 26 26 58 63 64 65 66 66 67 67
 IF                   : 19 20
 LBRACE               : 8 19 20 20 21 63
 LESS                 : 37
@@ -123,7 +126,7 @@ factor               : 41 42 43 44 45
 funcDeclaration      : 6 12
 ifStatement          : 14
 logical              : 28 29 30 31
-parameter_list       : 63 64
+parameter_list       : 63 64 66
 primary              : 50 52 53 55 56
 printStatement       : 16
 program              : 0
@@ -2364,11 +2367,13 @@ state 69
     (63) funcDeclaration -> FUNC ID LPAREN . parameter_list RPAREN LBRACE declaration_list RBRACE
     (64) parameter_list -> . parameter_list COMMA ID
     (65) parameter_list -> . ID
-    (66) parameter_list -> .
+    (66) parameter_list -> . parameter_list COMMA ID COLON ID
+    (67) parameter_list -> . ID COLON ID
+    (68) parameter_list -> .
 
     ID              shift and go to state 94
-    RPAREN          reduce using rule 66 (parameter_list -> .)
-    COMMA           reduce using rule 66 (parameter_list -> .)
+    RPAREN          reduce using rule 68 (parameter_list -> .)
+    COMMA           reduce using rule 68 (parameter_list -> .)
 
     parameter_list                 shift and go to state 95
 
@@ -3049,18 +3054,21 @@ state 93
 state 94
 
     (65) parameter_list -> ID .
+    (67) parameter_list -> ID . COLON ID
 
     RPAREN          reduce using rule 65 (parameter_list -> ID .)
     COMMA           reduce using rule 65 (parameter_list -> ID .)
+    COLON           shift and go to state 106
 
 
 state 95
 
     (63) funcDeclaration -> FUNC ID LPAREN parameter_list . RPAREN LBRACE declaration_list RBRACE
     (64) parameter_list -> parameter_list . COMMA ID
+    (66) parameter_list -> parameter_list . COMMA ID COLON ID
 
-    RPAREN          shift and go to state 106
-    COMMA           shift and go to state 107
+    RPAREN          shift and go to state 107
+    COMMA           shift and go to state 108
 
 
 state 96
@@ -3083,12 +3091,12 @@ state 97
     (26) varDeclaration -> . ID ID ASSIGN expression
     (63) funcDeclaration -> . FUNC ID LPAREN parameter_list RPAREN LBRACE declaration_list RBRACE
 
-    RBRACE          shift and go to state 108
+    RBRACE          shift and go to state 109
     VAR             shift and go to state 8
     ID              shift and go to state 96
     FUNC            shift and go to state 15
 
-    classDeclaration               shift and go to state 109
+    classDeclaration               shift and go to state 110
     varDeclaration                 shift and go to state 99
     funcDeclaration                shift and go to state 100
 
@@ -3197,7 +3205,7 @@ state 101
     MINUS           shift and go to state 34
 
     expression                     shift and go to state 10
-    declaration_list               shift and go to state 110
+    declaration_list               shift and go to state 111
     declaration                    shift and go to state 3
     varDeclaration                 shift and go to state 4
     statement                      shift and go to state 5
@@ -3293,7 +3301,7 @@ state 102
     MINUS           shift and go to state 34
 
     expression                     shift and go to state 10
-    declaration_list               shift and go to state 111
+    declaration_list               shift and go to state 112
     declaration                    shift and go to state 3
     varDeclaration                 shift and go to state 4
     statement                      shift and go to state 5
@@ -3431,7 +3439,7 @@ state 105
     NOT             shift and go to state 36
     MINUS           shift and go to state 34
 
-    expression                     shift and go to state 112
+    expression                     shift and go to state 113
     assignment                     shift and go to state 18
     property                       shift and go to state 23
     logical                        shift and go to state 24
@@ -3446,19 +3454,27 @@ state 105
 
 state 106
 
-    (63) funcDeclaration -> FUNC ID LPAREN parameter_list RPAREN . LBRACE declaration_list RBRACE
-
-    LBRACE          shift and go to state 113
-
-
-state 107
-
-    (64) parameter_list -> parameter_list COMMA . ID
+    (67) parameter_list -> ID COLON . ID
 
     ID              shift and go to state 114
 
 
+state 107
+
+    (63) funcDeclaration -> FUNC ID LPAREN parameter_list RPAREN . LBRACE declaration_list RBRACE
+
+    LBRACE          shift and go to state 115
+
+
 state 108
+
+    (64) parameter_list -> parameter_list COMMA . ID
+    (66) parameter_list -> parameter_list COMMA . ID COLON ID
+
+    ID              shift and go to state 116
+
+
+state 109
 
     (8) class -> CLASS ID LBRACE classDeclarationList RBRACE .
 
@@ -3479,7 +3495,7 @@ state 108
     RBRACE          reduce using rule 8 (class -> CLASS ID LBRACE classDeclarationList RBRACE .)
 
 
-state 109
+state 110
 
     (9) classDeclarationList -> classDeclarationList classDeclaration .
 
@@ -3489,7 +3505,7 @@ state 109
     FUNC            reduce using rule 9 (classDeclarationList -> classDeclarationList classDeclaration .)
 
 
-state 110
+state 111
 
     (19) ifStatement -> IF expression THEN LBRACE declaration_list . RBRACE
     (20) ifStatement -> IF expression THEN LBRACE declaration_list . RBRACE ELSE LBRACE declaration_list RBRACE
@@ -3548,7 +3564,7 @@ state 110
     (48) unary -> . MINUS unary
     (49) unary -> . property
 
-    RBRACE          shift and go to state 115
+    RBRACE          shift and go to state 117
     VAR             shift and go to state 8
     ID              shift and go to state 9
     FUNC            shift and go to state 15
@@ -3585,7 +3601,7 @@ state 110
     factor                         shift and go to state 33
     unary                          shift and go to state 35
 
-state 111
+state 112
 
     (21) whileStatement -> WHILE expression THEN LBRACE declaration_list . RBRACE
     (3) declaration_list -> declaration_list . declaration
@@ -3643,7 +3659,7 @@ state 111
     (48) unary -> . MINUS unary
     (49) unary -> . property
 
-    RBRACE          shift and go to state 116
+    RBRACE          shift and go to state 118
     VAR             shift and go to state 8
     ID              shift and go to state 9
     FUNC            shift and go to state 15
@@ -3680,7 +3696,7 @@ state 111
     factor                         shift and go to state 33
     unary                          shift and go to state 35
 
-state 112
+state 113
 
     (60) arguments -> arguments COMMA expression .
 
@@ -3688,7 +3704,15 @@ state 112
     COMMA           reduce using rule 60 (arguments -> arguments COMMA expression .)
 
 
-state 113
+state 114
+
+    (67) parameter_list -> ID COLON ID .
+
+    RPAREN          reduce using rule 67 (parameter_list -> ID COLON ID .)
+    COMMA           reduce using rule 67 (parameter_list -> ID COLON ID .)
+
+
+state 115
 
     (63) funcDeclaration -> FUNC ID LPAREN parameter_list RPAREN LBRACE . declaration_list RBRACE
     (2) declaration_list -> . declaration
@@ -3761,7 +3785,7 @@ state 113
     NOT             shift and go to state 36
     MINUS           shift and go to state 34
 
-    declaration_list               shift and go to state 117
+    declaration_list               shift and go to state 119
     declaration                    shift and go to state 3
     varDeclaration                 shift and go to state 4
     statement                      shift and go to state 5
@@ -3784,15 +3808,17 @@ state 113
     factor                         shift and go to state 33
     unary                          shift and go to state 35
 
-state 114
+state 116
 
     (64) parameter_list -> parameter_list COMMA ID .
+    (66) parameter_list -> parameter_list COMMA ID . COLON ID
 
     RPAREN          reduce using rule 64 (parameter_list -> parameter_list COMMA ID .)
     COMMA           reduce using rule 64 (parameter_list -> parameter_list COMMA ID .)
+    COLON           shift and go to state 120
 
 
-state 115
+state 117
 
     (19) ifStatement -> IF expression THEN LBRACE declaration_list RBRACE .
     (20) ifStatement -> IF expression THEN LBRACE declaration_list RBRACE . ELSE LBRACE declaration_list RBRACE
@@ -3812,10 +3838,10 @@ state 115
     MINUS           reduce using rule 19 (ifStatement -> IF expression THEN LBRACE declaration_list RBRACE .)
     $end            reduce using rule 19 (ifStatement -> IF expression THEN LBRACE declaration_list RBRACE .)
     RBRACE          reduce using rule 19 (ifStatement -> IF expression THEN LBRACE declaration_list RBRACE .)
-    ELSE            shift and go to state 118
+    ELSE            shift and go to state 121
 
 
-state 116
+state 118
 
     (21) whileStatement -> WHILE expression THEN LBRACE declaration_list RBRACE .
 
@@ -3836,7 +3862,7 @@ state 116
     RBRACE          reduce using rule 21 (whileStatement -> WHILE expression THEN LBRACE declaration_list RBRACE .)
 
 
-state 117
+state 119
 
     (63) funcDeclaration -> FUNC ID LPAREN parameter_list RPAREN LBRACE declaration_list . RBRACE
     (3) declaration_list -> declaration_list . declaration
@@ -3894,7 +3920,7 @@ state 117
     (48) unary -> . MINUS unary
     (49) unary -> . property
 
-    RBRACE          shift and go to state 119
+    RBRACE          shift and go to state 122
     VAR             shift and go to state 8
     ID              shift and go to state 9
     FUNC            shift and go to state 15
@@ -3931,14 +3957,21 @@ state 117
     factor                         shift and go to state 33
     unary                          shift and go to state 35
 
-state 118
+state 120
+
+    (66) parameter_list -> parameter_list COMMA ID COLON . ID
+
+    ID              shift and go to state 123
+
+
+state 121
 
     (20) ifStatement -> IF expression THEN LBRACE declaration_list RBRACE ELSE . LBRACE declaration_list RBRACE
 
-    LBRACE          shift and go to state 120
+    LBRACE          shift and go to state 124
 
 
-state 119
+state 122
 
     (63) funcDeclaration -> FUNC ID LPAREN parameter_list RPAREN LBRACE declaration_list RBRACE .
 
@@ -3959,7 +3992,15 @@ state 119
     RBRACE          reduce using rule 63 (funcDeclaration -> FUNC ID LPAREN parameter_list RPAREN LBRACE declaration_list RBRACE .)
 
 
-state 120
+state 123
+
+    (66) parameter_list -> parameter_list COMMA ID COLON ID .
+
+    RPAREN          reduce using rule 66 (parameter_list -> parameter_list COMMA ID COLON ID .)
+    COMMA           reduce using rule 66 (parameter_list -> parameter_list COMMA ID COLON ID .)
+
+
+state 124
 
     (20) ifStatement -> IF expression THEN LBRACE declaration_list RBRACE ELSE LBRACE . declaration_list RBRACE
     (2) declaration_list -> . declaration
@@ -4033,7 +4074,7 @@ state 120
     MINUS           shift and go to state 34
 
     expression                     shift and go to state 10
-    declaration_list               shift and go to state 121
+    declaration_list               shift and go to state 125
     declaration                    shift and go to state 3
     varDeclaration                 shift and go to state 4
     statement                      shift and go to state 5
@@ -4055,7 +4096,7 @@ state 120
     factor                         shift and go to state 33
     unary                          shift and go to state 35
 
-state 121
+state 125
 
     (20) ifStatement -> IF expression THEN LBRACE declaration_list RBRACE ELSE LBRACE declaration_list . RBRACE
     (3) declaration_list -> declaration_list . declaration
@@ -4113,7 +4154,7 @@ state 121
     (48) unary -> . MINUS unary
     (49) unary -> . property
 
-    RBRACE          shift and go to state 122
+    RBRACE          shift and go to state 126
     VAR             shift and go to state 8
     ID              shift and go to state 9
     FUNC            shift and go to state 15
@@ -4150,7 +4191,7 @@ state 121
     factor                         shift and go to state 33
     unary                          shift and go to state 35
 
-state 122
+state 126
 
     (20) ifStatement -> IF expression THEN LBRACE declaration_list RBRACE ELSE LBRACE declaration_list RBRACE .
 

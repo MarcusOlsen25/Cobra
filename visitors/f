@@ -1,0 +1,3 @@
+banan_descriptor:
+    .space insert 8bytes
+    .space delete 8bytes

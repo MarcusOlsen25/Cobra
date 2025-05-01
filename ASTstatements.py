@@ -25,8 +25,9 @@ class FunctionDeclaration(Stmt):
         return visitor.visitFunctionDeclaration(self)
     
 class ParameterStatement(Stmt):
-    def __init__(self, var: str):
+    def __init__(self, var: str, type: str):
         self.var = var
+        self.type = type
 
     def accept(self, visitor):
         return visitor.visitParameterStatement(self)

@@ -36,7 +36,8 @@ tokens = [
    'LESS',
    'GREATEROREQUAL',
    'LESSOREQUAL',
-   'DOT'
+   'DOT',
+   'COLON'
 ] + list(reserved.values())
 
 # Regular expression rules for simple tokens
@@ -58,6 +59,7 @@ t_LESS              = r'<'
 t_GREATEROREQUAL    = r'>='
 t_LESSOREQUAL       = r'<='
 t_DOT               = r'.'
+t_COLON             = r':'
 
 # A regular expression rule with some action code
 def t_NUMBER(t):

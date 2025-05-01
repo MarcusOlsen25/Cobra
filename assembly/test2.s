@@ -8,75 +8,54 @@ class_descriptor:
 form:
 	.string "%d\n"
 .text
-gulerod:			# Class
+one:			# Function
 	pushq %rbp			# Save base pointer
 	movq %rsp, %rbp			# Make stack pointer new base pointer
-	movq 16(%rbp), %rcx			# Move heap pointer into %rcx
-	pushq %rcx			# Push heap pointer
-	addq $24, heap_pointer(%rip)			# Add size of object to heap pointer
-	movq $8, %rax			# Put a number in %rax
-	negq %rax			# Negate value
-	movq %rax, 8(%rcx)			# Move initialized value into space on heap
-	movq %rbp, %rax			# Prepare to access variable from another scope
-	movq 24(%rax), %rax		# Traverse static link once
-	movq -8(%rax), %rax		# Move value into %rax
-	movq %rax, 16(%rcx)			# Move initialized value into space on heap
-	popq %rax			# Pop current heap pointer into %rax
+	subq $0, %rsp			# Allocate space for local variables on the stack
+	movq $3, %rax			# Put a number in %rax
+	jmp end_one
+end_one:			# End function
+	addq $0, %rsp			# Deallocate space for variables on the stack
 	popq %rbp			# Restore base pointer
-	ret				# End class
-melon:			# Class
+	ret				# Return from the function
+two:			# Function
 	pushq %rbp			# Save base pointer
 	movq %rsp, %rbp			# Make stack pointer new base pointer
-	movq 16(%rbp), %rcx			# Move heap pointer into %rcx
-	pushq %rcx			# Push heap pointer
-	addq $24, heap_pointer(%rip)			# Add size of object to heap pointer
-	movq $14, %rax			# Put a number in %rax
-	pushq %rax			# Push right side to stack
-	movq %rbp, %rax			# Prepare to access variable from another scope
-	movq 24(%rax), %rax		# Traverse static link once
-	movq -8(%rax), %rax		# Move value into %rax
-	popq %rbx			# Pop right side into %rbx
-	addq %rbx, %rax			# Perform addition
-	movq %rax, 8(%rcx)			# Move initialized value into space on heap
-	movq %rbp, %rax			# Prepare static link
-	movq 24(%rax), %rax		# Traverse static link once
-	pushq %rax			# Push static link
-	movq heap_pointer(%rip), %rax			# Move heap pointer into %rax
-	pushq %rax			# Push heap pointer
-	call gulerod			# Call gulerod constructor
-	movq 16(%rbp), %rcx			# Move potential heap pointer into %rcx
-	addq $8, %rsp			# Deallocate space on stack for heap pointer
-	addq $8, %rsp			# Deallocate space on stack for static link
-	movq %rax, 16(%rcx)			# Move initialized value into space on heap
-	popq %rax			# Pop current heap pointer into %rax
+	subq $0, %rsp			# Allocate space for local variables on the stack
+	movq $4, %rax			# Put a number in %rax
+	jmp end_two
+end_two:			# End function
+	addq $0, %rsp			# Deallocate space for variables on the stack
 	popq %rbp			# Restore base pointer
-	ret				# End class
+	ret				# Return from the function
 .globl main
 main:
 	pushq %rbp			# Save base pointer
 	movq %rsp, %rbp			# Make stack pointer new base pointer
-	subq $24, %rsp			# Allocate space for local variables on the stack
-	movq $12, %rax			# Put a number in %rax
-	movq %rax, -8(%rbp)			# Move initialized value into space on stack
+	subq $0, %rsp			# Allocate space for local variables on the stack
+	movq $6, %rax			# Put a number in %rax
+	pushq %rax			# Push argument number 2 to stack
+	movq $4, %rax			# Put a number in %rax
+	pushq %rax			# Push argument number 1 to stack
 	movq %rbp, %rax			# Prepare static link
 	pushq %rax			# Push static link
-	movq heap_pointer(%rip), %rax			# Move heap pointer into %rax
-	pushq %rax			# Push heap pointer
-	call gulerod			# Call gulerod constructor
-	movq 16(%rbp), %rcx			# Move potential heap pointer into %rcx
-	addq $8, %rsp			# Deallocate space on stack for heap pointer
+	subq $8, %rsp			# Dummy space
+	call one			# Call the one function 
+	addq $8, %rsp			# Dummy space
 	addq $8, %rsp			# Deallocate space on stack for static link
-	movq %rax, -16(%rbp)			# Move initialized value into space on stack
+	addq $16, %rsp			# Pop the arguments pushed to the stack
+	movq $6, %rax			# Put a number in %rax
+	pushq %rax			# Push argument number 2 to stack
+	movq $5, %rax			# Put a number in %rax
+	pushq %rax			# Push argument number 1 to stack
 	movq %rbp, %rax			# Prepare static link
 	pushq %rax			# Push static link
-	movq heap_pointer(%rip), %rax			# Move heap pointer into %rax
-	pushq %rax			# Push heap pointer
-	call melon			# Call melon constructor
-	movq 16(%rbp), %rcx			# Move potential heap pointer into %rcx
-	addq $8, %rsp			# Deallocate space on stack for heap pointer
+	subq $8, %rsp			# Dummy space
+	call two			# Call the two function 
+	addq $8, %rsp			# Dummy space
 	addq $8, %rsp			# Deallocate space on stack for static link
-	movq %rax, -24(%rbp)			# Move initialized value into space on stack
-	addq $24, %rsp			# Deallocate space for variables on the stack
+	addq $16, %rsp			# Pop the arguments pushed to the stack
+	addq $0, %rsp			# Deallocate space for variables on the stack
 	popq %rbp			# Restore base pointer
 	movq $0, %rax			# End with error code 0
 	ret			# Return from main

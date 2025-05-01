@@ -4,6 +4,8 @@ from ASTstatements import *
 from scope.SymbolTable import *
 
 class ScopeVisitor(Visitor):
+    
+    semanticErrors = ""
 
     def __init__(self, table: SymbolTable):
         self.table = table
@@ -26,7 +28,6 @@ class ScopeVisitor(Visitor):
     
     def visitVarDeclaration(self, stmt: VarDeclaration):
         self.table.insert(stmt, stmt.type, None)
-        
 
     #Using func as a type
     def visitFunctionDeclaration(self, stmt: FunctionDeclaration):
@@ -48,16 +49,18 @@ class ScopeVisitor(Visitor):
     def visitCallExpression(self, expr: CallExpression):
         entry = expr.var.accept(self)
         
-        correctParams = len(entry.params) == len(expr.arguments)
+        incorrectNrOfParams = len(entry.params) != len(expr.arguments)
+        if incorrectNrOfParams:
+            self.semanticErrors = self.semanticErrors + f"Incorrect number of parameters for {expr.var.var}\n"
 
         for arg in expr.arguments:
             arg.accept(self)
-
         
     def visitParameterStatement(self, stmt: ParameterStatement):
-
-        self.table.insert(stmt, "int", None)
-
+        if stmt.type != None:
+            self.table.insert(stmt, stmt.type, None)
+        else:
+            self.table.insert(stmt, "int", None)
 
     def visitIfStatement(self, stmt: IfStatement):
         stmt.condition.accept(self)
@@ -84,7 +87,6 @@ class ScopeVisitor(Visitor):
                 
             self.table = self.table.parent
         
-            
     def visitWhileStatement(self, stmt: WhileStatement):
         stmt.condition.accept(self)
         

@@ -32,11 +32,15 @@ print one()
 '''
 
 data = '''
-x = 4
-
-func one() = {
+func one(x cat, y dog) {
     return 3
 }
+one(4, 6, 8)
+
+func two(x, y) {
+    return 4
+}
+two(5)
 '''
 
 with open("test.co", "r") as file:
@@ -56,37 +60,40 @@ assemblyVisitor = AssemblyVisitor(table)
 #Scope check
 for statement in result:
     statement.accept(scopeVisitor)
+    
+if scopeVisitor.semanticErrors != "":
+    print(scopeVisitor.semanticErrors)
+else:
 
+    #Code generation
 
-#Code generation
+    assemblyVisitor = AssemblyVisitor(table)
 
-assemblyVisitor = AssemblyVisitor(table)
+    #Function prologue for main
+    assemblyVisitor.startScope()
 
-#Function prologue for main
-assemblyVisitor.startScope()
+    for s in result:
+        s.accept(assemblyVisitor)
 
-for s in result:
-    s.accept(assemblyVisitor)
+    #Function epilogue for main
+    #To be changed with
+    assemblyVisitor.endScope()
+    assemblyVisitor.generateCode("movq $0, %rax\t\t\t# End with error code 0")
+    assemblyVisitor.generateCode("ret\t\t\t# Return from main")
 
-#Function epilogue for main
-#To be changed with
-assemblyVisitor.endScope()
-assemblyVisitor.generateCode("movq $0, %rax\t\t\t# End with error code 0")
-assemblyVisitor.generateCode("ret\t\t\t# Return from main")
+    #Append functions and main
+    program = []
 
-#Append functions and main
-program = []
+    for function in assemblyVisitor.functions.values():
+        program.extend(function)
 
-for function in assemblyVisitor.functions.values():
-    program.extend(function)
+    program += assemblyVisitor.main
 
-program += assemblyVisitor.main
+    for p in program:
+        print(p)
 
-for p in program:
-     print(p)
-
-with open("assembly/test2.s", "w") as file:
-        for p in program:
-            file.write(p)
-            file.write("\n")
+    with open("assembly/test2.s", "w") as file:
+            for p in program:
+                file.write(p)
+                file.write("\n")
 
