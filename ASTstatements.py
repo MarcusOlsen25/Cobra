@@ -20,14 +20,15 @@ class FunctionDeclaration(Stmt):
         self.params = params
         self.body = body
         self.returnValue = returnValue 
+        self.isMethod = False
 
     def accept(self, visitor):
         return visitor.visitFunctionDeclaration(self)
     
 class ParameterStatement(Stmt):
-    def __init__(self, var: str, type: str):
-        self.var = var
+    def __init__(self, type: str, var: str):
         self.type = type
+        self.var = var
 
     def accept(self, visitor):
         return visitor.visitParameterStatement(self)

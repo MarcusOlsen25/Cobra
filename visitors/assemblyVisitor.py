@@ -8,7 +8,9 @@ class AssemblyVisitor(Visitor):
     def __init__(self, table: SymbolTable):
         self.table = table
         self.main = [".globl main", "main:"]
-        self.functions = {"init": [".data\nheap:\n\t.space 1000\nheap_pointer:\n\t.quad heap\nclass_descriptor:\n\t.space 100\nform:\n\t.string \"%d\\n\"\n.text"]}
+        self.classDescriptors = "cd\n"
+        self.functions = {"text": [".text"]}
+        self.init = [".data", "heap:", "\t.space 1000", "heap_pointer:", "\t.quad heap", "form:", "\t.string \"%d\\n\""]
         self.functionStack = []
         self.ifLabelCounter = 0
         self.whileLabelCounter = 0
@@ -233,16 +235,21 @@ class AssemblyVisitor(Visitor):
             self.generateCode(f"pushq %rax\t\t\t# Push argument number {i+1} to stack")
 
         self.setStaticLink(self.table.level - entry.level)
-
         self.generateCode("subq $8, %rsp\t\t\t# Dummy space")
 
-        self.generateCode(f"call {entry.name}\t\t\t# Call the {entry.name} function ")
+        if entry.isMethod:
+            self.generateCode("movq %r9, %rax")
+            self.generateCode("movq (%rax), %rax\t\t\t# Move class descriptor into %rax")
+            self.generateCode(f"movq {entry.offset}(%rax), %rax\t\t\t# Move function address into %rax")
+            self.generateCode("call *%rax")
+        else:
+            self.generateCode(f"call {entry.name}\t\t\t# Call the {entry.name} function ")
 
         self.generateCode("addq $8, %rsp\t\t\t# Dummy space")
-
         self.generateCode("addq $8, %rsp\t\t\t# Deallocate space on stack for static link")
-
         self.generateCode(self.popArgs(len(expr.arguments)))
+        
+        return entry
 
     def visitParameterStatement(self, stmt: ParameterStatement):
         pass
@@ -407,11 +414,19 @@ class AssemblyVisitor(Visitor):
 
         self.generateCode("movq 16(%rbp), %rcx\t\t\t# Move heap pointer into %rcx")
         self.generateCode("pushq %rcx\t\t\t# Push heap pointer")
+        
+        self.generateCode(f"leaq {stmt.var}_descriptor(%rip), %rax\t# Move class descriptor into %rax")
+        self.generateCode("movq %rax, (%rcx)\t\t# Move class descriptor into object")
 
         self.generateCode(f"addq ${self.table.fieldCounter + 8}, heap_pointer(%rip)\t\t\t# Add size of object to heap pointer")
 
         for s in stmt.body:
             s.accept(self)
+            
+        self.init.append(f"{stmt.var}_descriptor:")
+        for entry in self.table._tab.values():
+            if isinstance(entry, SymbolTable.FunctionValue):
+                self.init.append(f"\t.quad {entry.name}")
 
         self.generateCode("popq %rax\t\t\t# Pop current heap pointer into %rax")
 
@@ -446,4 +461,13 @@ class AssemblyVisitor(Visitor):
         return varEntry
     
     def visitPropertyCallExpression(self, expr: PropertyCallExpression):
-        pass
+        currentTable = self.table
+        for o in expr.object:
+            objectEntry = o.accept(self)
+            classEntry = self.table.lookup(objectEntry.type)
+            self.table = classEntry.table
+        self.generateCode("movq %rax, %r9")
+        callEntry = expr.call.accept(self)
+        self.table = currentTable
+        return callEntry
+    

@@ -67,6 +67,8 @@ class SymbolTable:
             self.returnType = "int"
             self.level = currentTable.level
             self.table = newTable
+            self.offset = None
+            self.isMethod = False
 
     class ClassValue:
         def __init__(self, stmt: ClassDeclaration, currentTable: 'SymbolTable', newTable: 'SymbolTable'):

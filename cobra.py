@@ -32,21 +32,15 @@ print one()
 '''
 
 data = '''
-func one(x cat, y dog) {
-    return 3
+func one(x, y) {
+    print 3
 }
-one(4, 6, 8)
-
-func two(x, y) {
-    return 4
-}
-two(5)
 '''
 
 with open("test.co", "r") as file:
     test = file.read()
 
-result = parser.parse(data)
+result = parser.parse(test)
 
 printVisitor = PrintVisitor()
 evalVisitor = EvalVisitor()
@@ -64,7 +58,6 @@ for statement in result:
 if scopeVisitor.semanticErrors != "":
     print(scopeVisitor.semanticErrors)
 else:
-
     #Code generation
 
     assemblyVisitor = AssemblyVisitor(table)
@@ -83,6 +76,8 @@ else:
 
     #Append functions and main
     program = []
+
+    program = assemblyVisitor.init.copy()
 
     for function in assemblyVisitor.functions.values():
         program.extend(function)

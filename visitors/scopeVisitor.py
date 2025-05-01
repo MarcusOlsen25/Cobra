@@ -31,10 +31,7 @@ class ScopeVisitor(Visitor):
 
     #Using func as a type
     def visitFunctionDeclaration(self, stmt: FunctionDeclaration):
-        if self.table.scopeType == "Class" or self.table.scopeType == "Method":
-            newTable = SymbolTable(self.table, "Method")
-        else:
-            newTable = SymbolTable(self.table, "Function")
+        newTable = SymbolTable(self.table, "Function")
         self.table.insert(stmt, "func", newTable)
         self.table = newTable
 
@@ -111,9 +108,16 @@ class ScopeVisitor(Visitor):
         self.table.insert(stmt, "class", newTable)
 
         self.table = newTable
+        methodCounter = -8
 
         for s in stmt.body:
             s.accept(self)
+            
+        for entry in self.table._tab.values():
+            if isinstance(entry, SymbolTable.FunctionValue):
+                methodCounter += 8
+                entry.offset = methodCounter
+                entry.isMethod = True
 
         self.table = self.table.parent
     

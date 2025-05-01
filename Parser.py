@@ -287,15 +287,6 @@ def p_parameter_list_multiple_typed(p):
 def p_parameter_list_single_typed(p):
     '''parameter_list : ID ID'''
     p[0] = [ParameterStatement(p[1], p[2])]
-    
-# For some weird reason, these ones always say error on the ':'
-# def p_parameter_list_multiple_typed(p):
-#     '''parameter_list : parameter_list COMMA ID COLON ID'''
-#     p[0] = p[1] + [ParameterStatement(p[3], p[5])]
-
-# def p_parameter_list_single_typed(p):
-#     '''parameter_list : ID COLON ID'''
-#     p[0] = [ParameterStatement(p[1], p[3])]
 
 def p_parameter_list_empty(p):
     '''parameter_list :'''
