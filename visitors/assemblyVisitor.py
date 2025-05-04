@@ -174,7 +174,15 @@ class AssemblyVisitor(Visitor):
         expr.value.accept(self)
         if expr.operator == "-":
             self.generateCode("negq %rax\t\t\t# Negate value")
-
+            
+    def visitBoolExpression(self, expr: BoolExpression):
+        if expr.value == "true":
+            self.generateCode("movq $1, %rax\t\t\t# Put true in %rax")
+        elif expr.value == "false":
+            self.generateCode("movq $0, %rax\t\t\t# Put false in %rax")
+        # Everything other than 0 is still true 
+        else:
+            self.generateCode(f"movq ${expr.value}, %rax\t\t\t# Put a non-binary boolean value in %rax")
     
     def visitVarExpression(self, expr: VarExpression):
         entry = self.table.lookup(expr.var)
@@ -235,7 +243,7 @@ class AssemblyVisitor(Visitor):
             self.generateCode(f"pushq %rax\t\t\t# Push argument number {i+1} to stack")
 
         self.setStaticLink(self.table.level - entry.level)
-        self.generateCode("subq $8, %rsp\t\t\t# Dummy space")
+        # self.generateCode("subq $8, %rsp\t\t\t# Add dummy space") # Why did we need a dummy space?
 
         if entry.isMethod:
             self.generateCode("movq %r9, %rax")
@@ -245,7 +253,7 @@ class AssemblyVisitor(Visitor):
         else:
             self.generateCode(f"call {entry.name}\t\t\t# Call the {entry.name} function ")
 
-        self.generateCode("addq $8, %rsp\t\t\t# Dummy space")
+        # self.generateCode("addq $8, %rsp\t\t\t# remove dummy space")  # Why did we need a dummy space?
         self.generateCode("addq $8, %rsp\t\t\t# Deallocate space on stack for static link")
         self.generateCode(self.popArgs(len(expr.arguments)))
         
@@ -300,7 +308,7 @@ class AssemblyVisitor(Visitor):
 
         #Prologue for then block
         self.setStaticLink(0)
-        self.generateCode("subq $16, %rsp\t\t\t# Dummy space")
+        self.generateCode("subq $16, %rsp\t\t\t# Add dummy space")
         self.startScope()
 
         for s in stmt.thenStatement:
@@ -309,7 +317,7 @@ class AssemblyVisitor(Visitor):
         #Epilogue for then block
         self.addLabel(f"end_then_{label}:\t\t\t# Clean up then block stack frame")
         self.endScope()
-        self.generateCode("addq $16, %rsp\t\t\t# Dummy space")
+        self.generateCode("addq $16, %rsp\t\t\t# Remove dummy space")
         self.generateCode("addq $8, %rsp\t\t\t# Deallocate space on stack for static link")
 
         self.generateCode(f"jmp end_{label}\t\t\t# Skip the else")
@@ -321,7 +329,7 @@ class AssemblyVisitor(Visitor):
 
             #Prologue for else block
             self.setStaticLink(0)
-            self.generateCode("subq $16, %rsp\t\t\t# Dummy space")
+            self.generateCode("subq $16, %rsp\t\t\t# Add dummy space")
             self.startScope()
 
             for s in stmt.elseStatement:
@@ -330,7 +338,7 @@ class AssemblyVisitor(Visitor):
             #Epilogue for else block
             self.addLabel(f"end_else_{label}:")
             self.endScope()
-            self.generateCode("addq $16, %rsp\t\t\t# Dummy space")
+            self.generateCode("addq $16, %rsp\t\t\t# Remove dummy space")
             self.generateCode("addq $8, %rsp\t\t\t# Deallocate space on stack for static link")
             
         self.addLabel(f"end_{label}:")
@@ -346,7 +354,7 @@ class AssemblyVisitor(Visitor):
         # Enter a new scope
         self.table = stmt.table
         self.setStaticLink(0)
-        self.generateCode("subq $16, %rsp\t\t\t# Dummy space")
+        self.generateCode("subq $16, %rsp\t\t\t# Add dummy space")
         self.startScope()
 
         self.generateCode(f"while_loop_{label}:")
@@ -364,7 +372,7 @@ class AssemblyVisitor(Visitor):
 
         # Exit the scope
         self.endScope()
-        self.generateCode("addq $16, %rsp\t\t\t# Dummy space")
+        self.generateCode("addq $16, %rsp\t\t\t# Remove dummy space")
         self.generateCode("addq $8, %rsp\t\t\t# Deallocate space on stack for static link")
         self.table = self.table.parent
 
@@ -450,6 +458,7 @@ class AssemblyVisitor(Visitor):
 
     def visitObjectExpression(self, expr: ObjectExpression):
         currentTable = self.table
+        # Traverse each property call until you come to the end
         for o in expr.object:
             objectEntry = o.accept(self)
             classEntry = self.table.lookup(objectEntry.type)

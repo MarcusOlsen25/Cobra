@@ -1,16 +1,16 @@
-var a = 1
+int a = 1
 print a
 
-var b = a + 1
+int b = a + 1
 print b
 
 a = 3
 print a
 
-var c = a - b * 3 + 7
+int c = a - b * 3 + 7
 print c
 
-var d = c / 9 - 3 * (b + a)
+int d = c / 9 - 3 * (b + a)
 if d == -15 then {
     print 5
 }
@@ -23,8 +23,8 @@ if 1 then {
     print 6
 }
 
-var zero = 0
-var one = 1
+int zero = 0
+int one = 1
 
 if zero then {
     print -1
@@ -47,20 +47,20 @@ if one then {
 }
 
 if 1 then {
-    var h = 9
-    var j = 10
+    int h = 9
+    int j = 10
     print j
 } else {
-    var y = 78
+    int y = 78
     print y
 }
 
 if 0 then {
-    var h = 6
-    var t = 0
+    int h = 6
+    int t = 0
     print h
 } else {
-    var g = 11
+    int g = 11
     print g
 }
 
@@ -120,23 +120,23 @@ if 8 != 8 then {
     print -1
 }
 
-var banan = 20
+int banan = 20
 while banan <= 25 then {
     print banan
     banan = banan + 1
 }
 
-var agurk = 26 
+int agurk = 26 
 while agurk + banan != 55 then {
     print agurk
     agurk = agurk + 1
 } 
 
-var one = 12
+int one = 12
 
 class gulerod {
-    var x = 17
-    var y = one
+    int x = 17
+    int y = one
 }
 Gulerod gul = new Gulerod()
 if gul.x + gul.y != 29 then {
@@ -146,7 +146,7 @@ if gul.x + gul.y != 29 then {
 }
    
 class melon {
-    var x = one + 14
+    int x = one + 14
     Gulerod y = new Gulerod()
 }
 
@@ -178,3 +178,33 @@ if l.x.x + l.m.x != 27 then {
 } else {
     print 32
 }
+
+func test33() {
+    if 6 > 20 then {
+        print -1
+    } else {
+        print 33
+    }
+}
+
+test33()
+
+func test34(int x) {
+    if x then {
+        print 34
+    } else {
+        print -1
+    }
+}
+
+func test35(int x) {
+    if x then {
+        print -1
+    } else {
+        print 35
+    }
+}
+
+test34(1)
+test35(0)
+

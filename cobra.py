@@ -22,25 +22,34 @@ lexer.input(lexerData)
 parser = yacc.yacc()
 
 parserData = '''
-func one() { 
-    func two() {
-        return 3
+func one() {
+    if 0 then {
+        print -1
+    } else {
+        print 200
     }
-    two()
 }
-print one()
+
+one()
 '''
 
 data = '''
-func one(x, y) {
-    print 3
+int a = 5
+
+class banan {
+    int x = 5
+    bool red = true
 }
+Banan garry = new Banan()
+
+int b = garry
+
 '''
 
 with open("test.co", "r") as file:
     test = file.read()
 
-result = parser.parse(test)
+result = parser.parse(data)
 
 printVisitor = PrintVisitor()
 evalVisitor = EvalVisitor()

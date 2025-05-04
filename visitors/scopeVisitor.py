@@ -23,11 +23,54 @@ class ScopeVisitor(Visitor):
     def visitVarExpression(self, expr: VarExpression):
         return self.table.lookup(expr.var)
     
-    def visitAssignExpression(self, expr: AssignExpression):
-        pass
+    def visitBoolExpression(self, expr: BoolExpression):
+        if expr.value == "true":
+            return 1
+        elif expr.value == "false":
+            return 0
+        # Everything other than 0 is still true 
+        else:
+            return expr.value 
     
+    def visitAssignExpression(self, expr: AssignExpression):
+        troubleMaker = expr.var.accept(self)    
+        if troubleMaker == None:
+            self.semanticErrors += f"Undeclared variable {expr.var} in line {expr.lineno}\n"
+            return
+        declaredType = troubleMaker.type
+        inferredType = self.evaluateExpressionType(expr.value)
+        if declaredType != inferredType:
+            self.semanticErrors += f"Type mismatch for {expr.var.var} in line {expr.lineno}: expected {declaredType}, got {inferredType}\n"
+        
     def visitVarDeclaration(self, stmt: VarDeclaration):
+        if stmt.initializer != None:
+            inferredType = self.evaluateExpressionType(stmt.initializer)
+            if inferredType != stmt.type:
+                self.semanticErrors += f"Type mismatch for {stmt.var} in line {stmt.lineno}: expected {stmt.type}, got {inferredType}\n"
         self.table.insert(stmt, stmt.type, None)
+        
+    def evaluateExpressionType(self, expr: Expr) -> str:
+        if isinstance(expr, NumberExpression):
+            return "int"
+        elif isinstance(expr, BoolExpression):
+            return "bool"
+        elif isinstance(expr, VarExpression):
+            entry = self.table.lookup(expr.var)
+            return entry.type if entry else "unknown"
+        elif isinstance(expr, BinaryExpression):
+            left_type = self.evaluateExpressionType(expr.left)
+            right_type = self.evaluateExpressionType(expr.right)
+            if left_type == right_type:
+                return left_type
+            else:
+                return "type_error"
+        elif isinstance(expr, UnaryExpression):
+            return self.evaluateExpressionType(expr.value)
+        elif isinstance(expr, ConstructorExpression):
+            return expr.var.var
+        else:
+            return "unknown"
+
 
     #Using func as a type
     def visitFunctionDeclaration(self, stmt: FunctionDeclaration):
@@ -48,7 +91,7 @@ class ScopeVisitor(Visitor):
         
         incorrectNrOfParams = len(entry.params) != len(expr.arguments)
         if incorrectNrOfParams:
-            self.semanticErrors = self.semanticErrors + f"Incorrect number of parameters for {expr.var.var}\n"
+            self.semanticErrors = self.semanticErrors + f"Incorrect number of parameters for {expr.var.var} in line {expr.lineno}\n"
 
         for arg in expr.arguments:
             arg.accept(self)
@@ -126,6 +169,7 @@ class ScopeVisitor(Visitor):
         
     def visitObjectExpression(self, expr: ObjectExpression):
         currentTable = self.table
+        # Traverse each property call until you come to the end
         for o in expr.object:
             objectEntry = o.accept(self)
             classEntry = self.table.lookup(objectEntry.type)

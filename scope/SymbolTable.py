@@ -1,6 +1,5 @@
 from ASTstatements import *
 
-
 class SymbolTable:
     """Implements a classic symbol table for static nested
     scope. Names for each scope are collected in a
