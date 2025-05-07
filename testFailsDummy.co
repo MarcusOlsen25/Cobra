@@ -1,0 +1,9 @@
+func test35(int x) {
+    if x then {
+        print -1
+    } else {
+        print 35
+    }
+}
+
+test35(0)

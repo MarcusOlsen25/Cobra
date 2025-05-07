@@ -319,9 +319,7 @@ test36one:			# Function
 	subq $0, %rsp			# Allocate space for local variables on the stack
 	movq %rbp, %rax			# Prepare static link
 	pushq %rax			# Push static link
-	subq $8, %rsp			# Add dummy space
 	call test36two			# Call the test36two function 
-	addq $8, %rsp			# remove dummy space
 	addq $8, %rsp			# Deallocate space on stack for static link
 	addq $0, %rsp			# Pop the arguments pushed to the stack
 end_test36one:			# End function
@@ -336,9 +334,7 @@ test36two:			# Function
 	movq 24(%rax), %rax		# Traverse static link once
 	movq 24(%rax), %rax		# Traverse static link once
 	pushq %rax			# Push static link
-	subq $8, %rsp			# Add dummy space
 	call test36three			# Call the test36three function 
-	addq $8, %rsp			# remove dummy space
 	addq $8, %rsp			# Deallocate space on stack for static link
 	addq $0, %rsp			# Pop the arguments pushed to the stack
 end_test36two:			# End function
@@ -1968,27 +1964,21 @@ end_else_26:
 end_26:
 	movq %rbp, %rax			# Prepare static link
 	pushq %rax			# Push static link
-	subq $8, %rsp			# Add dummy space
 	call test33			# Call the test33 function 
-	addq $8, %rsp			# remove dummy space
 	addq $8, %rsp			# Deallocate space on stack for static link
 	addq $0, %rsp			# Pop the arguments pushed to the stack
 	movq $1, %rax			# Put a number in %rax
 	pushq %rax			# Push argument number 1 to stack
 	movq %rbp, %rax			# Prepare static link
 	pushq %rax			# Push static link
-	subq $8, %rsp			# Add dummy space
 	call test34			# Call the test34 function 
-	addq $8, %rsp			# remove dummy space
 	addq $8, %rsp			# Deallocate space on stack for static link
 	addq $8, %rsp			# Pop the arguments pushed to the stack
 	movq $0, %rax			# Put a number in %rax
 	pushq %rax			# Push argument number 1 to stack
 	movq %rbp, %rax			# Prepare static link
 	pushq %rax			# Push static link
-	subq $8, %rsp			# Add dummy space
 	call test35			# Call the test35 function 
-	addq $8, %rsp			# remove dummy space
 	addq $8, %rsp			# Deallocate space on stack for static link
 	addq $8, %rsp			# Pop the arguments pushed to the stack
 	movq $36, %rax			# Put a number in %rax
@@ -2005,9 +1995,7 @@ end_26:
 	subq $0, %rsp			# Allocate space for local variables on the stack
 	movq %rbp, %rax			# Prepare static link
 	pushq %rax			# Push static link
-	subq $8, %rsp			# Add dummy space
 	call test36one			# Call the test36one function 
-	addq $8, %rsp			# remove dummy space
 	addq $8, %rsp			# Deallocate space on stack for static link
 	addq $0, %rsp			# Pop the arguments pushed to the stack
 end_then_30:			# Clean up then block stack frame
