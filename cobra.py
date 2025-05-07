@@ -7,6 +7,7 @@ from visitors.assemblyVisitor import AssemblyVisitor
 from visitors.nodeVisitor import NodeVisitor
 from visitors.scopeVisitor import ScopeVisitor
 from scope.SymbolTable import *
+from visitors.instruction import *
 
 lexer = lex.lex()
 
@@ -49,9 +50,6 @@ class banan {
 }
 Banan z = new Banan()
 
-if z then {
-    print 4
-}
 '''
 
 with open("test.co", "r") as file:
@@ -88,8 +86,8 @@ else:
     #Function epilogue for main
     #To be changed with
     assemblyVisitor.endScope()
-    assemblyVisitor.generateCode("movq $0, %rax\t\t\t# End with error code 0")
-    assemblyVisitor.generateCode("ret\t\t\t# Return from main")
+    assemblyVisitor.generateCode("movq", "$0", "%rax", 3, "# End with error code 0")
+    assemblyVisitor.generateCode("ret", None, None, 3, "# Return from main")
 
     #Append functions and main
     program = []
@@ -102,10 +100,11 @@ else:
     program += assemblyVisitor.main
 
     for p in program:
-        print(p)
+        line = prettyPrintAssembly(p)
+        print(line)
 
     with open("assembly/test2.s", "w") as file:
             for p in program:
-                file.write(p)
+                file.write(prettyPrintAssembly(p))
                 file.write("\n")
 
