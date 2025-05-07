@@ -208,3 +208,16 @@ func test35(int x) {
 test34(1)
 test35(0)
 
+int thirtysix = 36
+if thirtysix then {
+    func test36three() {
+        print thirtysix
+    }
+    func test36one() {
+        func test36two() {
+            test36three()
+        }
+        test36two()
+    }
+    test36one()
+}

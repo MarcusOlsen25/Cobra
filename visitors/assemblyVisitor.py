@@ -243,7 +243,7 @@ class AssemblyVisitor(Visitor):
             self.generateCode(f"pushq %rax\t\t\t# Push argument number {i+1} to stack")
 
         self.setStaticLink(self.table.level - entry.level)
-        # self.generateCode("subq $8, %rsp\t\t\t# Add dummy space") # Why did we need a dummy space?
+        self.generateCode("subq $8, %rsp\t\t\t# Add dummy space") # Why did we need a dummy space?
 
         if entry.isMethod:
             self.generateCode("movq %r9, %rax")
@@ -253,7 +253,7 @@ class AssemblyVisitor(Visitor):
         else:
             self.generateCode(f"call {entry.name}\t\t\t# Call the {entry.name} function ")
 
-        # self.generateCode("addq $8, %rsp\t\t\t# remove dummy space")  # Why did we need a dummy space?
+        self.generateCode("addq $8, %rsp\t\t\t# remove dummy space")  # Why did we need a dummy space?
         self.generateCode("addq $8, %rsp\t\t\t# Deallocate space on stack for static link")
         self.generateCode(self.popArgs(len(expr.arguments)))
         

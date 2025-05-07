@@ -46,9 +46,10 @@ class ScopeVisitor(Visitor):
         if stmt.initializer != None:
             inferredType = self.evaluateExpressionType(stmt.initializer)
             if inferredType != stmt.type:
-                self.semanticErrors += f"Type mismatch for {stmt.var} in line {stmt.lineno}: expected {stmt.type}, got {inferredType}\n"
+                self.semanticErrors += f"(V) Type mismatch for {stmt.var} in line {stmt.lineno}: expected {stmt.type}, got {inferredType}\n"
         self.table.insert(stmt, stmt.type, None)
         
+    # Auxiliary function for type checking
     def evaluateExpressionType(self, expr: Expr) -> str:
         if isinstance(expr, NumberExpression):
             return "int"
@@ -60,10 +61,24 @@ class ScopeVisitor(Visitor):
         elif isinstance(expr, BinaryExpression):
             left_type = self.evaluateExpressionType(expr.left)
             right_type = self.evaluateExpressionType(expr.right)
-            if left_type == right_type:
-                return left_type
-            else:
-                return "type_error"
+            match expr.operator:
+                case "+" | "-" | "/" | "*":
+                    if left_type == "int" and right_type == "int":
+                        return "int"
+                    else:
+                        return "illegal type in binary operation"
+                case "<" | ">" | "<=" | ">=":
+                    if left_type == "int" and right_type == "int":
+                        return "bool"
+                    else:
+                        return "illegal type in binary operation"
+                case "and" | "or":
+                    if left_type == "bool" and right_type == "bool":
+                        return "bool"
+                    else:
+                        return "illegal type in binary operation"
+                case "==" | "!=":
+                    return "bool"
         elif isinstance(expr, UnaryExpression):
             return self.evaluateExpressionType(expr.value)
         elif isinstance(expr, ConstructorExpression):
@@ -105,6 +120,11 @@ class ScopeVisitor(Visitor):
     def visitIfStatement(self, stmt: IfStatement):
         stmt.condition.accept(self)
         
+        # Check the type of the condition
+        inferredType = self.evaluateExpressionType(stmt.condition)
+        if inferredType != "bool" and inferredType != "int":
+                self.semanticErrors += f"Type mismatch for the condition in line {stmt.lineno}: expected bool or int, got {inferredType}\n"
+        
         # Create a new symbol table and visit the statements in the thenStatement
         newTable = SymbolTable(self.table, "If")
         stmt.thenTable = newTable
@@ -129,6 +149,11 @@ class ScopeVisitor(Visitor):
         
     def visitWhileStatement(self, stmt: WhileStatement):
         stmt.condition.accept(self)
+        
+        # Check the type of the condition
+        inferredType = self.evaluateExpressionType(stmt.condition)
+        if inferredType != "bool" and inferredType != "int":
+                self.semanticErrors += f"Type mismatch for the condition in line {stmt.lineno}: expected bool or int, got {inferredType}\n"
         
         # Create a new symbol table and visit the statements in the thenStatement
         newTable = SymbolTable(self.table, "While")

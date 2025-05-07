@@ -77,18 +77,19 @@ def p_printStatement(p):
 # Variable declaration uninitialized
 def p_varDeclaration_uninitialized(p):
     '''varDeclaration : type ID'''
-    p[0] = VarDeclaration(p[2], None, p[1], p.lineno(1))
+    p[0] = VarDeclaration(p[2], None, p[1], p.lineno(2))
 
 # Variable declaration initialized
 # Add multiple assignment
 def p_varDeclaration_initialized(p):
     '''varDeclaration : type ID ASSIGN expression'''
-    p[0] = VarDeclaration(p[2], p[4], p[1], p.lineno(1))
+    p[0] = VarDeclaration(p[2], p[4], p[1], p.lineno(2))
     
 # Types
 def p_type(p):
     '''type : INT
             | BOOL
+            | VOID
             | ID'''
     p[0] = p[1]
 

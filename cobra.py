@@ -34,22 +34,30 @@ one()
 '''
 
 data = '''
-int a = 5
+int x = 7
+if x then {
+    print 2
+}
+
+bool y = true
+if y then {
+    print 3
+}
 
 class banan {
-    int x = 5
-    bool red = true
+    int peel = 3
 }
-Banan garry = new Banan()
+Banan z = new Banan()
 
-int b = garry
-
+if z then {
+    print 4
+}
 '''
 
 with open("test.co", "r") as file:
     test = file.read()
 
-result = parser.parse(data)
+result = parser.parse(test)
 
 printVisitor = PrintVisitor()
 evalVisitor = EvalVisitor()
