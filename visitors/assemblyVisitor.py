@@ -220,9 +220,9 @@ class AssemblyVisitor(Visitor):
         expr.value.accept(self)
         self.generateCode("movq", "%rax", "%rdx", 3, "# Move right side of assignment into %rdx")
         entry = expr.var.accept(self)
-        if not isinstance(expr.var, ObjectExpression):
+        if not isinstance(expr.var, PropertyAccessExpression):
             self.accessVar(entry)
-        self.generateCode("movq", "%rdx", f"{entry.offset}(%rax)", 3, "# Move right side into location of left side of assign")
+        self.generateCode("movq", "%rdx", f"{entry.offset}(%rax)", 2, "# Move right side into location of left side of assign")
     
     def visitVarDeclaration(self, stmt: VarDeclaration):
         if stmt.initializer != None:
@@ -260,22 +260,14 @@ class AssemblyVisitor(Visitor):
 
         for i in range(len(expr.arguments)-1, -1, -1):
             expr.arguments[i].accept(self)
-            self.generateCode("pushq", "%rax", None, 3, f"# Push argument number {i+1} to stack")
+            self.generateCode("pushq", "%rax", None, 2, f"# Push argument number {i+1} to stack")
 
         self.setStaticLink(self.table.level - entry.level)
-        # self.generateCode("subq $8, %rsp\t\t\t# Add dummy space") # Why did we need a dummy space?
-        # This line makes test35 fail. For some reason, if you try only test36, it fails without this line, 
-        # but if you try all the tests (including test36), there are no problems.   
+        self.generateCode("subq", "$8", "%rsp", 3, "# Add dummy space") # Why did we need a dummy space?
 
-        if entry.isMethod:
-            self.generateCode("movq", "%r9", "%rax", None, None)
-            self.generateCode("movq", "(%rax)", "%rax", 3, "# Move class descriptor into %rax")
-            self.generateCode("movq", f"{entry.offset}(%rax)", "%rax", 3, "# Move function address into %rax")
-            self.generateCode("call", "*%rax", None, None, None)                        
-        else:
-            self.generateCode("call", f"{entry.name}", None, 3, "# Call the {entry.name} function")
+        self.generateCode("call", f"{entry.name}", None, 3, f"# Call the {entry.name} function")
 
-        # self.generateCode("addq $8, %rsp\t\t\t# remove dummy space")  # Why did we need a dummy space?
+        self.generateCode("addq", "$8", "%rsp", 3, "# Remove dummy space")  # Why did we need a dummy space?
         self.generateCode("addq", "$8", "%rsp", 3, "# Deallocate space on stack for static link")
         self.popArgs(len(expr.arguments))
         
@@ -475,27 +467,58 @@ class AssemblyVisitor(Visitor):
         self.generateCode("addq", "$8", "%rsp", 3, "# Deallocate space on stack for heap pointer")
         self.generateCode("addq", "$8", "%rsp", 3, "# Deallocate space on stack for static link")
 
-    def visitObjectExpression(self, expr: ObjectExpression):
-        currentTable = self.table
+    def visitPropertyAccessExpression(self, expr: PropertyAccessExpression):
         # Traverse each property call until you come to the end
-        for o in expr.object:
-            objectEntry = o.accept(self)
-            classEntry = self.table.lookup(objectEntry.type)
-            self.table = classEntry.table
-        varEntry = self.table.lookup(expr.var)
+        varEntry = expr.property.accept(self)
+        classEntry = self.table.lookup(varEntry.type)
+        propertyEntry = classEntry.table.lookup(expr.var)
+
+        if expr.isMethod:
+            self.generateCode("pushq", "%rax", None, 3, "# Push heap pointer to be used as argument")
+
         if not expr.isAssign:
-            self.generateCode("movq", f"{varEntry.offset}(%rax)", "%rax", 2, "# Assign value to %rax")
-        self.table = currentTable
-        return varEntry
+            self.generateCode("movq", f"{propertyEntry.offset}(%rax)", "%rax", 2, "# Move value into %rax")
+
+        return propertyEntry
     
-    def visitPropertyCallExpression(self, expr: PropertyCallExpression):
-        currentTable = self.table
-        for o in expr.object:
-            objectEntry = o.accept(self)
-            classEntry = self.table.lookup(objectEntry.type)
-            self.table = classEntry.table
-        self.generateCode("movq", "%rax", "%9", None, None)
-        callEntry = expr.call.accept(self)
-        self.table = currentTable
-        return callEntry
+    def visitMethodCallExpression(self, expr: MethodCallExpression):
+        methodEntry = expr.property.accept(self)
+        self.generateCode("movq", "(%rax)", "%rax", 3, "# Move method address into %rax")
+        self.generateCode("movq", "%rax", "%r9", 3, "# Move method address into r9")
+
+
+        for i in range(len(expr.arguments)-1, -1, -1):
+            expr.arguments[i].accept(self)
+            self.generateCode(f"pushq", "%rax", None, 3, f"# Push argument number {i+1} to stack")
+
+        self.setStaticLink(self.table.level - methodEntry.level)
+
+        self.generateCode("subq", "$8", "%rsp", 3, "# Add dummy space")
+        self.generateCode("movq", "%r9", "%rax", 3, "# Move heap pointer into r9")
+        self.generateCode("call", "*%rax", None, 2, "# Call method")
+
+        self.generateCode("addq" "$8", "%rsp", 3, "# Remove dummy space")
+        self.generateCode("addq" "$8", "%rsp", 3, "# Deallocate space on stack for static link")
+        self.popArgs(len(expr.arguments) + 1)
+
+        return methodEntry
     
+    def visitMethodDeclaration(self, stmt: MethodDeclaration):
+        self.functionStack.append(stmt.var)
+        self.functions[stmt.var] = [Instruction(None, None, None, f"{stmt.var}", 3, "# Method")]
+
+        entry = self.table.lookup(stmt.var)
+        self.table = entry.table
+
+        self.startScope()
+
+        for s in stmt.body:
+            s.accept(self)
+
+        self.addLabel(f"end_{entry.name}:", None, None)
+        self.endScope()
+
+        self.generateCode("ret", None, None, 4, "# Return from the method")
+
+        self.table = self.table.parent
+        self.functionStack.pop()

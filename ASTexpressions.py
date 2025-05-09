@@ -72,21 +72,22 @@ class ConstructorExpression(Expr):
     def accept(self, visitor):
         return visitor.visitConstructorExpression(self)
     
-class ObjectExpression(Expr):
-    def __init__(self, object: list[VarExpression], var: str, lineno: int):
-        self.object = object
+class MethodCallExpression(Expr):
+    def __init__(self, property: Expr, arguments: list[Expr], lineno: int):
+        self.property = property
+        self.arguments = arguments
+        self.lineno = lineno
+
+    def accept(self, visitor):
+        return visitor.visitMethodCallExpression(self)
+    
+class PropertyAccessExpression(Expr):
+    def __init__(self, property: Expr, var: str, lineno: int):
+        self.property = property
         self.var = var
         self.isAssign = False   # What is this?
+        self.isMethod = False
         self.lineno = lineno
 
     def accept(self, visitor):
-        return visitor.visitObjectExpression(self)
-    
-class PropertyCallExpression(Expr):
-    def __init__(self, object: list[VarExpression], call: CallExpression, lineno: int):
-        self.object = object
-        self.call = call
-        self.lineno = lineno
-
-    def accept(self, visitor):
-        return visitor.visitPropertyCallExpression(self)
+        return visitor.visitPropertyAccessExpression(self)

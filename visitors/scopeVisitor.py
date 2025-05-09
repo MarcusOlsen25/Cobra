@@ -112,10 +112,7 @@ class ScopeVisitor(Visitor):
             arg.accept(self)
         
     def visitParameterStatement(self, stmt: ParameterStatement):
-        if stmt.type != None:
-            self.table.insert(stmt, stmt.type, None)
-        else:
-            self.table.insert(stmt, "int", None)
+        self.table.insert(stmt, stmt.type, None)
 
     def visitIfStatement(self, stmt: IfStatement):
         stmt.condition.accept(self)
@@ -174,40 +171,47 @@ class ScopeVisitor(Visitor):
     def visitClassDeclaration(self, stmt: ClassDeclaration):
         newTable = SymbolTable(self.table, "Class")
         self.table.insert(stmt, "class", newTable)
-
         self.table = newTable
-        methodCounter = -8
 
         for s in stmt.body:
             s.accept(self)
-            
-        for entry in self.table._tab.values():
-            if isinstance(entry, SymbolTable.FunctionValue):
-                methodCounter += 8
-                entry.offset = methodCounter
-                entry.isMethod = True
-
+       
         self.table = self.table.parent
     
     def visitConstructorExpression(self, expr: ConstructorExpression):
-        entry = expr.var.accept(self)
+        expr.var.accept(self)
         
-    def visitObjectExpression(self, expr: ObjectExpression):
-        currentTable = self.table
+    def visitPropertyAccessExpression(self, expr: PropertyAccessExpression):
         # Traverse each property call until you come to the end
-        for o in expr.object:
-            objectEntry = o.accept(self)
-            classEntry = self.table.lookup(objectEntry.type)
-            self.table = classEntry.table
-        varEntry = self.table.lookup(expr.var)
-        self.table = currentTable
-        return varEntry
+        varEntry = expr.property.accept(self)
+        classEntry = self.table.lookup(varEntry.type)
+        propertyEntry = classEntry.table.lookup(expr.var)
 
-    def visitPropertyCallExpression(self, expr: PropertyCallExpression):
-        currentTable = self.table
-        for o in expr.object:
-            objectEntry = o.accept(self)
-            classEntry = self.table.lookup(objectEntry.type)
-            self.table = classEntry.table
-        self.table = currentTable
-        return
+        return propertyEntry
+
+    def visitMethodCallExpression(self, expr: MethodCallExpression):
+        methodEntry = expr.property.accept(self)
+        
+        incorrectNrOfParams = len(methodEntry.params) - 1 != len(expr.arguments)
+        if incorrectNrOfParams:
+            self.semanticErrors = self.semanticErrors + f"Incorrect number of parameters for {methodEntry.name} in line {expr.lineno}\n"
+
+        for arg in expr.arguments:
+            arg.accept(self)
+
+        return methodEntry
+    
+    def visitMethodDeclaration(self, stmt: MethodDeclaration):
+        newTable = SymbolTable(self.table, "Method")
+        self.table.insert(stmt, "method", newTable)
+        self.table = newTable
+
+        stmt.params.append(ParameterStatement(stmt.className, "this", stmt.lineno))
+
+        for param in stmt.params:
+            param.accept(self)
+
+        for s in stmt.body:
+            s.accept(self)
+        
+        self.table = self.table.parent

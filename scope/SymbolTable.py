@@ -7,7 +7,7 @@ class SymbolTable:
     via the parent reference.
     """
     def __init__(self, parent, scopeType: str):
-        self.paramCounter = 16
+        self.paramCounter = 24
         self.varCounter = 0
         self.fieldCounter = 0
         self._tab = {}
@@ -28,6 +28,8 @@ class SymbolTable:
             self._tab[stmt.var] = SymbolTable.VariableValue(type, self.incrementParamCounter(), self.level)
         elif isinstance(stmt, ClassDeclaration):
             self._tab[stmt.var.capitalize()] = SymbolTable.ClassValue(stmt, self, newTable)
+        elif isinstance(stmt, MethodDeclaration):
+            self._tab[stmt.var] = SymbolTable.MethodValue(stmt, self.level, newTable, self.incrementMethodCounter(), "int")
         else:
             self._tab[stmt.var] = SymbolTable.FunctionValue(stmt, self, newTable)
 
@@ -50,6 +52,10 @@ class SymbolTable:
     def incrementParamCounter(self):
         self.paramCounter += 8
         return self.paramCounter
+    
+    def incrementMethodCounter(self):
+        self.methodCounter += 8
+        return self.methodCounter
         
     class VariableValue:
         def __init__(self, type: str, offset: int, level: int):
@@ -66,8 +72,6 @@ class SymbolTable:
             self.returnType = "int"
             self.level = currentTable.level
             self.table = newTable
-            self.offset = None
-            self.isMethod = False
 
     class ClassValue:
         def __init__(self, stmt: ClassDeclaration, currentTable: 'SymbolTable', newTable: 'SymbolTable'):
@@ -80,3 +84,12 @@ class SymbolTable:
             self.level = level
             self.offset = offset
             self.type = stmt.type
+
+    class MethodValue:
+        def __init__(self, stmt: MethodDeclaration, level: int, table: 'SymbolTable', offset: int, returnType: str):
+            self.name = stmt.var
+            self.level = level
+            self.table = table
+            self.offset = offset
+            self.returnType = returnType
+            self.params = stmt.params

@@ -26,6 +26,9 @@ def p_declaration(p):
 
 def p_class(p):
     '''class : CLASS ID LBRACE classDeclarationList RBRACE'''
+    for declaration in p[4]:
+        if isinstance(declaration, MethodDeclaration):
+            declaration.className = p[2].capitalize()
     p[0] = ClassDeclaration(p[2], p[4], p.lineno(1))
 
 def p_classDeclarationList_multiple(p):
@@ -38,8 +41,12 @@ def p_classDeclarationList_single(p):
 
 def p_classDeclaration(p):
     '''classDeclaration : varDeclaration
-                        | funcDeclaration'''
+                        | methodDeclaration'''
     p[0] = p[1]
+
+def p_methodDeclaration(p):
+    '''methodDeclaration : FUNC ID LPAREN parameter_list RPAREN LBRACE declaration_list RBRACE'''
+    p[0] = MethodDeclaration(p[2], p[4], p[7], "int", p.lineno(1))
 
 # Statements
 # Statement -> expression
@@ -215,12 +222,14 @@ def p_call_constructor(p):
     '''property : NEW primary LPAREN RPAREN'''
     p[0] = ConstructorExpression(p[2], p.lineno(1))
 
-def p_property_multiple(p):
-    '''property : property_list DOT call'''
-    if isinstance(p[3], CallExpression):
-        p[0] = PropertyCallExpression(p[1], p[3], p.lineno(2))
-    else:
-        p[0] = ObjectExpression(p[1], p[3].var, p.lineno(2))
+def p_property_dot(p):
+    '''property : property DOT ID'''
+    p[0] = PropertyAccessExpression(p[1], p[3], p.lineno(3))
+
+def p_property_call(p):
+    '''property : property LPAREN arguments RPAREN'''
+    p[1].isMethod = True
+    p[0] = MethodCallExpression(p[1], p[3], p.lineno(1))
 
 def p_property_list(p):
     '''property_list : property_list DOT primary'''

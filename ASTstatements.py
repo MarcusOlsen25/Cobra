@@ -82,3 +82,15 @@ class ClassDeclaration(Stmt):
 
     def accept(self, visitor):
         return visitor.visitClassDeclaration(self)
+    
+class MethodDeclaration(Stmt):
+    def __init__(self, var: str, params: list[VarDeclaration], body: list[Stmt], returnValue: Expr, lineno: int):
+        self.var = var
+        self.params = params
+        self.body = body
+        self.returnValue = returnValue 
+        self.className = None
+        self.lineno = lineno
+
+    def accept(self, visitor):
+        return visitor.visitMethodDeclaration(self)
