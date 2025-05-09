@@ -35,20 +35,14 @@ one()
 '''
 
 data = '''
-int x = 7
-if x then {
-    print 2
-}
-
-bool y = true
-if y then {
-    print 3
-}
-
 class banan {
     int peel = 3
+    func asd() {
+        return this
+    }
 }
 Banan z = new Banan()
+print z.peel
 
 '''
 

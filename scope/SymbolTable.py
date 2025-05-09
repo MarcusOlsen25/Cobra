@@ -10,6 +10,7 @@ class SymbolTable:
         self.paramCounter = 24
         self.varCounter = 0
         self.fieldCounter = 0
+        self.methodCounter = -8
         self._tab = {}
         self.parent = parent
         if parent != None:

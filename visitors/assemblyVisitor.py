@@ -446,7 +446,7 @@ class AssemblyVisitor(Visitor):
         self.init.append(Instruction(None, None, None, f"{stmt.var}_descriptor", None, None))
 
         for entry in self.table._tab.values():
-            if isinstance(entry, SymbolTable.FunctionValue):
+            if isinstance(entry, SymbolTable.MethodValue):
                 self.init.append(Instruction(None, None, None, None, None, f"\t.quad {entry.name}"))
 
         self.generateCode("popq", "%rax", None, 3, "# Pop current heap pointer into %rax")
@@ -497,8 +497,8 @@ class AssemblyVisitor(Visitor):
         self.generateCode("movq", "%r9", "%rax", 3, "# Move heap pointer into r9")
         self.generateCode("call", "*%rax", None, 2, "# Call method")
 
-        self.generateCode("addq" "$8", "%rsp", 3, "# Remove dummy space")
-        self.generateCode("addq" "$8", "%rsp", 3, "# Deallocate space on stack for static link")
+        self.generateCode("addq", "$8", "%rsp", 3, "# Remove dummy space")
+        self.generateCode("addq", "$8", "%rsp", 3, "# Deallocate space on stack for static link")
         self.popArgs(len(expr.arguments) + 1)
 
         return methodEntry
@@ -515,7 +515,7 @@ class AssemblyVisitor(Visitor):
         for s in stmt.body:
             s.accept(self)
 
-        self.addLabel(f"end_{entry.name}:", None, None)
+        self.addLabel(f"end_{entry.name}", None, None)
         self.endScope()
 
         self.generateCode("ret", None, None, 4, "# Return from the method")

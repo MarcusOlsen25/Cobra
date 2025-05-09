@@ -6,7 +6,7 @@ test: test.o
 
 # Rule to assemble the assembly source file
 test.o: test.s
-	gcc -c test.s -o test.o
+	gcc -c -g -O0 test.s -o test.o
 
 # Target to run the compiled program
 run: test
