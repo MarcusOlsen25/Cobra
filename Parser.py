@@ -44,9 +44,9 @@ def p_classDeclaration(p):
                         | methodDeclaration'''
     p[0] = p[1]
 
-def p_methodDeclaration(p):
-    '''methodDeclaration : FUNC ID LPAREN parameter_list RPAREN LBRACE declaration_list RBRACE'''
-    p[0] = MethodDeclaration(p[2], p[4], p[7], "int", p.lineno(1))
+def p_methodDeclaration(p): 
+    '''methodDeclaration : FUNC ID LPAREN parameter_list RPAREN type LBRACE declaration_list RBRACE'''
+    p[0] = MethodDeclaration(p[2], p[4], p[8], p[6], p.lineno(1))
 
 # Statements
 # Statement -> expression
@@ -61,6 +61,10 @@ def p_statement(p):
 def p_returnStatement(p):
     '''returnStatement : RETURN expression'''
     p[0] = ReturnStatement(p[2], p.lineno(1))
+    
+def p_returnStatement_empty(p):     
+    '''returnStatement : RETURN'''
+    p[0] = ReturnStatement(None, p.lineno(1))
     
 # If statements
 def p_ifStatement_single(p):
@@ -290,8 +294,8 @@ def p_arguments_empty(p):
 # Function declarations 
 # Add return statements
 def p_funcDeclaration_statement(p):
-    '''funcDeclaration : FUNC ID LPAREN parameter_list RPAREN LBRACE declaration_list RBRACE'''
-    p[0] = FunctionDeclaration(p[2], p[4], p[7], None, p.lineno(1)) 
+    '''funcDeclaration : FUNC ID LPAREN parameter_list RPAREN type LBRACE declaration_list RBRACE'''
+    p[0] = FunctionDeclaration(p[2], p[4], p[8], p[6], p.lineno(1)) 
     
 def p_parameter_list_multiple(p):
     '''parameter_list : parameter_list COMMA ID'''

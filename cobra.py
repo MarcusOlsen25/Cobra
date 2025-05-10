@@ -37,7 +37,7 @@ one()
 data = '''
 class banan {
     int peel = 3
-    func asd() {
+    func asd() Banan {
         return this
     }
 }
@@ -49,7 +49,7 @@ print z.peel
 with open("test.co", "r") as file:
     test = file.read()
 
-result = parser.parse(test)
+result = parser.parse(data)
 
 printVisitor = PrintVisitor()
 evalVisitor = EvalVisitor()

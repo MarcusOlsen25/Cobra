@@ -16,11 +16,11 @@ class VarDeclaration(Stmt):
         return visitor.visitVarDeclaration(self)
     
 class FunctionDeclaration(Stmt):
-    def __init__(self, var: str, params: list[VarDeclaration], body: list[Stmt], returnValue: Expr, lineno: int):
+    def __init__(self, var: str, params: list[VarDeclaration], body: list[Stmt], returnType: Expr, lineno: int):
         self.var = var
         self.params = params
         self.body = body
-        self.returnValue = returnValue 
+        self.returnType = returnType 
         self.isMethod = False
         self.lineno = lineno
 
@@ -84,11 +84,11 @@ class ClassDeclaration(Stmt):
         return visitor.visitClassDeclaration(self)
     
 class MethodDeclaration(Stmt):
-    def __init__(self, var: str, params: list[VarDeclaration], body: list[Stmt], returnValue: Expr, lineno: int):
+    def __init__(self, var: str, params: list[VarDeclaration], body: list[Stmt], returnType: Expr, lineno: int):
         self.var = var
         self.params = params
         self.body = body
-        self.returnValue = returnValue 
+        self.returnType = returnType 
         self.className = None
         self.lineno = lineno
 

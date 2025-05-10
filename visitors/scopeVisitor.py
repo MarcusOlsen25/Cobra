@@ -33,20 +33,20 @@ class ScopeVisitor(Visitor):
             return expr.value 
     
     def visitAssignExpression(self, expr: AssignExpression):
-        troubleMaker = expr.var.accept(self)    
-        if troubleMaker == None:
+        var = expr.var.accept(self)    
+        if var == None:
             self.semanticErrors += f"Undeclared variable {expr.var} in line {expr.lineno}\n"
             return
-        declaredType = troubleMaker.type
+        declaredType = var.type
         inferredType = self.evaluateExpressionType(expr.value)
         if declaredType != inferredType:
             self.semanticErrors += f"Type mismatch for {expr.var.var} in line {expr.lineno}: expected {declaredType}, got {inferredType}\n"
-        
+                    
     def visitVarDeclaration(self, stmt: VarDeclaration):
         if stmt.initializer != None:
             inferredType = self.evaluateExpressionType(stmt.initializer)
             if inferredType != stmt.type:
-                self.semanticErrors += f"(V) Type mismatch for {stmt.var} in line {stmt.lineno}: expected {stmt.type}, got {inferredType}\n"
+                self.semanticErrors += f"Type mismatch for {stmt.var} in line {stmt.lineno}: expected {stmt.type}, got {inferredType}\n"
         self.table.insert(stmt, stmt.type, None)
         
     # Auxiliary function for type checking
@@ -84,6 +84,7 @@ class ScopeVisitor(Visitor):
         elif isinstance(expr, ConstructorExpression):
             return expr.var.var
         else:
+            # We do not want to get here
             return "unknown"
 
 
@@ -99,8 +100,38 @@ class ScopeVisitor(Visitor):
         for s in stmt.body:
             s.accept(self)
         
+        # Added this paragraph
+        # Check that the return types match the function definition
+        returnTypes = self.findReturnStatements(stmt.body)
+        if returnTypes == [] and stmt.returnType != "void":
+            self.semanticErrors += f"Type mismatch in line {stmt.lineno}: {stmt.var} returns {stmt.returnType}, not void\n"
+        elif returnTypes != []:
+            for type in returnTypes:
+                if type[0] != stmt.returnType:
+                    self.semanticErrors += f"Type mismatch in line {type[1]}: {stmt.var} returns {stmt.returnType}, not {type[0]}\n"
+
         self.table = self.table.parent
 
+    # Auxiliary recursive function for type-checking return statements 
+    def findReturnStatements(self, list: list[Stmt]):
+        # A list of all the return types found 
+        types = []
+        
+        for s in list:
+            if isinstance(s, ReturnStatement):
+                if s.value != None:
+                    types = types + [(self.evaluateExpressionType(s.value), s.lineno)]
+                else:
+                    types = types + [("void", s.lineno)]
+            elif isinstance(s, IfStatement):
+                types += self.findReturnStatements(s.thenStatement)
+                if s.elseStatement != None:
+                    types += self.findReturnStatements(s.elseStatement)
+            elif isinstance(s, WhileStatement):
+                types += self.findReturnStatements(s.thenStatement)
+        
+        return types
+    
     def visitCallExpression(self, expr: CallExpression):
         entry = expr.var.accept(self)
         
@@ -166,8 +197,9 @@ class ScopeVisitor(Visitor):
         stmt.value.accept(self)
 
     def visitReturnStatement(self, stmt: ReturnStatement):
-        stmt.value.accept(self)
-
+        if stmt.value != None:
+            stmt.value.accept(self)
+            
     def visitClassDeclaration(self, stmt: ClassDeclaration):
         newTable = SymbolTable(self.table, "Class")
         self.table.insert(stmt, "class", newTable)

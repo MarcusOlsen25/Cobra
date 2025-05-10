@@ -30,7 +30,7 @@ class SymbolTable:
         elif isinstance(stmt, ClassDeclaration):
             self._tab[stmt.var.capitalize()] = SymbolTable.ClassValue(stmt, self, newTable)
         elif isinstance(stmt, MethodDeclaration):
-            self._tab[stmt.var] = SymbolTable.MethodValue(stmt, self.level, newTable, self.incrementMethodCounter(), "int")
+            self._tab[stmt.var] = SymbolTable.MethodValue(stmt, self.level, newTable, self.incrementMethodCounter(), stmt.returnType)
         else:
             self._tab[stmt.var] = SymbolTable.FunctionValue(stmt, self, newTable)
 
@@ -69,8 +69,7 @@ class SymbolTable:
             self.name = stmt.var
             self.params = stmt.params
             self.body = stmt.body
-            #int by default
-            self.returnType = "int"
+            self.returnType = stmt.returnType
             self.level = currentTable.level
             self.table = newTable
 

@@ -179,7 +179,7 @@ if l.x.x + l.m.x != 27 then {
     print 32
 }
 
-func test33() {
+func test33() void {
     if 6 > 20 then {
         print -1
     } else {
@@ -189,7 +189,7 @@ func test33() {
 
 test33()
 
-func test34(int x) {
+func test34(int x) void {
     if x then {
         print 34
     } else {
@@ -197,7 +197,7 @@ func test34(int x) {
     }
 }
 
-func test35(int x) {
+func test35(int x) void {
     if x then {
         print -1
     } else {
@@ -210,11 +210,11 @@ test35(0)
 
 int thirtysix = 36
 if thirtysix then {
-    func test36three() {
+    func test36three() void {
         print thirtysix
     }
-    func test36one() {
-        func test36two() {
+    func test36one() void {
+        func test36two() void {
             test36three()
         }
         test36two()
