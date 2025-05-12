@@ -1,10 +1,7 @@
 from Lexer import *
 from Parser import *
 from visitors import visitor
-from visitors.printVisitor import PrintVisitor
-from visitors.evalVisitor import EvalVisitor
 from visitors.assemblyVisitor import AssemblyVisitor
-from visitors.nodeVisitor import NodeVisitor
 from visitors.scopeVisitor import ScopeVisitor
 from scope.SymbolTable import *
 from visitors.instruction import *
@@ -35,14 +32,14 @@ one()
 '''
 
 data = '''
-class banan {
-    int peel = 3
-    func asd() Banan {
-        return this
-    }
+func one(int x) int {
+    return x
 }
-Banan z = new Banan()
-print z.peel
+
+int b 
+b = 7 + c
+bool c = false
+
 
 '''
 
@@ -51,21 +48,20 @@ with open("test.co", "r") as file:
 
 result = parser.parse(data)
 
-printVisitor = PrintVisitor()
-evalVisitor = EvalVisitor()
-nodeVisitor = NodeVisitor()
-
 table = SymbolTable(None, "Function")
 
 scopeVisitor = ScopeVisitor(table)
 assemblyVisitor = AssemblyVisitor(table)
-
 #Scope check
 for statement in result:
     statement.accept(scopeVisitor)
-    
-if scopeVisitor.semanticErrors != "":
-    print(scopeVisitor.semanticErrors)
+
+if scopeVisitor.scopeErrors != []:
+    for error in scopeVisitor.scopeErrors:
+        print(error.message)
+elif scopeVisitor.typeErrors != []:
+    for error in scopeVisitor.typeErrors:
+        print(error.message)
 else:
     #Code generation
 
