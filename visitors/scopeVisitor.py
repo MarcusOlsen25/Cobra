@@ -120,6 +120,11 @@ class ScopeVisitor(Visitor):
                 return self.evaluateExpressionType(expr.value)
             elif isinstance(expr, ConstructorExpression):
                 return expr.var.var
+            elif isinstance(expr, PropertyAccessExpression):
+                varEntry = expr.property.accept(self)
+                classEntry = self.table.lookup(varEntry.type)
+                propertyEntry = classEntry.table.lookup(expr.var)
+                return propertyEntry.type
             else:
                 # We do not want to get here
                 return "unknown"
