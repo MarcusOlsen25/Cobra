@@ -25,11 +25,20 @@ def p_declaration(p):
     p[0] = p[1]
 
 def p_class(p):
-    '''class : CLASS ID LBRACE classDeclarationList RBRACE'''
-    for declaration in p[4]:
+    '''class : CLASS ID extends LBRACE classDeclarationList RBRACE'''
+    for declaration in p[5]:
         if isinstance(declaration, MethodDeclaration):
             declaration.className = p[2].capitalize()
-    p[0] = ClassDeclaration(p[2], p[4], p.lineno(1))
+    p[0] = ClassDeclaration(p[2], p[5], p[3], p.lineno(1))
+
+def p_extends(p):
+    '''extends : EXTENDS ID
+               | empty'''
+    if len(p) == 3:
+        p[0] = p[2]
+    else:
+        p[0] = None
+
 
 def p_classDeclarationList_multiple(p):
     '''classDeclarationList : classDeclarationList classDeclaration'''

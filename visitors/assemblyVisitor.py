@@ -427,27 +427,47 @@ class AssemblyVisitor(Visitor):
         self.functions[stmt.var] = [Instruction(None, None, None, f"{stmt.var}", 3, "# Class")]
 
         entry = self.table.lookup(stmt.var.capitalize())
-        self.table = entry.table
         
         self.generateCode("pushq", "%rbp", None, 3, "# Save base pointer")
         self.generateCode("movq", "%rsp", "%rbp", 3, "# Make stack pointer new base pointer")
-
-        self.generateCode("movq", "16(%rbp)", "%rcx", 3, "# Move heap pointer into %rcx")
+        self.generateCode("movq", "16(%rbp)", "%rcx", 3, "# Push heap pointer")
         self.generateCode("pushq", "%rcx", None, 3, "# Push heap pointer")
-        
-        self.generateCode("leaq", f"{stmt.var}_descriptor(%rip)", "%rax", 1, "# Move class descriptor into %rax")
-        self.generateCode("movq", "%rax", "(%rcx)", 3, "# Move class descriptor into object")
 
-        self.generateCode("addq", f"${self.table.fieldCounter + 8}", "heap_pointer(%rip)", 1, "# Add size of object to heap pointer")
+        
+        if stmt.super:
+            superEntry = self.table.lookup(stmt.super.capitalize())
+            self.setStaticLink(self.table.level - superEntry.level)
+            self.generateCode("pushq", "%rcx", None, 3, "# Push heap pointer")
+
+            self.generateCode("call", f"{superEntry.name}", None, 3, f"# Call {entry.name} constructor")
+
+            self.generateCode("addq", "$8", "%rsp", 3, "# Deallocate space on stack for heap pointer")
+            self.generateCode("addq", "$8", "%rsp", 3, "# Deallocate space on stack for static link")
+
+
+
+        self.table = entry.table
 
         for s in stmt.body:
             s.accept(self)
             
+        
         self.init.append(Instruction(None, None, None, f"{stmt.var}_descriptor", None, None))
+        super = stmt.super
+        super_classes = []
+        while super:
+            superEntry = self.table.lookup(super.capitalize())
+            super_classes.append(superEntry)
+            super = superEntry.super
 
-        for entry in self.table._tab.values():
-            if isinstance(entry, SymbolTable.MethodValue):
+        super_classes.reverse()
+
+        for superEntry in super_classes:
+            for entry in superEntry.table.getMethods():
                 self.init.append(Instruction(None, None, None, None, None, f"\t.quad {entry.name}"))
+
+        for entry in self.table.getMethods():
+            self.init.append(Instruction(None, None, None, None, None, f"\t.quad {entry.name}"))
 
         self.generateCode("popq", "%rax", None, 3, "# Pop current heap pointer into %rax")
         self.generateCode("popq", "%rbp", None, 3, "# Restore base pointer")
@@ -459,9 +479,14 @@ class AssemblyVisitor(Visitor):
     def visitConstructorExpression(self, expr: ConstructorExpression):
         entry = expr.var.accept(self)
 
+        self.generateCode("movq", "heap_pointer(%rip)", "%rcx", 3, "# Move heap pointer into %rcx")
+        self.generateCode("addq", f"${entry.table.fieldCounter + 8}", "heap_pointer(%rip)", 1, "# Add size of object to heap pointer")
+        self.generateCode("leaq", f"{entry.name}_descriptor(%rip)", "%rax", 1, "# Move class descriptor into %rax")
+        self.generateCode("movq", "%rax", "(%rcx)", 3, "# Move class descriptor into object")
+
         self.setStaticLink(self.table.level - entry.level)
-        self.generateCode("movq", "heap_pointer(%rip)", "%rax", 3, "# Move heap pointer into %rax")
-        self.generateCode("pushq", "%rax", None, 3, "# Push heap pointer")
+        self.generateCode("pushq", "%rcx", None, 3, "# Push heap pointer")
+
         self.generateCode("call", f"{entry.name}", None, 3, f"# Call {entry.name} constructor")
         self.generateCode("movq", "16(%rbp)", "%rcx", 3, "# Move potential heap pointer into %rcx")
         self.generateCode("addq", "$8", "%rsp", 3, "# Deallocate space on stack for heap pointer")
@@ -471,19 +496,23 @@ class AssemblyVisitor(Visitor):
         # Traverse each property call until you come to the end
         varEntry = expr.property.accept(self)
         classEntry = self.table.lookup(varEntry.type)
-        propertyEntry = classEntry.table.lookup(expr.var)
+        propertyEntry = classEntry.table.lookupField(expr.var)
+        while not propertyEntry and classEntry.super:
+            classEntry = self.table.lookup(classEntry.super.capitalize())
+            propertyEntry = classEntry.table.lookupField(expr.var)
 
         if expr.isMethod:
             self.generateCode("pushq", "%rax", None, 3, "# Push heap pointer to be used as argument")
+            self.generateCode("movq", "(%rax)", "%rax", 2, "# Move value into %rax")
 
-        if not expr.isAssign:
+        if not expr.isAssign and not expr.isMethod:
             self.generateCode("movq", f"{propertyEntry.offset}(%rax)", "%rax", 2, "# Move value into %rax")
 
         return propertyEntry
     
     def visitMethodCallExpression(self, expr: MethodCallExpression):
         methodEntry = expr.property.accept(self)
-        self.generateCode("movq", "(%rax)", "%rax", 3, "# Move method address into %rax")
+        self.generateCode("movq", f"{methodEntry.offset}(%rax)", "%rax", 3, "# Move method address into %rax")
         self.generateCode("movq", "%rax", "%r9", 3, "# Move method address into r9")
 
 

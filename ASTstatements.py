@@ -75,9 +75,10 @@ class ReturnStatement(Stmt):
         return visitor.visitReturnStatement(self)
     
 class ClassDeclaration(Stmt):
-    def __init__(self, var: str, body: list[Stmt], lineno: int):
+    def __init__(self, var: str, body: list[Stmt], super: str, lineno: int):
         self.var = var
         self.body = body
+        self.super = super
         self.lineno = lineno
 
     def accept(self, visitor):

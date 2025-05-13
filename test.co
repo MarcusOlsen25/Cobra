@@ -132,11 +132,11 @@ while agurk + banan != 55 then {
     agurk = agurk + 1
 } 
 
-int one = 12
+int onee = 12
 
 class gulerod {
     int x = 17
-    int y = one
+    int y = onee
 }
 Gulerod gul = new Gulerod()
 if gul.x + gul.y != 29 then {
@@ -146,7 +146,7 @@ if gul.x + gul.y != 29 then {
 }
    
 class melon {
-    int x = one + 14
+    int x = onee + 14
     Gulerod y = new Gulerod()
 }
 

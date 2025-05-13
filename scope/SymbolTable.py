@@ -42,6 +42,12 @@ class SymbolTable:
         else:
             return None
         
+    def lookupField(self, name: str):
+        if name in self._tab:
+            return self._tab[name]
+        else:
+            return None
+        
     def incrementFieldCounter(self):
         self.fieldCounter += 8
         return self.fieldCounter
@@ -57,6 +63,15 @@ class SymbolTable:
     def incrementMethodCounter(self):
         self.methodCounter += 8
         return self.methodCounter
+    
+    def setFieldCounter(self, counter: int):
+        self.fieldCounter = counter
+
+    def setMethodCounter(self, counter: int):
+        self.methodCounter = counter
+
+    def getMethods(self):
+        return [method for method in self._tab.values() if isinstance(method, SymbolTable.MethodValue)]
         
     class VariableValue:
         def __init__(self, type: str, offset: int, level: int):
@@ -78,6 +93,7 @@ class SymbolTable:
             self.name = stmt.var
             self.table = newTable
             self.level = currentTable.level
+            self.super = stmt.super
 
     class FieldValue:
         def __init__(self, stmt: VarDeclaration, level: int, offset: int):

@@ -18,7 +18,8 @@ reserved = {"if": "IF",
             "and": "AND",
             "print": "PRINT",
             "class": "CLASS",
-            "new": "NEW"
+            "new": "NEW",
+            "extends": "EXTENDS"
             }
 
 tokens = [

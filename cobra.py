@@ -32,13 +32,34 @@ one()
 '''
 
 data = '''
-func one(int x) int {
-    return x
+class agurk {
+    int z = 2
 }
 
-int b 
-b = 7 + c
-bool c = false
+class banan {
+    int x = 3
+    Agurk a = new Agurk()
+    func two() int {
+        return this.a.z
+    }
+}
+
+class melon extends banan {
+    func three() int {
+        return this.a.z
+    }
+}
+
+class gulerod extends melon {
+    func four(int a, int b) int {
+        return a + b + this.a.z + this.x
+    }
+}
+
+Gulerod g = new Gulerod()
+print g.two()
+print g.three()
+print g.four(1,2)
 
 
 '''
@@ -46,7 +67,7 @@ bool c = false
 with open("test.co", "r") as file:
     test = file.read()
 
-result = parser.parse(data)
+result = parser.parse(test)
 
 table = SymbolTable(None, "Function")
 

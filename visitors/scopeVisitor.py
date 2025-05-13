@@ -263,6 +263,12 @@ class ScopeVisitor(Visitor):
             else:
                 newTable = SymbolTable(self.table, "Class")
                 self.table.insert(stmt, "class", newTable)
+                superEntry = None
+                if stmt.super:
+                    superEntry = self.table.lookup(stmt.super.capitalize())
+                    newTable.setFieldCounter(superEntry.table.fieldCounter)
+                    newTable.setMethodCounter(superEntry.table.methodCounter)
+
                 self.table = newTable
 
                 for s in stmt.body:
@@ -279,7 +285,10 @@ class ScopeVisitor(Visitor):
         # Traverse each property call until you come to the end
         varEntry = expr.property.accept(self)
         classEntry = self.table.lookup(varEntry.type)
-        propertyEntry = classEntry.table.lookup(expr.var)
+        propertyEntry = classEntry.table.lookupField(expr.var)
+        while not propertyEntry and classEntry.super:
+            classEntry = self.table.lookup(classEntry.super.capitalize())
+            propertyEntry = classEntry.table.lookupField(expr.var)
 
         return propertyEntry
 
