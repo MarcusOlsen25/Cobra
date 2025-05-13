@@ -323,3 +323,6 @@ def p_error(p):
     else:
         print("Syntax error at EOF")
 
+def p_empty(p):
+    'empty :'
+    pass
