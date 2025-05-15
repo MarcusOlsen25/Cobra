@@ -426,7 +426,7 @@ class AssemblyVisitor(Visitor):
         self.functionStack.append(stmt.var)
         self.functions[stmt.var] = [Instruction(None, None, None, f"{stmt.var}", 3, "# Class")]
 
-        entry = self.table.lookup(stmt.var.capitalize())
+        entry = self.table.lookup(stmt.var)
         
         self.generateCode("pushq", "%rbp", None, 3, "# Save base pointer")
         self.generateCode("movq", "%rsp", "%rbp", 3, "# Make stack pointer new base pointer")
@@ -435,7 +435,7 @@ class AssemblyVisitor(Visitor):
 
         
         if stmt.super:
-            superEntry = self.table.lookup(stmt.super.capitalize())
+            superEntry = self.table.lookup(stmt.super)
             self.setStaticLink(self.table.level - superEntry.level)
             self.generateCode("pushq", "%rcx", None, 3, "# Push heap pointer")
 
@@ -456,7 +456,7 @@ class AssemblyVisitor(Visitor):
         super = stmt.super
         super_classes = []
         while super:
-            superEntry = self.table.lookup(super.capitalize())
+            superEntry = self.table.lookup(super)
             super_classes.append(superEntry)
             super = superEntry.super
 
@@ -496,10 +496,10 @@ class AssemblyVisitor(Visitor):
         # Traverse each property call until you come to the end
         varEntry = expr.property.accept(self)
         classEntry = self.table.lookup(varEntry.type)
-        propertyEntry = classEntry.table.lookupField(expr.var)
+        propertyEntry = classEntry.table.lookupLocal(expr.var)
         while not propertyEntry and classEntry.super:
-            classEntry = self.table.lookup(classEntry.super.capitalize())
-            propertyEntry = classEntry.table.lookupField(expr.var)
+            classEntry = self.table.lookup(classEntry.super)
+            propertyEntry = classEntry.table.lookupLocal(expr.var)
 
         if expr.isMethod:
             self.generateCode("pushq", "%rax", None, 3, "# Push heap pointer to be used as argument")
@@ -533,8 +533,8 @@ class AssemblyVisitor(Visitor):
         return methodEntry
     
     def visitMethodDeclaration(self, stmt: MethodDeclaration):
-        self.functionStack.append(stmt.var)
-        self.functions[stmt.var] = [Instruction(None, None, None, f"{stmt.var}", 3, "# Method")]
+        self.functionStack.append(stmt.var + "_" + stmt.className)
+        self.functions[stmt.var + "_" + stmt.className] = [Instruction(None, None, None, f"{stmt.var + "_" + stmt.className}", 3, "# Method")]
 
         entry = self.table.lookup(stmt.var)
         self.table = entry.table

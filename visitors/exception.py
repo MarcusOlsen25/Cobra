@@ -8,3 +8,8 @@ class TypeException(Exception):
     def __init__(self, message: str, lineno: int):
         self.message = message
         self.lineno = lineno
+        
+class FunctionException(Exception):
+    def __init__(self, message: str, lineno: int):
+        self.message = message
+        self.lineno = lineno

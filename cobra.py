@@ -2,6 +2,7 @@ from Lexer import *
 from Parser import *
 from visitors import visitor
 from visitors.assemblyVisitor import AssemblyVisitor
+from visitors.typeVisitor import TypeVisitor
 from visitors.scopeVisitor import ScopeVisitor
 from scope.SymbolTable import *
 from visitors.instruction import *
@@ -32,47 +33,49 @@ one()
 '''
 
 data = '''
-class agurk {
-    int z = 2
+
+class avocado {
+    int z = 37
 }
 
-class banan {
+class kartoffel {
     int x = 3
-    Agurk a = new Agurk()
+    Avocado a = new Avocado()
     func two() int {
         return this.a.z
     }
 }
 
-class melon extends banan {
+class mango extends kartoffel {
     func three() int {
-        return this.a.z
+        return this.a.z + 1
     }
 }
 
-class gulerod extends melon {
+class vandmelon extends mango {
     func four(int a, int b) int {
-        return a + b + this.a.z + this.x
+        return a + b + this.a.z - this.x
     }
 }
 
-Gulerod g = new Gulerod()
+Vandmelon g = new Vandmelon()
 print g.two()
 print g.three()
-print g.four(1,2)
-
+print g.four(3,2)
 
 '''
 
 with open("test.co", "r") as file:
     test = file.read()
 
-result = parser.parse(test)
+result = parser.parse(data)
 
 table = SymbolTable(None, "Function")
 
 scopeVisitor = ScopeVisitor(table)
+typeVisitor = TypeVisitor(table)
 assemblyVisitor = AssemblyVisitor(table)
+
 #Scope check
 for statement in result:
     statement.accept(scopeVisitor)
@@ -80,42 +83,49 @@ for statement in result:
 if scopeVisitor.scopeErrors != []:
     for error in scopeVisitor.scopeErrors:
         print(error.message)
-elif scopeVisitor.typeErrors != []:
-    for error in scopeVisitor.typeErrors:
-        print(error.message)
 else:
-    #Code generation
+    # Type check
+    for statement in result:
+        statement.accept(typeVisitor)
+    if typeVisitor.typeErrors != []:
+        for error in typeVisitor.typeErrors:
+            print(error.message)
+    elif typeVisitor.functionErrors != []:
+        for error in typeVisitor.functionErrors:
+            print(error.message)
+    else:
+        #Code generation
 
-    assemblyVisitor = AssemblyVisitor(table)
+        assemblyVisitor = AssemblyVisitor(table)
 
-    #Function prologue for main
-    assemblyVisitor.startScope()
+        #Function prologue for main
+        assemblyVisitor.startScope()
 
-    for s in result:
-        s.accept(assemblyVisitor)
+        for s in result:
+            s.accept(assemblyVisitor)
 
-    #Function epilogue for main
-    #To be changed with
-    assemblyVisitor.endScope()
-    assemblyVisitor.generateCode("movq", "$0", "%rax", 3, "# End with error code 0")
-    assemblyVisitor.generateCode("ret", None, None, 3, "# Return from main")
+        #Function epilogue for main
+        #To be changed with
+        assemblyVisitor.endScope()
+        assemblyVisitor.generateCode("movq", "$0", "%rax", 3, "# End with error code 0")
+        assemblyVisitor.generateCode("ret", None, None, 3, "# Return from main")
 
-    #Append functions and main
-    program = []
+        #Append functions and main
+        program = []
 
-    program = assemblyVisitor.init.copy()
+        program = assemblyVisitor.init.copy()
 
-    for function in assemblyVisitor.functions.values():
-        program.extend(function)
+        for function in assemblyVisitor.functions.values():
+            program.extend(function)
 
-    program += assemblyVisitor.main
+        program += assemblyVisitor.main
 
-    for p in program:
-        line = prettyPrintAssembly(p)
-        print(line)
+        for p in program:
+            line = prettyPrintAssembly(p)
+            print(line)
 
-    with open("assembly/test2.s", "w") as file:
-            for p in program:
-                file.write(prettyPrintAssembly(p))
-                file.write("\n")
+        with open("assembly/test2.s", "w") as file:
+                for p in program:
+                    file.write(prettyPrintAssembly(p))
+                    file.write("\n")
 

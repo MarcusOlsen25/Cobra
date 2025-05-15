@@ -28,7 +28,7 @@ class SymbolTable:
         elif isinstance(stmt, ParameterStatement):
             self._tab[stmt.var] = SymbolTable.VariableValue(type, self.incrementParamCounter(), self.level)
         elif isinstance(stmt, ClassDeclaration):
-            self._tab[stmt.var.capitalize()] = SymbolTable.ClassValue(stmt, self, newTable)
+            self._tab[stmt.var] = SymbolTable.ClassValue(stmt, self, newTable)
         elif isinstance(stmt, MethodDeclaration):
             self._tab[stmt.var] = SymbolTable.MethodValue(stmt, self.level, newTable, self.incrementMethodCounter(), stmt.returnType)
         else:
@@ -42,7 +42,8 @@ class SymbolTable:
         else:
             return None
         
-    def lookupField(self, name: str):
+    # Used amongst other things for fields
+    def lookupLocal(self, name: str):
         if name in self._tab:
             return self._tab[name]
         else:
@@ -103,7 +104,8 @@ class SymbolTable:
 
     class MethodValue:
         def __init__(self, stmt: MethodDeclaration, level: int, table: 'SymbolTable', offset: int, returnType: str):
-            self.name = stmt.var
+            self.name = stmt.var + "_" + stmt.className
+            self.className = stmt.className
             self.level = level
             self.table = table
             self.offset = offset

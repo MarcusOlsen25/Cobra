@@ -138,7 +138,7 @@ class gulerod {
     int x = 17
     int y = onee
 }
-Gulerod gul = new Gulerod()
+gulerod gul = new gulerod()
 if gul.x + gul.y != 29 then {
     print -1
 } else {
@@ -147,10 +147,10 @@ if gul.x + gul.y != 29 then {
    
 class melon {
     int x = onee + 14
-    Gulerod y = new Gulerod()
+    gulerod y = new gulerod()
 }
 
-Melon mel = new Melon()
+melon mel = new melon()
 
 if mel.x + mel.y.y != 38 then {
     print -1
@@ -159,10 +159,10 @@ if mel.x + mel.y.y != 38 then {
 }
 
 class sko {
-    Gulerod x = gul
-    Melon m = mel
+    gulerod x = gul
+    melon m = mel
 }
-Sko l = new Sko()
+sko l = new sko()
 
 if l.x.x + l.m.x != 43 then {
     print -1
@@ -221,3 +221,104 @@ if thirtysix then {
     }
     test36one()
 }
+
+int x1 = 37
+func f1() int {
+    return x1
+}
+func f2() void {
+    int x1 = 3
+    f1()
+}
+class c4 {
+    int a = 3
+}
+class c1 {
+    int x = 38
+    func m1() int {
+        return this.x
+    }
+}
+class c2 extends c1 {
+    int x = 39
+    func m2() int {
+        return this.x
+    }
+}
+class c3 extends c2 {
+    int y = 17
+    c4 c = new c4()
+    func m3() int {
+    this.x = 20
+        return this.y + this.x + this.c.a
+    }
+}
+print(f2())
+c3 cc3 = new c3()
+print cc3.m1()
+print cc3.m2()
+print cc3.m3()
+
+int counter = 39
+func increment() void {
+    counter = counter + 1
+}
+func runIncrements() void {
+    increment()
+    increment()
+}
+runIncrements()
+print counter
+
+
+class Calculator {
+    int x = 18
+    int y = 3
+    func add() int {
+        return this.x + this.y
+    }
+    func doubleAdd() int {
+        return this.add() * 2
+    }
+}
+Calculator calc = new Calculator()
+print calc.doubleAdd()
+
+class Box {
+    int value = 10
+    func set(int v) void {
+        this.value = v
+    }
+    func get() int {
+        return this.value
+    }
+}
+Box box = new Box()
+box.set(43)
+print box.get()
+
+class Inner {
+    int z = 44
+}
+class Outer {
+    Inner i = new Inner()
+    func getZ() int {
+        return this.i.z
+    }
+}
+Outer out = new Outer()
+print out.getZ()
+
+class Accumulator {
+    int total = 0
+    func add(int x) void {
+        this.total = this.total + x
+    }
+    func getTotal() int {
+        return this.total
+    }
+}
+Accumulator acc = new Accumulator()
+acc.add(20)
+acc.add(25)
+print acc.getTotal()
