@@ -65,7 +65,8 @@ class ScopeVisitor(Visitor):
     #Using func as a type
     def visitFunctionDeclaration(self, stmt: FunctionDeclaration):
         try:
-            # This lookup is not local. This is because of class descriptors. Do you agree, Marcus?
+            # This lookup is not local. This is because of function labels. Do you agree, Marcus?
+            # Never mind. Functions that are not local are methods and are handled correctly. 
             if self.table.lookup(stmt.var):
                 self.addScopeError(f"The variable {stmt.var} in line {stmt.lineno} is already defined.\n", stmt.lineno)
             else:
@@ -144,7 +145,7 @@ class ScopeVisitor(Visitor):
             
     def visitClassDeclaration(self, stmt: ClassDeclaration):
         try:
-            # Should this lookup be local?
+            # This lookup is not local. This is because of class descriptors. Do you agree, Marcus?
             lookup = self.table.lookup(stmt.var)
             if lookup:
                 self.addScopeError(f"The variable {stmt.var} in line {stmt.lineno} is already defined.\n", stmt.lineno)

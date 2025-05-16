@@ -1,6 +1,6 @@
 import ply.lex as lex
-
-# List of token names.
+import Lexer
+import sys
 
 reserved = {"if": "IF",
             "then": "THEN",
@@ -23,26 +23,26 @@ reserved = {"if": "IF",
             }
 
 tokens = [
-   'NUMBER',
-   'PLUS',
-   'MINUS',
-   'TIMES',
-   'DIVIDE',
-   'LPAREN',
-   'RPAREN',
-   'ID',
-   'COMMA',
-   'ASSIGN',
-   'LBRACE',
-   'RBRACE',
-   'NOT',
-   'EQUALS',
-   'NOTEQUALS',
-   'GREATER',
-   'LESS',
-   'GREATEROREQUAL',
-   'LESSOREQUAL',
-   'DOT'
+'NUMBER',
+'PLUS',
+'MINUS',
+'TIMES',
+'DIVIDE',
+'LPAREN',
+'RPAREN',
+'ID',
+'COMMA',
+'ASSIGN',
+'LBRACE',
+'RBRACE',
+'NOT',
+'EQUALS',
+'NOTEQUALS',
+'GREATER',
+'LESS',
+'GREATEROREQUAL',
+'LESSOREQUAL',
+'DOT'
 ] + list(reserved.values())
 
 # Regular expression rules for simple tokens
@@ -63,7 +63,7 @@ t_GREATER           = r'>'
 t_LESS              = r'<'
 t_GREATEROREQUAL    = r'>='
 t_LESSOREQUAL       = r'<='
-t_DOT               = r'.'
+t_DOT               = r'\.'
 
 # A regular expression rule with some action code
 def t_NUMBER(t):
@@ -84,5 +84,24 @@ def t_ID(t):
 t_ignore  = ' \t'
 
 def t_error(t):
-    print("Illegal character '%s'" % t.value[0])
+    Lexer.lexicalErrors.append(f"Illegal character '%s' in line {t.lineno}" % t.value[0])
     t.lexer.skip(1)
+
+
+class Lexer:
+
+    lexicalErrors = []
+    
+    def __init__(self):
+        self.lexer = lex.lex(module=sys.modules[__name__])
+        
+    def tokenize(self, data):
+        self.lexicalErrors.clear()
+        self.lexer.input(data)
+        tokens = []
+        while True:
+            tok = self.lexer.token()  
+            if not tok:
+                break
+            tokens.append(tok)
+        return tokens

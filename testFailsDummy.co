@@ -1,9 +1,37 @@
-func test35(int x) {
-    if x then {
-        print -1
-    } else {
-        print 35
+# Here are the tests that fail or have interesting behaviour. 
+
+int z = 67
+
+class carrot {
+    int z = 8
+    func four() void {
+        print z
     }
 }
 
-test35(0)
+class pineapple {
+    int z = 23
+    carrot carr = new carrot()
+    func three() void {
+        print z 
+        this.carr.four()
+    }
+}
+
+class avocado {
+    int z = 37
+    pineapple pine = new pineapple()
+    func two() void {
+        print z
+        this.pine.three()
+    }
+}
+
+avocado avoc = new avocado()
+
+func one(avocado avoc) void {
+    print z
+    avoc.two()
+}
+
+one(avoc)
