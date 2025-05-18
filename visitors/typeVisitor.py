@@ -68,8 +68,6 @@ class TypeVisitor(Visitor):
                 inferredType = self.evaluateExpressionType(stmt.initializer)
                 if inferredType != stmt.type:
                     self.addTypeError(f"Type mismatch for {stmt.var} in line {stmt.lineno}: expected {stmt.type}, got {inferredType}.\n", stmt.lineno)
-
-                self.table.insert(stmt, stmt.type, None)
             
         except TypeException:
             return
@@ -126,17 +124,17 @@ class TypeVisitor(Visitor):
 
     #Using func as a type
     def visitFunctionDeclaration(self, stmt: FunctionDeclaration):   
-        newTable = SymbolTable(self.table, "Function")
-        self.table.insert(stmt, "func", newTable)
-        self.table = newTable
-
-        for param in stmt.params:
-            param.accept(self)
-
-        for s in stmt.body:
-            s.accept(self)
-        
         try:
+            # Find the correct symbol table
+            func = self.table.lookup(stmt.var)
+            self.table = func.table
+
+            for param in stmt.params:
+                param.accept(self)
+
+            for s in stmt.body:
+                s.accept(self)
+            
             # Check that the return types match the function definition
             returnTypes = self.findReturnStatements(stmt.body)
             if returnTypes == [] and stmt.returnType != "void":
@@ -175,7 +173,6 @@ class TypeVisitor(Visitor):
             incorrectNrOfArgs = len(entry.params) != len(expr.arguments)
             if incorrectNrOfArgs:
                 self.addFunctionError(f"Incorrect number of arguments for {expr.var.var} in line {expr.lineno}.\n", expr.lineno)
-            # I think this is still missing to check the types of each argument against the parameters.
             
             # Type check
             i = 0
@@ -186,13 +183,11 @@ class TypeVisitor(Visitor):
                     self.addFunctionError(f"The arguments given in line {expr.lineno} do not match the types of the parameters for {entry.name}.\n", expr.lineno)
                 arg.accept(self)
             
-            # for arg in expr.arguments:
-            #     arg.accept(self)
         except FunctionException:
             return
         
     def visitParameterStatement(self, stmt: ParameterStatement):
-        self.table.insert(stmt, stmt.type, None)
+        pass
 
     def visitIfStatement(self, stmt: IfStatement):
         try:
@@ -203,9 +198,6 @@ class TypeVisitor(Visitor):
             if inferredType != "bool" and inferredType != "int":
                 self.addTypeError(f"Type mismatch for the condition in line {stmt.lineno}: expected bool or int, got {inferredType}.\n", stmt.lineno)    
             
-            # Create a new symbol table and visit the statements in the thenStatement
-            newTable = SymbolTable(self.table, "If")
-            stmt.thenTable = newTable
             self.table = stmt.thenTable
 
             for s in stmt.thenStatement:
@@ -215,9 +207,6 @@ class TypeVisitor(Visitor):
 
             if stmt.elseStatement:
                 
-                # Create a new symbol table and visit the statements in the elseStatement 
-                newTable = SymbolTable(self.table, "Else")
-                stmt.elseTable = newTable
                 self.table = stmt.elseTable
 
                 for s in stmt.elseStatement:
@@ -237,9 +226,6 @@ class TypeVisitor(Visitor):
             if inferredType != "bool" and inferredType != "int":
                 self.addTypeError(f"Type mismatch for the condition in line {stmt.lineno}: expected bool or int, got {inferredType}.\n", stmt.lineno)
             
-            # Create a new symbol table and visit the statements in the thenStatement
-            newTable = SymbolTable(self.table, "While")
-            stmt.table = newTable
             self.table = stmt.table
 
             for s in stmt.thenStatement:
@@ -257,21 +243,14 @@ class TypeVisitor(Visitor):
         if stmt.value:
             stmt.value.accept(self)
             
-    def visitClassDeclaration(self, stmt: ClassDeclaration):
-            newTable = SymbolTable(self.table, "Class")
-            self.table.insert(stmt, "class", newTable)
-            superEntry = None
-            if stmt.super:
-                superEntry = self.table.lookup(stmt.super)
-                newTable.setFieldCounter(superEntry.table.fieldCounter)
-                newTable.setMethodCounter(superEntry.table.methodCounter)
+    def visitClassDeclaration(self, stmt: ClassDeclaration):    
+        classEntry = self.table.lookup(stmt.var)
+        self.table = classEntry.table
 
-            self.table = newTable
-
-            for s in stmt.body:
-                s.accept(self)
-        
-            self.table = self.table.parent
+        for s in stmt.body:
+            s.accept(self)
+    
+        self.table = self.table.parent
     
     def visitConstructorExpression(self, expr: ConstructorExpression):
         expr.var.accept(self)
@@ -309,9 +288,8 @@ class TypeVisitor(Visitor):
             return
     
     def visitMethodDeclaration(self, stmt: MethodDeclaration):
-        newTable = SymbolTable(self.table, "Method")
-        self.table.insert(stmt, "method", newTable)
-        self.table = newTable
+        method = self.table.lookupLocal(stmt.var)
+        self.table = method.table
 
         for param in stmt.params:
             param.accept(self)

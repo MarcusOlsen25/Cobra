@@ -61,20 +61,23 @@ cobraCode = test
 table = SymbolTable(None, "Function")
 
 lexer = Lexer()
+parseLex = Lexer()  # A second lexer is needed in order to maintain correct line numbers. Is this too ugly?
 parser = Parser()
 scopeVisitor = ScopeVisitor(table)
 typeVisitor = TypeVisitor(table)
 assemblyVisitor = AssemblyVisitor(table)
 
 # Lexical analysis
-tokens = lexer.tokenize(cobraCode)   
+# tokens = lexer.tokenize(cobraCode)   
+lexer.tokenize(cobraCode)   
+
 if lexer.lexicalErrors != []:
     for error in lexer.lexicalErrors:
             print(error)
 else: 
     
     # Syntactic analysis
-    result = parser.parser.parse(cobraCode, lexer=lexer.lexer)
+    result = parser.parser.parse(cobraCode, lexer=parseLex.lexer)
     
     if parser.syntacticErrors != []:
         for error in parser.syntacticErrors:
