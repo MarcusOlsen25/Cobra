@@ -194,6 +194,10 @@ class AssemblyVisitor(Visitor):
         expr.value.accept(self)
         if expr.operator == "-":
             self.generateCode("negq", "%rax", None, 3, "# Negate value")
+        else:
+            self.generateCode("cmpq", "$0", "%rax", 3, "# Invert flag")
+            self.generateCode("sete", "%al", None, 3, "# Invert flag")
+            self.generateCode("movzbl", "%al", "%eax", 3, "# Invert flag")
             
     def visitBoolExpression(self, expr: BoolExpression):
         if expr.value == "true":

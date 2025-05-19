@@ -225,3 +225,6 @@ class ScopeVisitor(Visitor):
                 self.table = self.table.parent
         except ScopeException:
             return
+        
+    def visitNullExpression(self, expr: NullExpression):
+        pass

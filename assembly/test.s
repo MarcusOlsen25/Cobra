@@ -26,7 +26,7 @@ inorder_traversal:			# Function
 	movq %rbp, %rax			# Prepare to access variable from another scope
 	movq 32(%rax), %rax		# Move value into %rax
 	cmp $0, %rax			# Check the condition
-	je end_0			# Skip if the condition is false
+	je end_1			# Skip if the condition is false
 	movq %rbp, %rax			# Prepare static link
 	pushq %rax			# Push static link
 	subq $16, %rsp			# Add dummy spaces
@@ -56,14 +56,14 @@ inorder_traversal:			# Function
 	movq %rax, %rsi			# Passing %rax (2. argument)
 	movq $0, %rax			# No floating point registers used
 	testq $15, %rsp			# Test for 16 byte alignment
-	jz print_align_0		# Jump if aligned
+	jz print_align_1		# Jump if aligned
 	addq $-8, %rsp			# 16 byte aligning
 	callq printf@plt		# Call printf
 	addq $8, %rsp			# Reverting alignment
-	jmp end_print_0
-print_align_0:
+	jmp end_print_1
+print_align_1:
 	callq printf@plt		# Call printf
-end_print_0:
+end_print_1:
 			# End print statement
 	movq %rbp, %rax			# Prepare to access variable from another scope
 	movq 24(%rax), %rax		# Traverse static link once
@@ -79,13 +79,13 @@ end_print_0:
 	addq $8, %rsp			# Remove dummy space
 	addq $8, %rsp			# Deallocate space on stack for static link
 	addq $8, %rsp			# Pop the arguments pushed to the stack
-end_then_0:			# Clean up then block stack frame
+end_then_1:			# Clean up then block stack frame
 	addq $0, %rsp			# Deallocate space for local variables on the stack
 	popq %rbp			# Restore base pointer
 	addq $16, %rsp			# Remove dummy spaces
 	addq $8, %rsp			# Deallocate space on stack for static link
-	jmp end_0			# Skip the else
-end_0:
+	jmp end_1			# Skip the else
+end_1:
 end_inorder_traversal:			# End function
 	addq $0, %rsp			# Deallocate space for local variables on the stack
 	popq %rbp			# Restore base pointer
@@ -228,6 +228,44 @@ main:
 	movq %rbp, %rax			# Prepare to access variable from another scope
 	movq -8(%rax), %rax		# Move value into %rax
 	movq %rax, -56(%rbp)			# Move initialized value into space on stack
+	movq %rbp, %rax			# Prepare to access variable from another scope
+	movq -8(%rax), %rax		# Move value into %rax
+	movq 16(%rax), %rax		# Move value into %rax
+	movq 24(%rax), %rax		# Move value into %rax
+	movq 16(%rax), %rax		# Move value into %rax
+	cmpq $0, %rax			# Invert flag
+	sete %al			# Invert flag
+	movzbl %al, %eax			# Invert flag
+	cmp $0, %rax			# Check the condition
+	je end_0			# Skip if the condition is false
+	movq %rbp, %rax			# Prepare static link
+	pushq %rax			# Push static link
+	subq $16, %rsp			# Add dummy spaces
+	pushq %rbp			# Save base pointer
+	movq %rsp, %rbp			# Make stack pointer new base pointer
+	subq $0, %rsp			# Allocate space for local variables on the stack
+	movq $123, %rax			# Put a number in %rax
+			# Start print statement
+	leaq form(%rip), %rdi		# Passing string address (1. argument)
+	movq %rax, %rsi			# Passing %rax (2. argument)
+	movq $0, %rax			# No floating point registers used
+	testq $15, %rsp			# Test for 16 byte alignment
+	jz print_align_0		# Jump if aligned
+	addq $-8, %rsp			# 16 byte aligning
+	callq printf@plt		# Call printf
+	addq $8, %rsp			# Reverting alignment
+	jmp end_print_0
+print_align_0:
+	callq printf@plt		# Call printf
+end_print_0:
+			# End print statement
+end_then_0:			# Clean up then block stack frame
+	addq $0, %rsp			# Deallocate space for local variables on the stack
+	popq %rbp			# Restore base pointer
+	addq $16, %rsp			# Remove dummy spaces
+	addq $8, %rsp			# Deallocate space on stack for static link
+	jmp end_0			# Skip the else
+end_0:
 	movq %rbp, %rax			# Prepare to access variable from another scope
 	movq -8(%rax), %rax		# Move value into %rax
 	pushq %rax		# Push argument number 1 to stack

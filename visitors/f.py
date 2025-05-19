@@ -1,1 +1,2 @@
-print("3")
+x = not -1
+print(x)

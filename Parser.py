@@ -222,11 +222,6 @@ class Parser:
     def p_factor_unary(self, p):
         '''factor : unary'''
         p[0] = p[1]
-    
-    # Null
-    def p_factor_none(self, p):
-        '''factor : NULL'''
-        p[0] = NullExpression()
         
     # Unary not
     def p_unary(self, p):
@@ -285,6 +280,10 @@ class Parser:
         '''primary : TRUE
                 | FALSE'''
         p[0] = BoolExpression(p[1], p.lineno(1))
+
+    def p_primary_null(self, p):
+        '''primary : NULL'''
+        p[0] = NullExpression()
 
     # Expression - parenthesized expression
     def p_primary(self, p):

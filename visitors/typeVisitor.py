@@ -294,3 +294,6 @@ class TypeVisitor(Visitor):
         
     def compareTypes(self, inferred, declared):
         return declared == inferred or isinstance(inferred, NullType)
+    
+    def visitNullExpression(self, expr: NullExpression):
+        return expr.type

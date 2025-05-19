@@ -31,6 +31,9 @@ root.right = firstRight
 root.right.right = secondRight
 root.left.right = firstRightLeft
 Node n = root
+if !root.left.right.left then {
+    print 123
+}
 
 
 func inorder_traversal(Node root) void {
