@@ -1,0 +1,14 @@
+
+int a = 3
+
+int b = false
+
+bool c = 7
+
+a = true
+
+bool d = true
+
+d = 45
+
+int e = 34 + 8 * 21

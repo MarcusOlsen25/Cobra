@@ -91,3 +91,13 @@ class PropertyAccessExpression(Expr):
 
     def accept(self, visitor):
         return visitor.visitPropertyAccessExpression(self)
+    
+class NullExpression(Expr):
+    def __init__(self):
+        self.type = NullType()
+
+    def accept(self, visitor):
+        return visitor.visitNullExpression(self)
+
+class NullType():
+    pass

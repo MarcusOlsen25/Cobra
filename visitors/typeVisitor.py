@@ -5,12 +5,11 @@ from scope.SymbolTable import *
 from .exception import *
 
 class TypeVisitor(Visitor):
-    
-    typeErrors = []
-    functionErrors = []
 
-    def __init__(self, table: SymbolTable):
+    def __init__(self, table: SymbolTable, typeErrors, functionErrors):
         self.table = table
+        self.typeErrors = typeErrors
+        self.functionErrors = functionErrors
     
     def addTypeError(self, message: str, lineno: int):
         exception = TypeException(message, lineno)
@@ -27,7 +26,7 @@ class TypeVisitor(Visitor):
             expr.value.accept(self)
             valueType = self.evaluateExpressionType(expr.value)
             if valueType != "int" and expr.operator == "-":
-                self.addTypeError(f"Type error in line {expr.lineno}: The operand '-' is only compatible with integer expressions, got {valueType} instead.\n", expr.lineno)
+                self.addTypeError(f"Type error in line {expr.lineno}: The operand '-' is only compatible with integer expressions, got {valueType} instead.", expr.lineno)
         except TypeException:
             return
 
@@ -57,8 +56,8 @@ class TypeVisitor(Visitor):
             var = expr.var.accept(self) 
             declaredType = var.type
             inferredType = self.evaluateExpressionType(expr.value)
-            if declaredType != inferredType:
-                self.addTypeError(f"Type mismatch for {expr.var.var} in line {expr.lineno}: expected {declaredType}, got {inferredType}.\n", expr.lineno)           
+            if not self.compareTypes(inferredType, declaredType):
+                self.addTypeError(f"Type mismatch for {expr.var.var} in line {expr.lineno}: expected {declaredType}, got {inferredType}.", expr.lineno)           
         except TypeException:
             return
                     
@@ -66,8 +65,8 @@ class TypeVisitor(Visitor):
         try:
             if stmt.initializer:
                 inferredType = self.evaluateExpressionType(stmt.initializer)
-                if inferredType != stmt.type:
-                    self.addTypeError(f"Type mismatch for {stmt.var} in line {stmt.lineno}: expected {stmt.type}, got {inferredType}.\n", stmt.lineno)
+                if not self.compareTypes(inferredType, stmt.type):
+                    self.addTypeError(f"Type mismatch for {stmt.var} in line {stmt.lineno}: expected {stmt.type}, got {inferredType}.", stmt.lineno)
             
         except TypeException:
             return
@@ -115,6 +114,8 @@ class TypeVisitor(Visitor):
             elif isinstance(expr, MethodCallExpression):
                 entry = expr.property.accept(self)
                 return entry.returnType
+            elif isinstance(expr, NullExpression):
+                return expr.type
             else:
                 # We do not want to get here
                 return "unknown"
@@ -138,11 +139,11 @@ class TypeVisitor(Visitor):
             # Check that the return types match the function definition
             returnTypes = self.findReturnStatements(stmt.body)
             if returnTypes == [] and stmt.returnType != "void":
-                self.addFunctionError(f"Type mismatch in line {stmt.lineno}: {stmt.var} returns {stmt.returnType}, not void.\n", stmt.lineno)
+                self.addFunctionError(f"Type mismatch in line {stmt.lineno}: {stmt.var} returns {stmt.returnType}, not void.", stmt.lineno)
             elif returnTypes != []:
                 for type in returnTypes:
                     if type[0] != stmt.returnType:
-                        self.addFunctionError(f"Type mismatch in line {type[1]}: {stmt.var} returns {stmt.returnType}, not {type[0]}.\n", stmt.lineno)
+                        self.addFunctionError(f"Type mismatch in line {type[1]}: {stmt.var} returns {stmt.returnType}, not {type[0]}.", stmt.lineno)
             self.table = self.table.parent
         except FunctionException:
             return
@@ -172,16 +173,17 @@ class TypeVisitor(Visitor):
             entry = expr.var.accept(self)
             incorrectNrOfArgs = len(entry.params) != len(expr.arguments)
             if incorrectNrOfArgs:
-                self.addFunctionError(f"Incorrect number of arguments for {expr.var.var} in line {expr.lineno}.\n", expr.lineno)
+                self.addFunctionError(f"Incorrect number of arguments for {expr.var.var} in line {expr.lineno}.", expr.lineno)
             
             # Type check
             i = 0
-            for arg in expr.arguments:
-                inferredType = self.evaluateExpressionType(arg)
+            while i < len(expr.arguments):
+                inferredType = self.evaluateExpressionType(expr.arguments[i])
                 declaredType = entry.params[i].type
                 if inferredType != declaredType:
-                    self.addFunctionError(f"The arguments given in line {expr.lineno} do not match the types of the parameters for {entry.name}.\n", expr.lineno)
-                arg.accept(self)
+                    self.addFunctionError(f"The arguments given in line {expr.lineno} do not match the types of the parameters for {entry.name}.", expr.lineno)
+                expr.arguments[i].accept(self)
+                i += 1
             
         except FunctionException:
             return
@@ -192,11 +194,6 @@ class TypeVisitor(Visitor):
     def visitIfStatement(self, stmt: IfStatement):
         try:
             stmt.condition.accept(self)
-            
-            # Check the type of the condition - should we allow anything?
-            inferredType = self.evaluateExpressionType(stmt.condition)
-            if inferredType != "bool" and inferredType != "int":
-                self.addTypeError(f"Type mismatch for the condition in line {stmt.lineno}: expected bool or int, got {inferredType}.\n", stmt.lineno)    
             
             self.table = stmt.thenTable
 
@@ -220,11 +217,6 @@ class TypeVisitor(Visitor):
     def visitWhileStatement(self, stmt: WhileStatement):
         try:
             stmt.condition.accept(self)
-            
-            # Check the type of the condition - should we allow anything?
-            inferredType = self.evaluateExpressionType(stmt.condition)
-            if inferredType != "bool" and inferredType != "int":
-                self.addTypeError(f"Type mismatch for the condition in line {stmt.lineno}: expected bool or int, got {inferredType}.\n", stmt.lineno)
             
             self.table = stmt.table
 
@@ -272,16 +264,17 @@ class TypeVisitor(Visitor):
             
             incorrectNrOfArgs = len(methodEntry.params) - 1 != len(expr.arguments)
             if incorrectNrOfArgs:
-                self.addFunctionError(f"Incorrect number of arguments for {methodEntry.name} in line {expr.lineno}, expected {len(methodEntry.params)}, got {len(expr.arguments)}.\n", expr.lineno)
+                self.addFunctionError(f"Incorrect number of arguments for {methodEntry.name} in line {expr.lineno}, expected {len(methodEntry.params)}, got {len(expr.arguments)}.", expr.lineno)
 
             # Type check
             i = 0
-            for arg in expr.arguments:
-                inferredType = self.evaluateExpressionType(arg)
+            while i < len(expr.arguments):
+                inferredType = self.evaluateExpressionType(expr.arguments[i])
                 declaredType = methodEntry.params[i].type
                 if inferredType != declaredType:
-                    self.addFunctionError(f"The arguments given in line {expr.lineno} do not match the types of the parameters for {methodEntry.name}.\n", expr.lineno)
-                arg.accept(self)
+                    self.addFunctionError(f"The arguments given in line {expr.lineno} do not match the types of the parameters for {methodEntry.name}.", expr.lineno)
+                expr.arguments[i].accept(self)
+                i += 1
 
             return methodEntry
         except FunctionException:
@@ -298,3 +291,6 @@ class TypeVisitor(Visitor):
             s.accept(self)
         
         self.table = self.table.parent
+        
+    def compareTypes(self, inferred, declared):
+        return declared == inferred or isinstance(inferred, NullType)

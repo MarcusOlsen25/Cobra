@@ -7,7 +7,6 @@ reserved = {"if": "IF",
             "else": "ELSE",
             "while": "WHILE",
             "func": "FUNC",
-            # "var": "VAR",
             "int": "INT",
             "bool": "BOOL",
             "true": "TRUE",
@@ -19,7 +18,8 @@ reserved = {"if": "IF",
             "print": "PRINT",
             "class": "CLASS",
             "new": "NEW",
-            "extends": "EXTENDS"
+            "extends": "EXTENDS",
+            "null": "NULL"
             }
 
 tokens = [
@@ -65,13 +65,11 @@ t_GREATEROREQUAL    = r'>='
 t_LESSOREQUAL       = r'<='
 t_DOT               = r'\.'
 
-# A regular expression rule with some action code
 def t_NUMBER(t):
     r'\d+'
     t.value = int(t.value)    
     return t
 
-# Define a rule so we can track line numbers
 def t_newline(t):
     r'\n+'
     t.lexer.lineno += len(t.value)

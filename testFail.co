@@ -1,5 +1,3 @@
-# Here are the tests that fail or have interesting behaviour. 
-
 int z = 67
 
 class carrot {

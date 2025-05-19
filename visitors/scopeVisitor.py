@@ -6,10 +6,9 @@ from .exception import *
 
 class ScopeVisitor(Visitor):
     
-    scopeErrors = []
-
-    def __init__(self, table: SymbolTable):
+    def __init__(self, table: SymbolTable, scopeErrors):
         self.table = table
+        self.scopeErrors = scopeErrors
         
     def addScopeError(self, message: str, lineno: int):
         exception = ScopeException(message, lineno)
@@ -30,7 +29,7 @@ class ScopeVisitor(Visitor):
         try:
             lookup = self.table.lookup(expr.var)
             if not lookup:
-                self.addScopeError(f"Undeclared variable {expr.var} in line {expr.lineno}.\n", expr.lineno)
+                self.addScopeError(f"Undeclared variable {expr.var} in line {expr.lineno}.", expr.lineno)
             else:
                 return lookup
         except ScopeException:
@@ -46,17 +45,13 @@ class ScopeVisitor(Visitor):
             return expr.value 
     
     def visitAssignExpression(self, expr: AssignExpression):
-        try:   
-            var = expr.var.accept(self) 
-            if not var:
-                self.addScopeError(f"Undeclared variable {expr.var.var} in line {expr.lineno}.\n", expr.lineno)
-        except ScopeException:
-            return
+        expr.var.accept(self) 
+        expr.value.accept(self)
                     
     def visitVarDeclaration(self, stmt: VarDeclaration):
         try:
             if self.table.lookupLocal(stmt.var):
-                self.addScopeError(f"The variable {stmt.var} in line {stmt.lineno} is already defined in this scope.\n", stmt.lineno)
+                self.addScopeError(f"The variable {stmt.var} in line {stmt.lineno} is already defined in this scope.", stmt.lineno)
             else:
                 self.table.insert(stmt, stmt.type, None)
         except ScopeException:
@@ -65,10 +60,8 @@ class ScopeVisitor(Visitor):
     #Using func as a type
     def visitFunctionDeclaration(self, stmt: FunctionDeclaration):
         try:
-            # This lookup is not local. This is because of function labels. Do you agree, Marcus?
-            # Never mind. Functions that are not local are methods and are handled correctly. 
             if self.table.lookup(stmt.var):
-                self.addScopeError(f"The variable {stmt.var} in line {stmt.lineno} is already defined.\n", stmt.lineno)
+                self.addScopeError(f"The variable {stmt.var} in line {stmt.lineno} is already defined.", stmt.lineno)
             else:
                 newTable = SymbolTable(self.table, "Function")
                 self.table.insert(stmt, "func", newTable)
@@ -85,14 +78,21 @@ class ScopeVisitor(Visitor):
             return
     
     def visitCallExpression(self, expr: CallExpression):
-        for arg in expr.arguments:
-            arg.accept(self)
+        try:
+            lookup = self.table.lookup(expr.var.var)
+            if not lookup:
+                self.addScopeError(f"The function {expr.var.var} from line {expr.lineno} is not defined.", expr.lineno)
+            else:
+                for arg in expr.arguments:
+                    arg.accept(self)
+        except ScopeException:
+            return
 
     def visitParameterStatement(self, stmt: ParameterStatement):
         try:
             lookup = self.table.lookupLocal(stmt.var)
             if lookup:
-                self.addScopeError(f"The variable {stmt.var} in line {stmt.lineno} is already defined in this scope.\n", stmt.lineno)
+                self.addScopeError(f"The variable {stmt.var} in line {stmt.lineno} is already defined in this scope.", stmt.lineno)
             else:
                 self.table.insert(stmt, stmt.type, None)
         except ScopeException:
@@ -148,7 +148,7 @@ class ScopeVisitor(Visitor):
             # This lookup is not local. This is because of class descriptors. Do you agree, Marcus?
             lookup = self.table.lookup(stmt.var)
             if lookup:
-                self.addScopeError(f"The variable {stmt.var} in line {stmt.lineno} is already defined.\n", stmt.lineno)
+                self.addScopeError(f"The variable {stmt.var} in line {stmt.lineno} is already defined.", stmt.lineno)
             else:
                 newTable = SymbolTable(self.table, "Class")
                 self.table.insert(stmt, "class", newTable)
@@ -156,7 +156,7 @@ class ScopeVisitor(Visitor):
                 if stmt.super:
                     superEntry = self.table.lookup(stmt.super)
                     if not superEntry:
-                        self.addScopeError(f"Scope error in line {stmt.lineno}.\n", stmt.lineno)
+                        self.addScopeError(f"Scope error in line {stmt.lineno}.", stmt.lineno)
                     else:
                         newTable.setFieldCounter(superEntry.table.fieldCounter)
                         newTable.setMethodCounter(superEntry.table.methodCounter)
@@ -179,7 +179,7 @@ class ScopeVisitor(Visitor):
             varEntry = expr.property.accept(self)
             if not varEntry:
                 # Not a pretty error, but one I met a lot while debugging. 
-                self.addScopeError(f"For some reason, a property in line {expr.lineno} could not be accessed.\n", expr.lineno)
+                self.addScopeError(f"For some reason, a property in line {expr.lineno} could not be accessed.", expr.lineno)
             else:
                 classEntry = self.table.lookup(varEntry.type)
                 if not classEntry:
@@ -190,7 +190,7 @@ class ScopeVisitor(Visitor):
                         classEntry = self.table.lookup(classEntry.super)
                         propertyEntry = classEntry.table.lookupLocal(expr.var)
                     if not propertyEntry:
-                        self.addScopeError(f"The property {expr.var} from line {expr.lineno} could not be found.\n", expr.lineno)
+                        self.addScopeError(f"The property {expr.var} from line {expr.lineno} could not be found.", expr.lineno)
                     else:
                         return propertyEntry
         except ScopeException:
@@ -208,7 +208,7 @@ class ScopeVisitor(Visitor):
         try:
             lookup = self.table.lookupLocal(stmt.var)
             if lookup:
-                self.addScopeError(f"The method {stmt.var} in line {stmt.lineno} is already defined in this scope.\n", stmt.lineno)
+                self.addScopeError(f"The method {stmt.var} in line {stmt.lineno} is already defined in this scope.", stmt.lineno)
             else:
                 newTable = SymbolTable(self.table, "Method")
                 self.table.insert(stmt, "method", newTable)

@@ -551,3 +551,6 @@ class AssemblyVisitor(Visitor):
 
         self.table = self.table.parent
         self.functionStack.pop()
+        
+    def visitNullExpression(self, expr: NullExpression):
+        self.generateCode("movq", "$0", "%rax", 3, "# Put a number in %rax")

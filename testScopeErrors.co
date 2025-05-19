@@ -1,0 +1,15 @@
+
+int b = 3
+
+c = 4
+
+func one(int x) int {
+    return x + y
+}
+
+bool b = false
+
+two(x, y)
+
+int d = 4
+d = z

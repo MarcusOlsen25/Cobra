@@ -4,12 +4,11 @@ from ASTstatements import *
 from Lexer import tokens
 
 class Parser:
-    
-    syntacticErrors = []
-    
-    def __init__(self):
+        
+    def __init__(self, syntacticErrors):
         self.tokens = tokens
         self.parser = yacc.yacc(module=self)
+        self.syntacticErrors = syntacticErrors
 
     # Program
     def p_program(self, p):
@@ -67,7 +66,6 @@ class Parser:
         p[0] = MethodDeclaration(p[2], p[4], p[8], p[6], p.lineno(1))
 
     # Statements
-    # Statement -> expression
     def p_statement(self, p):
         '''statement : expression
                     | ifStatement
@@ -76,19 +74,22 @@ class Parser:
                     | returnStatement''' 
         p[0] = p[1]
 
+    # Return statement
     def p_returnStatement(self, p):
         '''returnStatement : RETURN expression'''
         p[0] = ReturnStatement(p[2], p.lineno(1))
         
+    # Empty return statement
     def p_returnStatement_empty(self, p):     
         '''returnStatement : RETURN'''
         p[0] = ReturnStatement(None, p.lineno(1))
         
-    # If statements
+    # If statement
     def p_ifStatement_single(self, p):
         '''ifStatement : IF expression THEN LBRACE declaration_list RBRACE'''
         p[0] = IfStatement(p[2], p[5], None, None, None, p.lineno(1))
-        
+    
+    # If/else statement
     def p_ifStatement_else(self, p):
         '''ifStatement : IF expression THEN LBRACE declaration_list RBRACE ELSE LBRACE declaration_list RBRACE'''
         p[0] = IfStatement(p[2], p[5], p[9], None, None, p.lineno(1))   
@@ -109,7 +110,6 @@ class Parser:
         p[0] = VarDeclaration(p[2], None, p[1], p.lineno(2))
 
     # Variable declaration initialized
-    # Add multiple assignment
     def p_varDeclaration_initialized(self, p):
         '''varDeclaration : type ID ASSIGN expression'''
         p[0] = VarDeclaration(p[2], p[4], p[1], p.lineno(2))
@@ -128,7 +128,6 @@ class Parser:
         p[0] = p[1]
 
     # Expression - assignment
-    # Add multiple assignment
     def p_assignment(self, p):
         '''assignment : property ASSIGN logical'''
         p[1].isAssign = True
@@ -223,12 +222,18 @@ class Parser:
     def p_factor_unary(self, p):
         '''factor : unary'''
         p[0] = p[1]
+    
+    # Null
+    def p_factor_none(self, p):
+        '''factor : NULL'''
+        p[0] = NullExpression()
         
-    # Factor -> unary
+    # Unary not
     def p_unary(self, p):
         '''unary : NOT unary'''
         p[0] = UnaryExpression(p[1], p[2], p.lineno(1))
 
+    # Unary minus
     def p_unary_minus(self, p):
         '''unary : MINUS unary'''
         p[0] = UnaryExpression(p[1], p[2], p.lineno(1))
@@ -252,14 +257,6 @@ class Parser:
         '''property : property LPAREN arguments RPAREN'''
         p[1].isMethod = True
         p[0] = MethodCallExpression(p[1], p[3], p.lineno(2))
-
-    def p_property_list(self, p):
-        '''property_list : property_list DOT primary'''
-        p[0] = p[1] + [p[3]]
-
-    def p_property_single(self, p):
-        '''property_list : primary'''
-        p[0] = [p[1]]
 
     def p_property(self, p):
         '''property : call'''
@@ -310,24 +307,17 @@ class Parser:
         p[0] = []   
 
     # Function declarations 
-    # Add return statements
     def p_funcDeclaration_statement(self, p):
         '''funcDeclaration : FUNC ID LPAREN parameter_list RPAREN type LBRACE declaration_list RBRACE'''
         p[0] = FunctionDeclaration(p[2], p[4], p[8], p[6], p.lineno(1)) 
         
-    def p_parameter_list_multiple(self, p):
-        '''parameter_list : parameter_list COMMA ID'''
-        p[0] = p[1] + [ParameterStatement(p[3], None, p.lineno(3))]
-
-    def p_parameter_list_single(self, p):
-        '''parameter_list : ID'''
-        p[0] = [ParameterStatement(p[1], None, p.lineno(1))]
+    # Parameters
         
-    def p_parameter_list_multiple_typed(self, p):
+    def p_parameter_list_multiple(self, p):
         '''parameter_list : parameter_list COMMA type ID'''
         p[0] = p[1] + [ParameterStatement(p[3], p[4], p.lineno(3))]
 
-    def p_parameter_list_single_typed(self, p):
+    def p_parameter_list_single(self, p):
         '''parameter_list : type ID'''
         p[0] = [ParameterStatement(p[1], p[2], p.lineno(1))]
 
@@ -335,10 +325,12 @@ class Parser:
         '''parameter_list :'''
         p[0] = []
 
+    # In case of an empty program - this is not working...
     def p_empty(self, p):
         'empty :'
         p[0] = None
-        
+    
+    # Syntax errors
     def p_error(self, p):
         if p:
             self.syntacticErrors.append(f"Syntax error at line {p.lineno}: Unexpected token '{p.value}'")
