@@ -9,41 +9,18 @@ from errorTester import *
 
 # The line numbers match the error messages + 10.  
 data = '''
-class Node {
-    int value
-    Node left = null
-    Node right = null
-}
-Node root = new Node()
-Node firstLeft = new Node()
-firstLeft.value = 3
-Node secondLeft = new Node()
-secondLeft.value = 4
-Node firstRight = new Node()
-firstRight.value = 5
-Node secondRight = new Node()
-secondRight.value = 6
-Node firstRightLeft = new Node()
-firstRightLeft.value = 7
-root.left = firstLeft
-root.left.left = secondLeft
-root.right = firstRight
-root.right.right = secondRight
-root.left.right = firstRightLeft
-Node n = root
-if !root.left.right.left then {
-    print 123
-}
 
 
-func inorder_traversal(Node root) void {
-    if root then {
-        inorder_traversal(root.left)
-        print(root.value)
-        inorder_traversal(root.right)
-    }
+class agurk {
+    int x = 2
 }
-inorder_traversal(root)
+
+func s(agurk a) void {
+    print a.x
+}
+agurk a = new agurk()
+s(null)
+
 '''
     
 
@@ -52,7 +29,7 @@ with open("test.co", "r") as file:
 
 
 # Change this line from 'test' to 'data' and vice versa
-cobraCode = data
+cobraCode = test
 
 # Runs the main program
 def compileCobra(cobraCode: str):

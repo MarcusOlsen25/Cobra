@@ -9,6 +9,7 @@ class ScopeVisitor(Visitor):
     def __init__(self, table: SymbolTable, scopeErrors):
         self.table = table
         self.scopeErrors = scopeErrors
+        self.functionStack = []
         
     def addScopeError(self, message: str, lineno: int):
         exception = ScopeException(message, lineno)
@@ -53,7 +54,7 @@ class ScopeVisitor(Visitor):
             if self.table.lookupLocal(stmt.var):
                 self.addScopeError(f"The variable {stmt.var} in line {stmt.lineno} is already defined in this scope.", stmt.lineno)
             else:
-                self.table.insert(stmt, stmt.type, None)
+                self.table.insertVar(stmt)
         except ScopeException:
             return
         
@@ -63,8 +64,10 @@ class ScopeVisitor(Visitor):
             if self.table.lookup(stmt.var):
                 self.addScopeError(f"The variable {stmt.var} in line {stmt.lineno} is already defined.", stmt.lineno)
             else:
+                functionName = self.getFunctionName(stmt.var)
+                self.functionStack.append(functionName)
                 newTable = SymbolTable(self.table, "Function")
-                self.table.insert(stmt, "func", newTable)
+                self.table.insertFunction(stmt, functionName, newTable)
                 self.table = newTable
 
                 for param in stmt.params:
@@ -74,6 +77,7 @@ class ScopeVisitor(Visitor):
                     s.accept(self)
                     
                 self.table = self.table.parent
+                self.functionStack.pop()
         except ScopeException:
             return
     
@@ -94,7 +98,7 @@ class ScopeVisitor(Visitor):
             if lookup:
                 self.addScopeError(f"The variable {stmt.var} in line {stmt.lineno} is already defined in this scope.", stmt.lineno)
             else:
-                self.table.insert(stmt, stmt.type, None)
+                self.table.insertParameter(stmt)
         except ScopeException:
             return
 
@@ -135,7 +139,7 @@ class ScopeVisitor(Visitor):
             s.accept(self)
             
         self.table = self.table.parent
-            
+
     def visitPrintStatement(self, stmt: PrintStatement):
         stmt.value.accept(self)
 
@@ -151,7 +155,7 @@ class ScopeVisitor(Visitor):
                 self.addScopeError(f"The variable {stmt.var} in line {stmt.lineno} is already defined.", stmt.lineno)
             else:
                 newTable = SymbolTable(self.table, "Class")
-                self.table.insert(stmt, "class", newTable)
+                self.table.insertClass(stmt, newTable)
                 superEntry = None
                 if stmt.super:
                     superEntry = self.table.lookup(stmt.super)
@@ -211,7 +215,7 @@ class ScopeVisitor(Visitor):
                 self.addScopeError(f"The method {stmt.var} in line {stmt.lineno} is already defined in this scope.", stmt.lineno)
             else:
                 newTable = SymbolTable(self.table, "Method")
-                self.table.insert(stmt, "method", newTable)
+                self.table.insertMethod(stmt, newTable)
                 self.table = newTable
 
                 stmt.params.append(ParameterStatement(stmt.className, "this", stmt.lineno))
@@ -228,3 +232,9 @@ class ScopeVisitor(Visitor):
         
     def visitNullExpression(self, expr: NullExpression):
         pass
+
+    def getFunctionName(self, function: str):
+        if len(self.functionStack) == 0:
+            return function
+        else: 
+            return self.functionStack[-1] + "_" + function

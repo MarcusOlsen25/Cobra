@@ -240,8 +240,9 @@ class AssemblyVisitor(Visitor):
             pass
         
     def visitFunctionDeclaration(self, stmt: FunctionDeclaration):
-        self.functionStack.append(stmt.var)
-        self.functions[stmt.var] = [Instruction(None, None, None, f"{stmt.var}", 3, "# Function")]
+        functionName = self.functionName(stmt.var)
+        self.functionStack.append(functionName)
+        self.functions[functionName] = [Instruction(None, None, None, f"{functionName}", 3, "# Function")]
 
         entry = self.table.lookup(stmt.var)
         self.table = entry.table
@@ -251,7 +252,7 @@ class AssemblyVisitor(Visitor):
         for s in stmt.body:
             s.accept(self)
 
-        self.addLabel(f"end_{entry.name}", 3, "# End function")
+        self.addLabel(f"end_{functionName}", 3, "# End function")
         self.endScope()
 
         self.generateCode("ret", None, None, 4, "# Return from the function")
@@ -269,7 +270,7 @@ class AssemblyVisitor(Visitor):
         self.setStaticLink(self.table.level - entry.level)
         self.generateCode("subq", "$8", "%rsp", 3, "# Add dummy space") # Why did we need a dummy space?
 
-        self.generateCode("call", f"{entry.name}", None, 3, f"# Call the {entry.name} function")
+        self.generateCode("call", f"{entry.functionName}", None, 3, f"# Call the {entry.functionName} function")
 
         self.generateCode("addq", "$8", "%rsp", 3, "# Remove dummy space")  # Why did we need a dummy space?
         self.generateCode("addq", "$8", "%rsp", 3, "# Deallocate space on stack for static link")
@@ -448,14 +449,11 @@ class AssemblyVisitor(Visitor):
             self.generateCode("addq", "$8", "%rsp", 3, "# Deallocate space on stack for heap pointer")
             self.generateCode("addq", "$8", "%rsp", 3, "# Deallocate space on stack for static link")
 
-
-
         self.table = entry.table
 
         for s in stmt.body:
             s.accept(self)
             
-        
         self.init.append(Instruction(None, None, None, f"{stmt.var}_descriptor", None, None))
         super = stmt.super
         super_classes = []
@@ -558,3 +556,9 @@ class AssemblyVisitor(Visitor):
         
     def visitNullExpression(self, expr: NullExpression):
         self.generateCode("movq", "$0", "%rax", 3, "# Put a number in %rax")
+
+    def functionName(self, functionName: str):
+        if len(self.functionStack) == 0:
+            return functionName
+        else: 
+            return self.functionStack[-1] + "_" + functionName

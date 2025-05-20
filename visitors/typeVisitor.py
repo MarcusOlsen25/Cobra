@@ -27,6 +27,7 @@ class TypeVisitor(Visitor):
             valueType = self.evaluateExpressionType(expr.value)
             if valueType != "int" and expr.operator == "-":
                 self.addTypeError(f"Type error in line {expr.lineno}: The operand '-' is only compatible with integer expressions, got {valueType} instead.", expr.lineno)
+
         except TypeException:
             return
 
@@ -180,7 +181,7 @@ class TypeVisitor(Visitor):
             while i < len(expr.arguments):
                 inferredType = self.evaluateExpressionType(expr.arguments[i])
                 declaredType = entry.params[i].type
-                if inferredType != declaredType:
+                if not self.compareTypes(inferredType, declaredType):
                     self.addFunctionError(f"The arguments given in line {expr.lineno} do not match the types of the parameters for {entry.name}.", expr.lineno)
                 expr.arguments[i].accept(self)
                 i += 1
