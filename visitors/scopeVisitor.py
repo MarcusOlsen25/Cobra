@@ -182,8 +182,9 @@ class ScopeVisitor(Visitor):
             # Traverse each property call until you come to the end
             varEntry = expr.property.accept(self)
             if not varEntry:
-                # Not a pretty error, but one I met a lot while debugging. 
-                self.addScopeError(f"For some reason, a property in line {expr.lineno} could not be accessed.", expr.lineno)
+                pass
+            elif not (isinstance(varEntry, self.table.VariableValue) or isinstance(varEntry, self.table.FieldValue)):
+                self.addScopeError(f"Error: {expr.property.var} in line {expr.lineno} has no properties, since it is neither a variable nor a field.", expr.lineno)
             else:
                 classEntry = self.table.lookup(varEntry.type)
                 if not classEntry:

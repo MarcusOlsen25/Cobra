@@ -9,10 +9,13 @@ from errorTester import *
 
 # The line numbers match the error messages + 10.  
 data = '''
+3 + true 
 
+true and 6
 
-int number = 34 + 8 
+int x = true
 
+bool m = 5
 '''
     
 
@@ -36,7 +39,7 @@ def compileCobra(cobraCode: str):
     assemblyVisitor = AssemblyVisitor(table)
 
     # Lexical analysis
-    lexer.tokenize(cobraCode)   
+    lexer.tokenize(cobraCode) 
 
     if lexer.lexicalErrors != []:
         for error in lexer.lexicalErrors:

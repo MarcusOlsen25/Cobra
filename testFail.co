@@ -33,3 +33,19 @@ func one(avocado avoc) void {
 }
 
 one(avoc)
+
+
+
+
+
+
+
+
+class banan {
+    int x = 7
+    func one() int {
+        return x
+    }
+}
+
+print banan.one()

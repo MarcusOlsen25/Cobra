@@ -26,7 +26,7 @@ class TypeVisitor(Visitor):
             expr.value.accept(self)
             valueType = self.evaluateExpressionType(expr.value)
             if valueType != "int" and expr.operator == "-":
-                self.addTypeError(f"Type error in line {expr.lineno}: The operand '-' is only compatible with integer expressions, got {valueType} instead.", expr.lineno)
+                self.addTypeError(f"Type error in line {expr.lineno}: The operand '-' is only compatible with integer values, got {valueType} instead.", expr.lineno)
 
         except TypeException:
             return
