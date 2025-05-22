@@ -54,10 +54,14 @@ class ScopeVisitor(Visitor):
             if self.table.lookupLocal(stmt.var):
                 self.addScopeError(f"The variable {stmt.var} in line {stmt.lineno} is already defined in this scope.", stmt.lineno)
             else:
+                if stmt.type != "int" and stmt.type != "bool":
+                    classEntry = self.table.lookup(stmt.type)
+                    if not classEntry:
+                        self.addScopeError(f"The class {stmt.type} referenced in line {stmt.lineno} is not defined.", stmt.lineno)
                 self.table.insertVar(stmt)
         except ScopeException:
             return
-        
+    
     #Using func as a type
     def visitFunctionDeclaration(self, stmt: FunctionDeclaration):
         try:
@@ -160,7 +164,7 @@ class ScopeVisitor(Visitor):
                 if stmt.super:
                     superEntry = self.table.lookup(stmt.super)
                     if not superEntry:
-                        self.addScopeError(f"Scope error in line {stmt.lineno}.", stmt.lineno)
+                        self.addScopeError(f"Scope error for {stmt.var} in line {stmt.lineno}.", stmt.lineno)
                     else:
                         newTable.setFieldCounter(superEntry.table.fieldCounter)
                         newTable.setMethodCounter(superEntry.table.methodCounter)
@@ -182,7 +186,8 @@ class ScopeVisitor(Visitor):
             # Traverse each property call until you come to the end
             varEntry = expr.property.accept(self)
             if not varEntry:
-                pass
+            #     pass
+                self.addScopeError(f"Error accessing a property in line {expr.lineno}.", expr.lineno) 
             elif not (isinstance(varEntry, self.table.VariableValue) or isinstance(varEntry, self.table.FieldValue)):
                 self.addScopeError(f"Error: {expr.property.var} in line {expr.lineno} has no properties, since it is neither a variable nor a field.", expr.lineno)
             else:

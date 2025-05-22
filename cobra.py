@@ -9,13 +9,8 @@ from errorTester import *
 
 # The line numbers match the error messages + 10.  
 data = '''
-3 + true 
 
-true and 6
 
-int x = true
-
-bool m = 5
 '''
     
 

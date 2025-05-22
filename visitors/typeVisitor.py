@@ -81,7 +81,11 @@ class TypeVisitor(Visitor):
                 return "bool"
             elif isinstance(expr, VarExpression):
                 entry = self.table.lookup(expr.var)
-                return entry.type if entry else "unknown"
+                if entry:
+                    if isinstance(entry, self.table.VariableValue) or isinstance(entry, self.table.FieldValue):
+                        return entry.type
+                else:
+                    return "unknown"
             elif isinstance(expr, BinaryExpression):
                 left_type = self.evaluateExpressionType(expr.left)
                 right_type = self.evaluateExpressionType(expr.right)
@@ -108,10 +112,18 @@ class TypeVisitor(Visitor):
             elif isinstance(expr, ConstructorExpression):
                 return expr.var.var
             elif isinstance(expr, PropertyAccessExpression):
-                return expr.accept(self).type
+                entry = expr.accept(self)
+                if not entry:
+                    self.addTypeError(f"Inaccessible property in line {expr.lineno}.", expr.lineno)
+                else:
+                    return entry.type
             elif isinstance(expr, CallExpression):
                 entry = expr.var.accept(self)
-                return entry.returnType
+                if isinstance(entry, self.table.FunctionValue) or isinstance(entry, self.table.MethodValue):
+                    return entry.returnType
+                else:
+                    self.addTypeError(f"The object {expr.var.var} in line {expr.lineno} is neither a function nor a method. Did you forget to write new?", expr.lineno)
+                    return "unknown"
             elif isinstance(expr, MethodCallExpression):
                 entry = expr.property.accept(self)
                 return entry.returnType
@@ -182,7 +194,7 @@ class TypeVisitor(Visitor):
                 inferredType = self.evaluateExpressionType(expr.arguments[i])
                 declaredType = entry.params[i].type
                 if not self.compareTypes(inferredType, declaredType):
-                    self.addFunctionError(f"The arguments given in line {expr.lineno} do not match the types of the parameters for {entry.name}.", expr.lineno)
+                    self.addFunctionError(f"The arguments given in line {expr.lineno} do not match the types of the parameters for {entry.functionName}.", expr.lineno)
                 expr.arguments[i].accept(self)
                 i += 1
             
@@ -249,15 +261,23 @@ class TypeVisitor(Visitor):
         expr.var.accept(self)
         
     def visitPropertyAccessExpression(self, expr: PropertyAccessExpression):
-        # Traverse each property call until you come to the end
-        varEntry = expr.property.accept(self)
-        classEntry = self.table.lookup(varEntry.type)
-        propertyEntry = classEntry.table.lookupLocal(expr.var)
-        while not propertyEntry and classEntry.super:
-            classEntry = self.table.lookup(classEntry.super)
-            propertyEntry = classEntry.table.lookupLocal(expr.var)
+        try:
+            # Traverse each property call until you come to the end
+            varEntry = expr.property.accept(self)
+            # if not varEntry:
+            #     self.addTypeError("Ups! What is this?", expr.lineno)
+            if not (isinstance(varEntry, self.table.VariableValue) or isinstance(varEntry, self.table.FieldValue)):
+                self.addTypeError(f"The property after {expr.var} in line {expr.lineno} is neither a variable nor a field.", expr.lineno)
+            else:
+                classEntry = self.table.lookup(varEntry.type)
+                propertyEntry = classEntry.table.lookupLocal(expr.var)
+                while not propertyEntry and classEntry.super:
+                    classEntry = self.table.lookup(classEntry.super)
+                    propertyEntry = classEntry.table.lookupLocal(expr.var)
 
-        return propertyEntry
+                return propertyEntry
+        except TypeException:
+            return
 
     def visitMethodCallExpression(self, expr: MethodCallExpression):
         try:

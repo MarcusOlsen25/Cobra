@@ -13,3 +13,57 @@ two(x, y)
 
 int d = 4
 d = z
+
+
+func one(bool y) bool {
+    return not y
+}
+
+class banan {
+    int a = 1
+}
+
+class agurk {
+    int b = 2
+    banan ba = new banan()
+}
+
+class melon {
+    int c = 3
+    agurk ag = new agurk()
+}
+
+class ananas {
+    int d = 4
+    melon me = new melon()
+}
+
+ananas an = new ananas()
+
+an.d
+an.me.c 
+an.me.ag.b 
+an.me.ag.ba.a 
+
+an.c 
+an.me.ba 
+an.me.ag.ba.b
+
+int ha = 2
+int he = 4
+int hi = 6
+int ho = 8
+int hu = 10
+
+class innerScope {
+    int ha = 0
+    int he = 0
+}
+
+if ha then {
+    int ha = hi - hu
+    int ho = 27
+    he = 15
+} else {
+    fup = 7
+}
