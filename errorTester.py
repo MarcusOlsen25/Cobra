@@ -96,6 +96,14 @@ def testSyntacticErrors():
     test3ExpectedErrors = ["Syntax error at line 2: Unexpected token '{'"]
     test3 = auxTestSyntacticErrors(test3Code, test3ExpectedErrors, 3)
     
+    test4Code = '''
+        func two {
+            print 3
+        }
+        '''
+    test4ExpectedErrors = ["Syntax error at line 2: Unexpected token '{'"]
+    test4 = auxTestSyntacticErrors(test4Code, test4ExpectedErrors, 4)
+    
     if not (test1 and test2 and test3):
         success = False
     

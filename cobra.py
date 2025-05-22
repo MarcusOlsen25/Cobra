@@ -11,15 +11,7 @@ from errorTester import *
 data = '''
 
 
-class agurk {
-    int x = 2
-}
-
-func s(agurk a) void {
-    print a.x
-}
-agurk a = new agurk()
-s(null)
+int number = 34 + 8 
 
 '''
     
@@ -29,7 +21,7 @@ with open("test.co", "r") as file:
 
 
 # Change this line from 'test' to 'data' and vice versa
-cobraCode = test
+cobraCode = data
 
 # Runs the main program
 def compileCobra(cobraCode: str):
@@ -80,7 +72,6 @@ def compileCobra(cobraCode: str):
                 else:
                     
                     #Code generation
-                    assemblyVisitor = AssemblyVisitor(table)
 
                     #Function prologue for main
                     assemblyVisitor.startScope()

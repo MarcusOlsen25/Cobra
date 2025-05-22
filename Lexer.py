@@ -65,6 +65,12 @@ t_GREATEROREQUAL    = r'>='
 t_LESSOREQUAL       = r'<='
 t_DOT               = r'\.'
 
+
+def t_INVALID_ID(t):
+    r'\d+[a-zA-Z_]+[a-zA-Z_0-9]*'
+    Lexer.lexicalErrors.append(f"Invalid identifier '{t.value}' in line {t.lineno}")
+    t.lexer.skip(len(t.value))
+
 def t_NUMBER(t):
     r'\d+'
     t.value = int(t.value)    
