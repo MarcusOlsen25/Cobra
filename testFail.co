@@ -4,8 +4,9 @@ declaration     := varDeclaration | funcDeclaration
 
 varDeclaration  := type ID ("=" expression)?
 classDeclaration := "class" ID ("extends" ID)? 
-                    "{" (varDeclaration | funcDeclaration)* "}"
+                    "{" (varDeclaration | methodDeclaration)* "}"
 funcDeclaration := "func" ID "(" parameters ")" type "{" declaration* "}"
+methodDeclaration := "func" ID "(" parameters ")" type "{" declaration* "}"
 
 type            := "int" | "bool" | "void" | ID
 arguments       := ((arguments ",")? expression)?

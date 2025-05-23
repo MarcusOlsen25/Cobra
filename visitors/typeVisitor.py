@@ -156,6 +156,8 @@ class TypeVisitor(Visitor):
             returnTypes = self.findReturnStatements(stmt.body)
             if returnTypes == [] and stmt.returnType != "void":
                 self.addFunctionError(f"Type mismatch in line {stmt.lineno}: {stmt.var} returns {stmt.returnType}, not void.", stmt.lineno)
+            elif returnTypes != [] and stmt.returnType == "void":
+                self.addFunctionError(f"The function {stmt.var} in line {stmt.lineno} is void, so it cannot include return statements.", stmt.lineno)
             elif returnTypes != []:
                 for type in returnTypes:
                     if type[0] != stmt.returnType:
@@ -299,16 +301,30 @@ class TypeVisitor(Visitor):
             return
     
     def visitMethodDeclaration(self, stmt: MethodDeclaration):
-        method = self.table.lookupLocal(stmt.var)
-        self.table = method.table
+        try: 
+            method = self.table.lookupLocal(stmt.var)
+            self.table = method.table
 
-        for param in stmt.params:
-            param.accept(self)
+            for param in stmt.params:
+                param.accept(self)
 
-        for s in stmt.body:
-            s.accept(self)
+            for s in stmt.body:
+                s.accept(self)
+                
+            # Check that the return types match the function definition
+            returnTypes = self.findReturnStatements(stmt.body)
+            if returnTypes == [] and stmt.returnType != "void":
+                self.addFunctionError(f"Type mismatch in line {stmt.lineno}: {stmt.var} returns {stmt.returnType}, not void.", stmt.lineno)
+            elif returnTypes != [] and stmt.returnType == "void":
+                self.addFunctionError(f"The function {stmt.var} in line {stmt.lineno} is void, so it cannot include return statements.", stmt.lineno)
+            elif returnTypes != []:
+                for type in returnTypes:
+                    if type[0] != stmt.returnType:
+                        self.addFunctionError(f"Type mismatch in line {type[1]}: {stmt.var} returns {stmt.returnType}, not {type[0]}.", stmt.lineno)
         
-        self.table = self.table.parent
+            self.table = self.table.parent
+        except FunctionException:
+            return
         
     def compareTypes(self, inferred, declared):
         return declared == inferred or isinstance(inferred, NullType)

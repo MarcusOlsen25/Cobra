@@ -67,3 +67,16 @@ if ha then {
 } else {
     fup = 7
 }
+
+
+
+class tiger {
+    int a = 2
+    func one() void {
+        print 3
+    }
+}
+tiger tigger = new tiger()
+tigger.one()
+tigger.a()
+tigger.b()

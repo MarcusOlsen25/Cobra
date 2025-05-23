@@ -231,7 +231,9 @@ def testScopeErrors():
         "The property c from line 48 could not be found.",
         "The property ba from line 49 could not be found.",
         "The property b from line 50 could not be found.",
-        "Undeclared variable fup in line 68."
+        "Undeclared variable fup in line 68.",
+        "The ID a in line 81 is not a method.",
+        "The property b from line 82 could not be found."
     ]
     
     with open("testScopeErrors.co", "r") as file:

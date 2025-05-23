@@ -10,34 +10,16 @@ from errorTester import *
 # The line numbers match the error messages + 10.  
 data = '''
 
-
-int a = 3
-
-int b = false
-
-bool c = 7
-
-a = true
-
-bool d = true
-
-d = 45
-
-int e = 34 + 8 * 21
-
 class tiger {
-    int x = 0
-    int y = 0
+    int a = 2
+    func one() void {
+        print 3
+    }
 }
-
-87 + 43
-3 + tiger
-4 + false 
-
 tiger tigger = new tiger()
-5 + tigger
-
-int t = new tiger()
+tigger.one()
+tigger.a()
+tigger.b()
 '''
     
 
@@ -45,7 +27,7 @@ with open("test.co", "r") as file:
     test = file.read()
 
 # Change this line from 'test' to 'data' and vice versa
-cobraCode = test
+cobraCode = data
 
 # Runs the main program
 def compileCobra(cobraCode: str):

@@ -79,6 +79,7 @@ class SymbolTable:
         
     class VariableValue:
         def __init__(self, stmt: VarDeclaration, offset: int, level: int):
+            self.name = stmt.var
             self.type = stmt.type
             self.offset = offset
             self.level = level
@@ -101,6 +102,7 @@ class SymbolTable:
 
     class FieldValue:
         def __init__(self, stmt: VarDeclaration, level: int, offset: int):
+            self.name = stmt.var
             self.level = level
             self.offset = offset
             self.type = stmt.type
