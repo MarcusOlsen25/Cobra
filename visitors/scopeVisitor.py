@@ -210,12 +210,19 @@ class ScopeVisitor(Visitor):
             return
 
     def visitMethodCallExpression(self, expr: MethodCallExpression):  
-        methodEntry = expr.property.accept(self)
-        
-        for arg in expr.arguments:
-            arg.accept(self)
+        try:
+            methodEntry = expr.property.accept(self)
+            if not methodEntry:
+                self.addScopeError(f"The function {expr.var.var} from line {expr.lineno} is not defined.", expr.lineno)
+            elif not (isinstance(methodEntry, SymbolTable.FunctionValue) or isinstance(methodEntry, SymbolTable.MethodValue)):
+                self.addScopeError(f"The ID {expr.var.var} in line {expr.lineno} is neither a function nor a method.", expr.lineno)
+            else:
+                for arg in expr.arguments:
+                    arg.accept(self)
+            return methodEntry
 
-        return methodEntry
+        except ScopeException:
+            return
 
     def visitMethodDeclaration(self, stmt: MethodDeclaration):
         try:
