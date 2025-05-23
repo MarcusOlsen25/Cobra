@@ -1,0 +1,126 @@
+program         := declaration* EOF
+declaration     := varDeclaration | funcDeclaration 
+                    | classDeclaration | statement
+
+varDeclaration  := type ID ("=" expression)?
+classDeclaration := "class" ID ("extends" ID)? 
+                    "{" (varDeclaration | funcDeclaration)* "}"
+funcDeclaration := "func" ID "(" parameters ")" type "{" declaration* "}"
+
+type            := "int" | "bool" | "void" | ID
+arguments       := ((arguments ",")? expression)?
+parameters      := ((parameters ",")? type ID)?
+
+statement       := expression | ifStatement 
+                    | whileStatement | printStatement   
+                    | returnStatement
+
+ifStatement     := "if" expression "then" "{" statement* "}" 
+                    ("else" "{" statement "}")?
+whileStatement  := "while" expression "then" "{" statement* "}"
+printStatement  := "print" expression
+returnStatement := "return" expression?
+
+expression      := assignment
+assignment      := (property "=")? logical
+logical         := (logical ("or" | "and"))? equality
+equality        := (equality ("==" | "!="))? comparison
+comparison      := (comparison (">" | "<" | ">=" | "<="))? term
+term            := (term ("+" | "-"))? factor 
+factor          := (factor ("*" | "/"))? unary
+unary           := ("not" | "-") unary | property
+
+property        := "new" primary "(" ")" | property "." ID  
+                    | property "(" arguments ")" | call
+call            := primary ("(" arguments ")")?
+primary         := NUMBER | ID | "true" | "false"  
+                    | "null" | "(" expression ")"
+
+
+
+
+
+
+
+
+
+Rule 0     S' -> program
+Rule 1     program -> declaration_list
+Rule 2     declaration_list -> declaration
+Rule 3     declaration_list -> declaration_list declaration
+Rule 4     declaration -> varDeclaration
+Rule 5     declaration -> statement
+Rule 6     declaration -> funcDeclaration
+Rule 7     declaration -> class
+Rule 8     class -> CLASS ID extends LBRACE classDeclarationList RBRACE
+Rule 9     extends -> EXTENDS ID
+Rule 10    extends -> empty
+Rule 11    classDeclarationList -> classDeclarationList classDeclaration
+Rule 12    classDeclarationList -> classDeclaration
+Rule 13    classDeclaration -> varDeclaration
+Rule 14    classDeclaration -> methodDeclaration
+Rule 15    methodDeclaration -> FUNC ID LPAREN parameter_list RPAREN type LBRACE declaration_list RBRACE
+Rule 16    statement -> expression
+Rule 17    statement -> ifStatement
+Rule 18    statement -> whileStatement
+Rule 19    statement -> printStatement
+Rule 20    statement -> returnStatement
+Rule 21    returnStatement -> RETURN expression
+Rule 22    returnStatement -> RETURN
+Rule 23    ifStatement -> IF expression THEN LBRACE declaration_list RBRACE
+Rule 24    ifStatement -> IF expression THEN LBRACE declaration_list RBRACE ELSE LBRACE declaration_list RBRACE
+Rule 25    whileStatement -> WHILE expression THEN LBRACE declaration_list RBRACE
+Rule 26    printStatement -> PRINT expression
+Rule 27    varDeclaration -> type ID
+Rule 28    varDeclaration -> type ID ASSIGN expression
+Rule 29    type -> INT
+Rule 30    type -> BOOL
+Rule 31    type -> VOID
+Rule 32    type -> ID
+Rule 33    expression -> assignment
+Rule 34    assignment -> property ASSIGN logical
+Rule 35    assignment -> logical
+Rule 36    logical -> logical OR equality
+Rule 37    logical -> logical AND equality
+Rule 38    logical -> equality
+Rule 39    equality -> equality EQUALS comparison
+Rule 40    equality -> equality NOTEQUALS comparison
+Rule 41    equality -> comparison
+Rule 42    comparison -> comparison GREATER term
+Rule 43    comparison -> comparison LESS term
+Rule 44    comparison -> comparison GREATEROREQUAL term
+Rule 45    comparison -> comparison LESSOREQUAL term
+Rule 46    comparison -> term
+Rule 47    term -> term PLUS factor
+Rule 48    term -> term MINUS factor
+Rule 49    term -> factor
+Rule 50    factor -> factor TIMES unary
+Rule 51    factor -> factor DIVIDE unary
+Rule 52    factor -> unary
+Rule 53    unary -> NOT unary
+Rule 54    unary -> MINUS unary
+Rule 55    unary -> property
+Rule 56    property -> NEW primary LPAREN RPAREN
+Rule 57    property -> property DOT ID
+Rule 58    property -> property LPAREN arguments RPAREN
+Rule 59    property -> call
+Rule 60    call -> primary LPAREN arguments RPAREN
+Rule 61    call -> primary
+Rule 62    primary -> NUMBER
+Rule 63    primary -> ID
+Rule 64    primary -> TRUE
+Rule 65    primary -> FALSE
+Rule 66    primary -> NULL
+Rule 67    primary -> LPAREN expression RPAREN
+Rule 68    arguments -> arguments COMMA expression
+Rule 69    arguments -> expression
+Rule 70    arguments -> <empty>
+Rule 71    funcDeclaration -> FUNC ID LPAREN parameter_list RPAREN type LBRACE declaration_list RBRACE
+Rule 72    parameter_list -> parameter_list COMMA type ID
+Rule 73    parameter_list -> type ID
+Rule 74    parameter_list -> <empty>
+Rule 75    empty -> <empty>
+
+
+
+

@@ -11,15 +11,41 @@ from errorTester import *
 data = '''
 
 
+int a = 3
+
+int b = false
+
+bool c = 7
+
+a = true
+
+bool d = true
+
+d = 45
+
+int e = 34 + 8 * 21
+
+class tiger {
+    int x = 0
+    int y = 0
+}
+
+87 + 43
+3 + tiger
+4 + false 
+
+tiger tigger = new tiger()
+5 + tigger
+
+int t = new tiger()
 '''
     
 
 with open("test.co", "r") as file:
     test = file.read()
 
-
 # Change this line from 'test' to 'data' and vice versa
-cobraCode = data
+cobraCode = test
 
 # Runs the main program
 def compileCobra(cobraCode: str):

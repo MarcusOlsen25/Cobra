@@ -82,10 +82,13 @@ class TypeVisitor(Visitor):
             elif isinstance(expr, VarExpression):
                 entry = self.table.lookup(expr.var)
                 if entry:
-                    if isinstance(entry, self.table.VariableValue) or isinstance(entry, self.table.FieldValue):
+                    if isinstance(entry, SymbolTable.VariableValue) or isinstance(entry, SymbolTable.FieldValue):
                         return entry.type
+                    else:
+                        print(expr.lineno)
                 else:
                     return "unknown"
+                # return entry.type
             elif isinstance(expr, BinaryExpression):
                 left_type = self.evaluateExpressionType(expr.left)
                 right_type = self.evaluateExpressionType(expr.right)
@@ -119,7 +122,7 @@ class TypeVisitor(Visitor):
                     return entry.type
             elif isinstance(expr, CallExpression):
                 entry = expr.var.accept(self)
-                if isinstance(entry, self.table.FunctionValue) or isinstance(entry, self.table.MethodValue):
+                if isinstance(entry, SymbolTable.FunctionValue) or isinstance(entry, SymbolTable.MethodValue):
                     return entry.returnType
                 else:
                     self.addTypeError(f"The object {expr.var.var} in line {expr.lineno} is neither a function nor a method. Did you forget to write new?", expr.lineno)
@@ -261,23 +264,17 @@ class TypeVisitor(Visitor):
         expr.var.accept(self)
         
     def visitPropertyAccessExpression(self, expr: PropertyAccessExpression):
-        try:
-            # Traverse each property call until you come to the end
-            varEntry = expr.property.accept(self)
-            # if not varEntry:
-            #     self.addTypeError("Ups! What is this?", expr.lineno)
-            if not (isinstance(varEntry, self.table.VariableValue) or isinstance(varEntry, self.table.FieldValue)):
-                self.addTypeError(f"The property after {expr.var} in line {expr.lineno} is neither a variable nor a field.", expr.lineno)
-            else:
-                classEntry = self.table.lookup(varEntry.type)
-                propertyEntry = classEntry.table.lookupLocal(expr.var)
-                while not propertyEntry and classEntry.super:
-                    classEntry = self.table.lookup(classEntry.super)
-                    propertyEntry = classEntry.table.lookupLocal(expr.var)
+        # Traverse each property call until you come to the end
+        varEntry = expr.property.accept(self)
+    
+        classEntry = self.table.lookup(varEntry.type)
+        propertyEntry = classEntry.table.lookupLocal(expr.var)
+        while not propertyEntry and classEntry.super:
+            classEntry = self.table.lookup(classEntry.super)
+            propertyEntry = classEntry.table.lookupLocal(expr.var)
 
-                return propertyEntry
-        except TypeException:
-            return
+        return propertyEntry
+    
 
     def visitMethodCallExpression(self, expr: MethodCallExpression):
         try:

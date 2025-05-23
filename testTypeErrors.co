@@ -19,7 +19,7 @@ class tiger {
 }
 
 87 + 43
-3 + tiger
+
 4 + false 
 
 tiger tigger = new tiger()

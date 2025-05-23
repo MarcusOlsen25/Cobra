@@ -31,6 +31,8 @@ class ScopeVisitor(Visitor):
             lookup = self.table.lookup(expr.var)
             if not lookup:
                 self.addScopeError(f"Undeclared variable {expr.var} in line {expr.lineno}.", expr.lineno)
+            elif not isinstance(lookup, SymbolTable.VariableValue) and not isinstance(lookup, SymbolTable.FieldValue):
+                self.addScopeError(f"The ID {expr.var} in line {expr.lineno} is neither a variable nor a field.", expr.lineno)
             else:
                 return lookup
         except ScopeException:
@@ -90,6 +92,8 @@ class ScopeVisitor(Visitor):
             lookup = self.table.lookup(expr.var.var)
             if not lookup:
                 self.addScopeError(f"The function {expr.var.var} from line {expr.lineno} is not defined.", expr.lineno)
+            elif not (isinstance(lookup, SymbolTable.FunctionValue) or isinstance(lookup, SymbolTable.MethodValue)):
+                self.addScopeError(f"The ID {expr.var.var} in line {expr.lineno} is neither a function nor a method.", expr.lineno)
             else:
                 for arg in expr.arguments:
                     arg.accept(self)
@@ -186,9 +190,8 @@ class ScopeVisitor(Visitor):
             # Traverse each property call until you come to the end
             varEntry = expr.property.accept(self)
             if not varEntry:
-            #     pass
                 self.addScopeError(f"Error accessing a property in line {expr.lineno}.", expr.lineno) 
-            elif not (isinstance(varEntry, self.table.VariableValue) or isinstance(varEntry, self.table.FieldValue)):
+            elif not (isinstance(varEntry, SymbolTable.VariableValue) or isinstance(varEntry, SymbolTable.FieldValue)):
                 self.addScopeError(f"Error: {expr.property.var} in line {expr.lineno} has no properties, since it is neither a variable nor a field.", expr.lineno)
             else:
                 classEntry = self.table.lookup(varEntry.type)

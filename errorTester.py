@@ -278,7 +278,6 @@ def testTypeErrors():
         "Type mismatch for c in line 6: expected bool, got int.",
         "Type mismatch for a in line 8: expected int, got bool.",
         "Type mismatch for d in line 12: expected bool, got int.",
-        "Illegal type in binary operation in line 22.",
         "Illegal type in binary operation in line 23.",
         "Illegal type in binary operation in line 26.",
         "Type mismatch for t in line 28: expected int, got tiger."
