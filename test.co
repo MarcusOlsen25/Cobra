@@ -322,3 +322,30 @@ Accumulator acc = new Accumulator()
 acc.add(20)
 acc.add(25)
 print acc.getTotal()
+
+
+bool t = true
+bool f = false
+
+if (f and f) then {
+    print -1
+}
+if f and t then {
+    print -1
+}
+if f or f then {
+    print -1
+}
+if not (f or t) then {
+    print -1
+}
+if f or not t then {
+    print -1
+}
+if t and not t then {
+    print -1
+}
+if (f and t) or ((f or t) and (t and t)) then {
+    print 46
+}
+

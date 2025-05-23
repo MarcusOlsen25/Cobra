@@ -19,7 +19,8 @@ reserved = {"if": "IF",
             "class": "CLASS",
             "new": "NEW",
             "extends": "EXTENDS",
-            "null": "NULL"
+            "null": "NULL",
+            "not": "NOT"
             }
 
 tokens = [
@@ -35,7 +36,7 @@ tokens = [
 'ASSIGN',
 'LBRACE',
 'RBRACE',
-'NOT',
+# 'NOT',
 'EQUALS',
 'NOTEQUALS',
 'GREATER',
@@ -56,7 +57,7 @@ t_COMMA             = r','
 t_ASSIGN            = r'='
 t_LBRACE            = r'{'
 t_RBRACE            = r'}'
-t_NOT               = r'!'
+# t_NOT               = r'!'
 t_EQUALS            = r'=='
 t_NOTEQUALS         = r'!='
 t_GREATER           = r'>'
