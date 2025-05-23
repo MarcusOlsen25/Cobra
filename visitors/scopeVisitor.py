@@ -92,8 +92,8 @@ class ScopeVisitor(Visitor):
             lookup = self.table.lookup(expr.var.var)
             if not lookup:
                 self.addScopeError(f"The function {expr.var.var} from line {expr.lineno} is not defined.", expr.lineno)
-            elif not (isinstance(lookup, SymbolTable.FunctionValue) or isinstance(lookup, SymbolTable.MethodValue)):
-                self.addScopeError(f"The ID {expr.var.var} in line {expr.lineno} is neither a function nor a method.", expr.lineno)
+            elif not isinstance(lookup, SymbolTable.FunctionValue):
+                self.addScopeError(f"The ID {expr.var.var} in line {expr.lineno} is not a function.", expr.lineno)
             else:
                 for arg in expr.arguments:
                     arg.accept(self)
@@ -214,8 +214,8 @@ class ScopeVisitor(Visitor):
             methodEntry = expr.property.accept(self)
             if not methodEntry:
                 self.addScopeError(f"The function {expr.var.var} from line {expr.lineno} is not defined.", expr.lineno)
-            elif not (isinstance(methodEntry, SymbolTable.FunctionValue) or isinstance(methodEntry, SymbolTable.MethodValue)):
-                self.addScopeError(f"The ID {expr.var.var} in line {expr.lineno} is neither a function nor a method.", expr.lineno)
+            elif not isinstance(methodEntry, SymbolTable.MethodValue):
+                self.addScopeError(f"The ID {expr.var.var} in line {expr.lineno} is not a method.", expr.lineno)
             else:
                 for arg in expr.arguments:
                     arg.accept(self)
