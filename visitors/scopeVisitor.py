@@ -61,6 +61,7 @@ class ScopeVisitor(Visitor):
                     if not classEntry:
                         self.addScopeError(f"The class {stmt.type} referenced in line {stmt.lineno} is not defined.", stmt.lineno)
                 self.table.insertVar(stmt)
+                stmt.initializer.accept(self)
         except ScopeException:
             return
     
