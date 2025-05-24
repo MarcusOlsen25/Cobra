@@ -1,28 +1,28 @@
 
-int a = 3
+int a = 3;
 
-int b = false
+int b = false;
 
-bool c = 7
+bool c = 7;
 
-a = true
+a = true;
 
-bool d = true
+bool d = true;
 
-d = 45
+d = 45;
 
-int e = 34 + 8 * 21
+int e = 34 + 8 * 21;
 
 class tiger {
-    int x = 0
-    int y = 0
+    int x = 0;
+    int y = 0;
 }
 
-87 + 43
+87 + 43;
 
-4 + false 
+4 + false; 
 
-tiger tigger = new tiger()
-5 + tigger
+tiger tigger = new tiger();
+5 + tigger;
 
-int t = new tiger()
+int t = new tiger();

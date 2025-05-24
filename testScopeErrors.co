@@ -1,82 +1,82 @@
 
-int b = 3
+int b = 3;
 
-c = 4
+c = 4;
 
 func one(int x) int {
-    return x + y
+    return x + y;
 }
 
-bool b = false
+bool b = false;
 
-two(x, y)
+two(x, y);
 
-int d = 4
-d = z
+int d = 4;
+d = z;
 
 
 func one(bool y) bool {
-    return not y
+    return not y;
 }
 
 class banan {
-    int a = 1
+    int a = 1;
 }
 
 class agurk {
-    int b = 2
-    banan ba = new banan()
+    int b = 2;
+    banan ba = new banan();
 }
 
 class melon {
-    int c = 3
-    agurk ag = new agurk()
+    int c = 3;
+    agurk ag = new agurk();
 }
 
 class ananas {
-    int d = 4
-    melon me = new melon()
+    int d = 4;
+    melon me = new melon();
 }
 
-ananas an = new ananas()
+ananas an = new ananas();
 
-an.d
-an.me.c 
-an.me.ag.b 
-an.me.ag.ba.a 
+an.d;
+an.me.c; 
+an.me.ag.b; 
+an.me.ag.ba.a; 
 
-an.c 
-an.me.ba 
-an.me.ag.ba.b
+an.c;
+an.me.ba; 
+an.me.ag.ba.b;
 
-int ha = 2
-int he = 4
-int hi = 6
-int ho = 8
-int hu = 10
+int ha = 2;
+int he = 4;
+int hi = 6;
+int ho = 8;
+int hu = 10;
 
 class innerScope {
-    int ha = 0
-    int he = 0
+    int ha = 0;
+    int he = 0;
 }
 
 if ha then {
-    int ha = hi - hu
-    int ho = 27
-    he = 15
+    int ha = hi - hu;
+    int ho = 27;
+    he = 15;
 } else {
-    fup = 7
+    fup = 7;
 }
 
 
 
 class tiger {
-    int a = 2
+    int a = 2;
     func one() void {
-        print 3
+        print 3;
     }
 }
-tiger tigger = new tiger()
-tigger.one()
-tigger.a()
-tigger.b()
+tiger tigger = new tiger();
+tigger.one();
+tigger.a();
+tigger.b();

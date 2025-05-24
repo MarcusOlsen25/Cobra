@@ -30,6 +30,8 @@ Outer_descriptor:
 Accumulator_descriptor:
 	.quad add_Accumulator
 	.quad getTotal_Accumulator
+theCompilerWorks_descriptor:
+	.quad celebrate_theCompilerWorks
 .text
 gulerod:			# Class
 	pushq %rbp			# Save base pointer
@@ -728,11 +730,46 @@ end_getTotal_Accumulator:
 	addq $0, %rsp			# Deallocate space for local variables on the stack
 	popq %rbp			# Restore base pointer
 	ret				# Return from the method
+theCompilerWorks:			# Class
+	pushq %rbp			# Save base pointer
+	movq %rsp, %rbp			# Make stack pointer new base pointer
+	movq 16(%rbp), %rcx			# Push heap pointer
+	pushq %rcx			# Push heap pointer
+	movq $50, %rax			# Put a number in %rax
+	movq %rax, 8(%rcx)			# Move initialized value into space on heap
+	popq %rax			# Pop current heap pointer into %rax
+	popq %rbp			# Restore base pointer
+	ret				# End class
+celebrate_theCompilerWorks:			# Method
+	pushq %rbp			# Save base pointer
+	movq %rsp, %rbp			# Make stack pointer new base pointer
+	subq $0, %rsp			# Allocate space for local variables on the stack
+	movq %rbp, %rax			# Prepare to access variable from another scope
+	movq 32(%rax), %rax		# Move value into %rax
+	movq 8(%rax), %rax		# Move value into %rax
+			# Start print statement
+	leaq form(%rip), %rdi		# Passing string address (1. argument)
+	movq %rax, %rsi			# Passing %rax (2. argument)
+	movq $0, %rax			# No floating point registers used
+	testq $15, %rsp			# Test for 16 byte alignment
+	jz print_align_70		# Jump if aligned
+	addq $-8, %rsp			# 16 byte aligning
+	callq printf@plt		# Call printf
+	addq $8, %rsp			# Reverting alignment
+	jmp end_print_70
+print_align_70:
+	callq printf@plt		# Call printf
+end_print_70:
+			# End print statement
+end_celebrate_theCompilerWorks:
+	addq $0, %rsp			# Deallocate space for local variables on the stack
+	popq %rbp			# Restore base pointer
+	ret				# Return from the method
 .globl main
 main:
 	pushq %rbp			# Save base pointer
 	movq %rsp, %rbp			# Make stack pointer new base pointer
-	subq $216, %rsp			# Allocate space for local variables on the stack
+	subq $208, %rsp			# Allocate space for local variables on the stack
 	movq $1, %rax			# Put a number in %rax
 	movq %rax, -8(%rbp)			# Move initialized value into space on stack
 	movq %rbp, %rax			# Prepare to access variable from another scope
@@ -3410,82 +3447,33 @@ end_else_40:
 	addq $16, %rsp			# Remove dummy spaces
 	addq $8, %rsp			# Deallocate space on stack for static link
 end_40:
-	movq %rbp, %rax			# Prepare to access variable from another scope
-	movq -216(%rax), %rax		# Move value into %rax
-	pushq %rax			# Push right side to stack
+	movq heap_pointer(%rip), %rcx			# Move heap pointer into %rcx
+	addq $16, heap_pointer(%rip)	# Add size of object to heap pointer
+	leaq theCompilerWorks_descriptor(%rip), %rax	# Move class descriptor into %rax
+	movq %rax, (%rcx)			# Move class descriptor into object
+	movq %rbp, %rax			# Prepare static link
+	pushq %rax			# Push static link
+	pushq %rcx			# Push heap pointer
+	call theCompilerWorks			# Call theCompilerWorks constructor
+	movq 16(%rbp), %rcx			# Move potential heap pointer into %rcx
+	addq $8, %rsp			# Deallocate space on stack for heap pointer
+	addq $8, %rsp			# Deallocate space on stack for static link
+	movq %rax, -208(%rbp)			# Move initialized value into space on stack
 	movq %rbp, %rax			# Prepare to access variable from another scope
 	movq -208(%rax), %rax		# Move value into %rax
-	popq %rbx			# Pop right side into %rbx
-	movq $0, %rdx			# Put FALSE in %rdx
-	cmp %rax, %rdx			# Check if the left side is false
-	je logical_false_36		# Skip to the false
-	cmp %rbx, %rdx			# Check if the right side is false
-	je logical_false_36		# Skip to the false
-	movq $1, %rax			# Put true in %rax
-	jmp logical_end_36		# Skip to the end
-logical_false_36:
-	movq $0, %rax			# Put false in %rax
-logical_end_36:
-	cmp $0, %rax			# Check the condition
-	je else_part_41			# Skip to the else if the condition is false
+	pushq %rax			# Push heap pointer to be used as argument
+	movq (%rax), %rax		# Move value into %rax
+	movq 0(%rax), %rax			# Move method address into %rax
+	movq %rax, %r9			# Move method address into r9
 	movq %rbp, %rax			# Prepare static link
 	pushq %rax			# Push static link
-	subq $16, %rsp			# Add dummy spaces
-	pushq %rbp			# Save base pointer
-	movq %rsp, %rbp			# Make stack pointer new base pointer
-	subq $0, %rsp			# Allocate space for local variables on the stack
-	movq $1000, %rax			# Put a number in %rax
-	negq %rax			# Negate value
-			# Start print statement
-	leaq form(%rip), %rdi		# Passing string address (1. argument)
-	movq %rax, %rsi			# Passing %rax (2. argument)
-	movq $0, %rax			# No floating point registers used
-	testq $15, %rsp			# Test for 16 byte alignment
-	jz print_align_70		# Jump if aligned
-	addq $-8, %rsp			# 16 byte aligning
-	callq printf@plt		# Call printf
-	addq $8, %rsp			# Reverting alignment
-	jmp end_print_70
-print_align_70:
-	callq printf@plt		# Call printf
-end_print_70:
-			# End print statement
-end_then_41:			# Clean up then block stack frame
-	addq $0, %rsp			# Deallocate space for local variables on the stack
-	popq %rbp			# Restore base pointer
-	addq $16, %rsp			# Remove dummy spaces
+	subq $8, %rsp			# Add dummy space
+	movq %r9, %rax			# Move heap pointer into r9
+	call *%rax		# Call method
+	addq $8, %rsp			# Remove dummy space
 	addq $8, %rsp			# Deallocate space on stack for static link
-	jmp end_41			# Skip the else
-else_part_41:
-	movq %rbp, %rax			# Prepare static link
-	pushq %rax			# Push static link
-	subq $16, %rsp			# Add dummy spaces
-	pushq %rbp			# Save base pointer
-	movq %rsp, %rbp			# Make stack pointer new base pointer
-	subq $0, %rsp			# Allocate space for local variables on the stack
-	movq $1, %rax			# Put a number in %rax
-	negq %rax			# Negate value
-			# Start print statement
-	leaq form(%rip), %rdi		# Passing string address (1. argument)
-	movq %rax, %rsi			# Passing %rax (2. argument)
-	movq $0, %rax			# No floating point registers used
-	testq $15, %rsp			# Test for 16 byte alignment
-	jz print_align_71		# Jump if aligned
-	addq $-8, %rsp			# 16 byte aligning
-	callq printf@plt		# Call printf
-	addq $8, %rsp			# Reverting alignment
-	jmp end_print_71
-print_align_71:
-	callq printf@plt		# Call printf
-end_print_71:
-			# End print statement
-end_else_41:
-	addq $0, %rsp			# Deallocate space for local variables on the stack
-	popq %rbp			# Restore base pointer
-	addq $16, %rsp			# Remove dummy spaces
-	addq $8, %rsp			# Deallocate space on stack for static link
-end_41:
-	addq $216, %rsp			# Deallocate space for local variables on the stack
+	addq $8, %rsp			# Pop the arguments pushed to the stack
+	addq $208, %rsp			# Deallocate space for local variables on the stack
 	popq %rbp			# Restore base pointer
 	movq $0, %rax			# End with error code 0
 	ret			# Return from main

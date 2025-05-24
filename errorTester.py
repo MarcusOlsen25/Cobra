@@ -47,6 +47,7 @@ def testLexicalErrors():
         "Illegal character '?' in line 3", 
         "Illegal character '¤' in line 4", 
         "Illegal character '#' in line 5",
+        "Illegal character '!' in line 6",
         "Invalid identifier '55mor' in line 9"
     ]
     test1 = auxTestLexicalErrors(test1Code, test1ExpectedErrors, 1)
@@ -115,10 +116,10 @@ def auxTestLexicalErrors(cobraCode: str, expectedErrors: list[str], testNr: int)
                 print(f"\tTest {testNr}; Expected: {expectedErrors[i]}, Got: {error}.\n")
             i += 1
     
-    if success:
-        print(f"\tTest {testNr} succeeded!")
-    else:
-        print(f"\tTest {testNr} fails! :(")
+        if success:
+            print(f"\tTest {testNr} succeeded!")
+        else:
+            print(f"\tTest {testNr} fails! :(")
         
     return success
         
@@ -129,59 +130,63 @@ def testSyntacticErrors():
     print("Testing syntactic errors now:")
         
     test1Code = '''
-        int num = 33
+        int num = 33;
 
         if then {
-            print num
+            print num;
         }
         '''
-    test1ExpectedErrors = ["Syntax error at line 4: Unexpected token 'then'"]
+    test1ExpectedErrors = ["Syntax error at line 4: Unexpected token 'then'", "Syntax error at line 6: Unexpected token '}'"]
     test1 = auxTestSyntacticErrors(test1Code, test1ExpectedErrors, 1)
     
     test2Code = '''
         func one() void {
-            int var = 0
+            int var = 0;
         }
 
-        func(35)
+        func(35);
         '''
     test2ExpectedErrors = ["Syntax error at line 6: Unexpected token '('"]
     test2 = auxTestSyntacticErrors(test2Code, test2ExpectedErrors, 2)
     
     test3Code = '''
         func two {
-            print 3
+            print 3;
         }
         '''
-    test3ExpectedErrors = ["Syntax error at line 2: Unexpected token '{'"]
+    test3ExpectedErrors = ["Syntax error at line 2: Unexpected token '{'", "Syntax error at line 4: Unexpected token '}'"]
     test3 = auxTestSyntacticErrors(test3Code, test3ExpectedErrors, 3)
     
     test4Code = '''
         if x then {
-            print hello
+            print hello;
         } else if y then {
-            print goodbye
+            print goodbye;
         }
         '''
-    test4ExpectedErrors = ["Syntax error at line 4: Unexpected token 'if'"]
+    test4ExpectedErrors = ["Syntax error at line 4: Unexpected token 'if'", "Syntax error at line 6: Unexpected token '}'"]
     test4 = auxTestSyntacticErrors(test4Code, test4ExpectedErrors, 4)
     
     test5Code = '''
         class shoe {
-    
         }
-
-        shoe converse = new shoe()
+        shoe converse = new shoe();
         '''
-    test5ExpectedErrors = ["Syntax error at line 4: Unexpected token '}'"]
+    test5ExpectedErrors = ["Syntax error at line 3: Unexpected token '}'"]
     test5 = auxTestSyntacticErrors(test5Code, test5ExpectedErrors, 5)
     
     test6Code = '''
-        print int x = 6
-
+        print int x = 6;
         '''
     test6ExpectedErrors = ["Syntax error at line 2: Unexpected token 'int'"]
     test6 = auxTestSyntacticErrors(test6Code, test6ExpectedErrors, 6)
+    
+    test7Code = '''
+        int x = 3
+        print x
+        '''
+    test7ExpectedErrors = ["Syntax error at line 3: Unexpected token 'print'"]
+    test7 = auxTestSyntacticErrors(test7Code, test7ExpectedErrors, 7)
     
     success = test1 and test2 and test3 and test4 and test5 and test6
     

@@ -379,10 +379,13 @@ if ra or re then {
     print -1;
 }
 
-sko marcus; box diego;
-
-if marcus and diego then {
-    print -1000;
-} else {
-    print -1;
+class theCompilerWorks {
+    int yay = 50;
+    func celebrate() void {
+        print this.yay;
+    }
 }
+
+theCompilerWorks hurrah = new theCompilerWorks();
+
+hurrah.celebrate();

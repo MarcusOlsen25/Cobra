@@ -1,37 +1,37 @@
 
 func one(int x, int y, bool z) int {
     if z then {
-        return x
+        return x;
     }
     else {
-        return y
+        return y;
     }
 }
 
-one(8, 6, true)
-one(2, 3, 4)
-one(true, 3, false)
+one(8, 6, true);
+one(2, 3, 4);
+one(true, 3, false);
 
 func two() int {
-    return true
+    return true;
 }
 
 func three() int {
     if 4 then {
-        return 67
+        return 67;
     }
     else {
-        return false
+        return false;
     }
 }
 
-three()
-three(8)
+three();
+three(8);
 
 func four(int a, int b, int c, int d) int {
-    return a + b + c + d
+    return a + b + c + d;
 }
 
-four(3, 4, 5)
-four(5, 6, 7, 8)
-four(1, 2, 3, 4, 5)
+four(3, 4, 5);
+four(5, 6, 7, 8);
+four(1, 2, 3, 4, 5);
