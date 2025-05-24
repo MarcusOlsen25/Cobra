@@ -1,388 +1,388 @@
-int a = 1
-print a
+int a = 1;
+print a;
 
-int b = a + 1
-print b
+int b = a + 1;
+print b;
 
-a = 3
-print a
+a = 3;
+print a;
 
-int c = a - b * 3 + 7
-print c
+int c = a - b * 3 + 7;
+print c;
 
-int d = c / 9 - 3 * (b + a)
+int d = c / 9 - 3 * (b + a);
 if d == -15 then {
-    print 5
+    print 5;
 }
 
 if 0 then {
-    print -1
+    print -1;
 }
 
 if 1 then {
-    print 6
+    print 6;
 }
 
-int zero = 0
-int one = 1
+int zero = 0;
+int one = 1;
 
 if zero then {
-    print -1
+    print -1;
 }
 
 if one then {
-    print 7
+    print 7;
 }
 
 if zero then {
-    print -1
+    print -1;
 } else {
-    print 8
+    print 8;
 }
 
 if one then {
-    print 9
+    print 9;
 } else {
-    print -1
+    print -1;
 }
 
 if 1 then {
-    int h = 9
-    int j = 10
-    print j
+    int h = 9;
+    int j = 10;
+    print j;
 } else {
-    int y = 78
-    print y
+    int y = 78;
+    print y;
 }
 
 if 0 then {
-    int h = 6
-    int t = 0
-    print h
+    int h = 6;
+    int t = 0;
+    print h;
 } else {
-    int g = 11
-    print g
+    int g = 11;
+    print g;
 }
 
 if 6 < 3 then {
-    print -1
+    print -1;
 }
 
 if 3 < 6 then {
-    print 12
+    print 12;
 }
 
 if 6 > 3 then {
-    print 13
+    print 13;
 }
 
 if 3 > 8 then {
-    print -1
+    print -1;
 }
 
 if 7 >= 9 then {
-    print -1
+    print -1;
 }
 
 if 9 >= 2 then {
-    print 14
+    print 14;
 }
 
 if 6 >= 6 then {
-    print 15
+    print 15;
 }
 
 if 4 <= 2 then {
-    print -1
+    print -1;
 }
 
 if 2 <= 4 then {
-    print 16
+    print 16;
 }
 
 if 2 <= 2 then {
-    print 17
+    print 17;
 }
 
 if 8 == 8 then {
-    print 18
+    print 18;
 }
 
 if 8 == 9 then {
-    print -1 
+    print -1;
 }
 
 if 8 != 5 then {
-    print 19
+    print 19;
 }
 
 if 8 != 8 then {
-    print -1
+    print -1;
 }
 
-int banan = 20
+int banan = 20;
 while banan <= 25 then {
-    print banan
-    banan = banan + 1
+    print banan;
+    banan = banan + 1;
 }
 
-int agurk = 26 
+int agurk = 26;
 while agurk + banan != 55 then {
-    print agurk
-    agurk = agurk + 1
+    print agurk;
+    agurk = agurk + 1;
 } 
 
-int onee = 12
+int onee = 12;
 
 class gulerod {
-    int x = 17
-    int y = onee
+    int x = 17;
+    int y = onee;
 }
-gulerod gul = new gulerod()
+gulerod gul = new gulerod();
 if gul.x + gul.y != 29 then {
-    print -1
+    print -1;
 } else {
-    print gul.x + gul.y
+    print gul.x + gul.y;
 }
    
 class melon {
-    int x = onee + 14
-    gulerod y = new gulerod()
+    int x = onee + 14;
+    gulerod y = new gulerod();
 }
 
-melon mel = new melon()
+melon mel = new melon();
 
 if mel.x + mel.y.y != 38 then {
-    print -1
+    print -1;
 } else {
-    print 30
+    print 30;
 }
 
 class sko {
-    gulerod x = gul
-    melon m = mel
+    gulerod x = gul;
+    melon m = mel;
 }
-sko l = new sko()
+sko l = new sko();
 
 if l.x.x + l.m.x != 43 then {
-    print -1
+    print -1;
 } else {
-    print 31
+    print 31;
 }
 
-l.x.x = 13
-l.m.x = 14
+l.x.x = 13;
+l.m.x = 14;
 
 if l.x.x + l.m.x != 27 then {
-    print -1
+    print -1;
 } else {
-    print 32
+    print 32;
 }
 
 func test33() void {
     if 6 > 20 then {
-        print -1
+        print -1;
     } else {
-        print 33
+        print 33;
     }
 }
 
-test33()
+test33();
 
 func test34(int x) void {
     if x then {
-        print 34
+        print 34;
     } else {
-        print -1
+        print -1;
     }
 }
 
 func test35(int x) void {
     if x then {
-        print -1
+        print -1;
     } else {
-        print 35
+        print 35;
     }
 }
 
-test34(1)
-test35(0)
+test34(1);
+test35(0);
 
-int thirtysix = 36
+int thirtysix = 36;
 if thirtysix then {
     func test36three() void {
-        print thirtysix
+        print thirtysix;
     }
     func test36one() void {
         func test36two() void {
-            test36three()
+            test36three();
         }
-        test36two()
+        test36two();
     }
-    test36one()
+    test36one();
 }
 
-int x1 = 37
+int x1 = 37;
 func f1() int {
-    return x1
+    return x1;
 }
 func f2() void {
-    int x1 = 3
-    f1()
+    int x1 = 3;
+    f1();
 }
 class c4 {
-    int a = 3
+    int a = 3;
 }
 class c1 {
-    int x = 38
+    int x = 38;
     func m1() int {
-        return this.x
+        return this.x;
     }
 }
 class c2 extends c1 {
-    int x = 39
+    int x = 39;
     func m2() int {
-        return this.x
+        return this.x;
     }
 }
 class c3 extends c2 {
-    int y = 17
-    c4 c = new c4()
+    int y = 17;
+    c4 c = new c4();
     func m3() int {
-    this.x = 20
-        return this.y + this.x + this.c.a
+        this.x = 20;
+        return this.y + this.x + this.c.a;
     }
 }
-print(f2())
-c3 cc3 = new c3()
-print cc3.m1()
-print cc3.m2()
-print cc3.m3()
+print(f2());
+c3 cc3 = new c3();
+print cc3.m1();
+print cc3.m2();
+print cc3.m3();
 
-int counter = 39
+int counter = 39;
 func increment() void {
-    counter = counter + 1
+    counter = counter + 1;
 }
 func runIncrements() void {
-    increment()
-    increment()
+    increment();
+    increment();
 }
-runIncrements()
-print counter
+runIncrements();
+print counter;
 
 
 class Calculator {
-    int x = 18
-    int y = 3
+    int x = 18;
+    int y = 3;
     func add() int {
-        return this.x + this.y
+        return this.x + this.y;
     }
     func doubleAdd() int {
-        return this.add() * 2
+        return this.add() * 2;
     }
 }
-Calculator calc = new Calculator()
-print calc.doubleAdd()
+Calculator calc = new Calculator();
+print calc.doubleAdd();
 
 class Box {
-    int value = 10
+    int value = 10;
     func set(int v) void {
-        this.value = v
+        this.value = v;
     }
     func get() int {
-        return this.value
+        return this.value;
     }
 }
-Box box = new Box()
-box.set(43)
-print box.get()
+Box box = new Box();
+box.set(43);
+print box.get();
 
 class Inner {
-    int z = 44
+    int z = 44;
 }
 class Outer {
-    Inner i = new Inner()
+    Inner i = new Inner();
     func getZ() int {
-        return this.i.z
+        return this.i.z;
     }
 }
-Outer out = new Outer()
-print out.getZ()
+Outer out = new Outer();
+print out.getZ();
 
 class Accumulator {
-    int total = 0
+    int total = 0;
     func add(int x) void {
-        this.total = this.total + x
+        this.total = this.total + x;
     }
     func getTotal() int {
-        return this.total
+        return this.total;
     }
 }
-Accumulator acc = new Accumulator()
-acc.add(20)
-acc.add(25)
-print acc.getTotal()
+Accumulator acc = new Accumulator();
+acc.add(20);
+acc.add(25);
+print acc.getTotal();
 
 
-bool t = true
-bool f = false
+bool t = true;
+bool f = false;
 
 if (f and f) then {
-    print -1
+    print -1;
 }
 if f and t then {
-    print -1
+    print -1;
 }
 if f or f then {
-    print -1
+    print -1;
 }
 if not (f or t) then {
-    print -1
+    print -1;
 }
 if f or not t then {
-    print -1
+    print -1;
 }
 if t and not t then {
-    print -1
+    print -1;
 }
 if (f and t) or ((f or t) and (t and t)) then {
-    print 46
+    print 46;
 }
 
 
-int ra
-bool re
-Box ro
+int ra;
+bool re;
+Box ro;
 
 if ra then {
-    print 47
+    print 47;
 } else {
-    print -1
+    print -1;
 }
 
-ra = null
-re = null
-ro = null
+ra = null;
+re = null;
+ro = null;
 
 if ra or re or ro then {
-    print -1 
+    print -1;
 } else {
-    print 48
+    print 48;
 }
 
-ra = 5
-re = false
+ra = 5;
+re = false;
 
 if ra or re then {
-    print 49
+    print 49;
 } else {
-    print -1
+    print -1;
 }
 
-sko marcus box diego
+sko marcus; box diego;
 
 if marcus and diego then {
-    print -1000
+    print -1000;
 } else {
-    print -1
+    print -1;
 }

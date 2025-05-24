@@ -9,27 +9,11 @@ from errorTester import *
 
 # The line numbers match the error messages + 10.  
 data = '''
+int x = 3;
+x;
+x = 2;
+print x;
 
-int ra 
-if ra then {
-    print -1
-} else {
-    print 5
-}
-
-ra = 5
-if ra then {
-    print 6
-} else {
-    print -1
-}
-
-ra = null
-if ra then {
-    print -1
-} else {
-    print 7
-}
 '''
     
 

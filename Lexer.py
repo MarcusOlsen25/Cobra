@@ -43,7 +43,8 @@ tokens = [
 'LESS',
 'GREATEROREQUAL',
 'LESSOREQUAL',
-'DOT'
+'DOT',
+'SEMICOLON'
 ] + list(reserved.values())
 
 # Regular expression rules for simple tokens
@@ -65,6 +66,7 @@ t_LESS              = r'<'
 t_GREATEROREQUAL    = r'>='
 t_LESSOREQUAL       = r'<='
 t_DOT               = r'\.'
+t_SEMICOLON         = r';'
 
 
 def t_INVALID_ID(t):

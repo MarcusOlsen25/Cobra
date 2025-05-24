@@ -6,7 +6,7 @@ Rule 0     S' -> program
 Rule 1     program -> declaration_list
 Rule 2     declaration_list -> declaration
 Rule 3     declaration_list -> declaration_list declaration
-Rule 4     declaration -> varDeclaration
+Rule 4     declaration -> varDeclaration SEMICOLON
 Rule 5     declaration -> statement
 Rule 6     declaration -> funcDeclaration
 Rule 7     declaration -> class
@@ -15,14 +15,14 @@ Rule 9     extends -> EXTENDS ID
 Rule 10    extends -> empty
 Rule 11    classDeclarationList -> classDeclarationList classDeclaration
 Rule 12    classDeclarationList -> classDeclaration
-Rule 13    classDeclaration -> varDeclaration
+Rule 13    classDeclaration -> varDeclaration SEMICOLON
 Rule 14    classDeclaration -> methodDeclaration
 Rule 15    methodDeclaration -> FUNC ID LPAREN parameter_list RPAREN type LBRACE declaration_list RBRACE
-Rule 16    statement -> expression
+Rule 16    statement -> expression SEMICOLON
 Rule 17    statement -> ifStatement
 Rule 18    statement -> whileStatement
-Rule 19    statement -> printStatement
-Rule 20    statement -> returnStatement
+Rule 19    statement -> printStatement SEMICOLON
+Rule 20    statement -> returnStatement SEMICOLON
 Rule 21    returnStatement -> RETURN expression
 Rule 22    returnStatement -> RETURN
 Rule 23    ifStatement -> IF expression THEN LBRACE declaration_list RBRACE
@@ -114,6 +114,7 @@ PRINT                : 26
 RBRACE               : 8 15 23 24 24 25 71
 RETURN               : 21 22
 RPAREN               : 15 56 58 60 67 71
+SEMICOLON            : 4 13 16 19 20
 THEN                 : 23 24 25
 TIMES                : 50
 TRUE                 : 64
@@ -162,17 +163,17 @@ state 0
     (1) program -> . declaration_list
     (2) declaration_list -> . declaration
     (3) declaration_list -> . declaration_list declaration
-    (4) declaration -> . varDeclaration
+    (4) declaration -> . varDeclaration SEMICOLON
     (5) declaration -> . statement
     (6) declaration -> . funcDeclaration
     (7) declaration -> . class
     (27) varDeclaration -> . type ID
     (28) varDeclaration -> . type ID ASSIGN expression
-    (16) statement -> . expression
+    (16) statement -> . expression SEMICOLON
     (17) statement -> . ifStatement
     (18) statement -> . whileStatement
-    (19) statement -> . printStatement
-    (20) statement -> . returnStatement
+    (19) statement -> . printStatement SEMICOLON
+    (20) statement -> . returnStatement SEMICOLON
     (71) funcDeclaration -> . FUNC ID LPAREN parameter_list RPAREN type LBRACE declaration_list RBRACE
     (8) class -> . CLASS ID extends LBRACE classDeclarationList RBRACE
     (29) type -> . INT
@@ -274,17 +275,17 @@ state 2
 
     (1) program -> declaration_list .
     (3) declaration_list -> declaration_list . declaration
-    (4) declaration -> . varDeclaration
+    (4) declaration -> . varDeclaration SEMICOLON
     (5) declaration -> . statement
     (6) declaration -> . funcDeclaration
     (7) declaration -> . class
     (27) varDeclaration -> . type ID
     (28) varDeclaration -> . type ID ASSIGN expression
-    (16) statement -> . expression
+    (16) statement -> . expression SEMICOLON
     (17) statement -> . ifStatement
     (18) statement -> . whileStatement
-    (19) statement -> . printStatement
-    (20) statement -> . returnStatement
+    (19) statement -> . printStatement SEMICOLON
+    (20) statement -> . returnStatement SEMICOLON
     (71) funcDeclaration -> . FUNC ID LPAREN parameter_list RPAREN type LBRACE declaration_list RBRACE
     (8) class -> . CLASS ID extends LBRACE classDeclarationList RBRACE
     (29) type -> . INT
@@ -403,28 +404,9 @@ state 3
 
 state 4
 
-    (4) declaration -> varDeclaration .
+    (4) declaration -> varDeclaration . SEMICOLON
 
-    FUNC            reduce using rule 4 (declaration -> varDeclaration .)
-    CLASS           reduce using rule 4 (declaration -> varDeclaration .)
-    INT             reduce using rule 4 (declaration -> varDeclaration .)
-    BOOL            reduce using rule 4 (declaration -> varDeclaration .)
-    VOID            reduce using rule 4 (declaration -> varDeclaration .)
-    ID              reduce using rule 4 (declaration -> varDeclaration .)
-    IF              reduce using rule 4 (declaration -> varDeclaration .)
-    WHILE           reduce using rule 4 (declaration -> varDeclaration .)
-    PRINT           reduce using rule 4 (declaration -> varDeclaration .)
-    RETURN          reduce using rule 4 (declaration -> varDeclaration .)
-    NEW             reduce using rule 4 (declaration -> varDeclaration .)
-    NUMBER          reduce using rule 4 (declaration -> varDeclaration .)
-    TRUE            reduce using rule 4 (declaration -> varDeclaration .)
-    FALSE           reduce using rule 4 (declaration -> varDeclaration .)
-    NULL            reduce using rule 4 (declaration -> varDeclaration .)
-    LPAREN          reduce using rule 4 (declaration -> varDeclaration .)
-    NOT             reduce using rule 4 (declaration -> varDeclaration .)
-    MINUS           reduce using rule 4 (declaration -> varDeclaration .)
-    $end            reduce using rule 4 (declaration -> varDeclaration .)
-    RBRACE          reduce using rule 4 (declaration -> varDeclaration .)
+    SEMICOLON       shift and go to state 43
 
 
 state 5
@@ -510,7 +492,7 @@ state 8
     (27) varDeclaration -> type . ID
     (28) varDeclaration -> type . ID ASSIGN expression
 
-    ID              shift and go to state 43
+    ID              shift and go to state 44
 
 
 state 9
@@ -518,7 +500,6 @@ state 9
     (32) type -> ID .
     (63) primary -> ID .
 
-  ! reduce/reduce conflict for ID resolved using rule 32 (type -> ID .)
     ID              reduce using rule 32 (type -> ID .)
     LPAREN          reduce using rule 63 (primary -> ID .)
     ASSIGN          reduce using rule 63 (primary -> ID .)
@@ -535,51 +516,14 @@ state 9
     NOTEQUALS       reduce using rule 63 (primary -> ID .)
     OR              reduce using rule 63 (primary -> ID .)
     AND             reduce using rule 63 (primary -> ID .)
-    FUNC            reduce using rule 63 (primary -> ID .)
-    CLASS           reduce using rule 63 (primary -> ID .)
-    INT             reduce using rule 63 (primary -> ID .)
-    BOOL            reduce using rule 63 (primary -> ID .)
-    VOID            reduce using rule 63 (primary -> ID .)
-    IF              reduce using rule 63 (primary -> ID .)
-    WHILE           reduce using rule 63 (primary -> ID .)
-    PRINT           reduce using rule 63 (primary -> ID .)
-    RETURN          reduce using rule 63 (primary -> ID .)
-    NEW             reduce using rule 63 (primary -> ID .)
-    NUMBER          reduce using rule 63 (primary -> ID .)
-    TRUE            reduce using rule 63 (primary -> ID .)
-    FALSE           reduce using rule 63 (primary -> ID .)
-    NULL            reduce using rule 63 (primary -> ID .)
-    NOT             reduce using rule 63 (primary -> ID .)
-    $end            reduce using rule 63 (primary -> ID .)
-    RBRACE          reduce using rule 63 (primary -> ID .)
-
-  ! ID              [ reduce using rule 63 (primary -> ID .) ]
+    SEMICOLON       reduce using rule 63 (primary -> ID .)
 
 
 state 10
 
-    (16) statement -> expression .
+    (16) statement -> expression . SEMICOLON
 
-    FUNC            reduce using rule 16 (statement -> expression .)
-    CLASS           reduce using rule 16 (statement -> expression .)
-    INT             reduce using rule 16 (statement -> expression .)
-    BOOL            reduce using rule 16 (statement -> expression .)
-    VOID            reduce using rule 16 (statement -> expression .)
-    ID              reduce using rule 16 (statement -> expression .)
-    IF              reduce using rule 16 (statement -> expression .)
-    WHILE           reduce using rule 16 (statement -> expression .)
-    PRINT           reduce using rule 16 (statement -> expression .)
-    RETURN          reduce using rule 16 (statement -> expression .)
-    NEW             reduce using rule 16 (statement -> expression .)
-    NUMBER          reduce using rule 16 (statement -> expression .)
-    TRUE            reduce using rule 16 (statement -> expression .)
-    FALSE           reduce using rule 16 (statement -> expression .)
-    NULL            reduce using rule 16 (statement -> expression .)
-    LPAREN          reduce using rule 16 (statement -> expression .)
-    NOT             reduce using rule 16 (statement -> expression .)
-    MINUS           reduce using rule 16 (statement -> expression .)
-    $end            reduce using rule 16 (statement -> expression .)
-    RBRACE          reduce using rule 16 (statement -> expression .)
+    SEMICOLON       shift and go to state 45
 
 
 state 11
@@ -636,61 +580,23 @@ state 12
 
 state 13
 
-    (19) statement -> printStatement .
+    (19) statement -> printStatement . SEMICOLON
 
-    FUNC            reduce using rule 19 (statement -> printStatement .)
-    CLASS           reduce using rule 19 (statement -> printStatement .)
-    INT             reduce using rule 19 (statement -> printStatement .)
-    BOOL            reduce using rule 19 (statement -> printStatement .)
-    VOID            reduce using rule 19 (statement -> printStatement .)
-    ID              reduce using rule 19 (statement -> printStatement .)
-    IF              reduce using rule 19 (statement -> printStatement .)
-    WHILE           reduce using rule 19 (statement -> printStatement .)
-    PRINT           reduce using rule 19 (statement -> printStatement .)
-    RETURN          reduce using rule 19 (statement -> printStatement .)
-    NEW             reduce using rule 19 (statement -> printStatement .)
-    NUMBER          reduce using rule 19 (statement -> printStatement .)
-    TRUE            reduce using rule 19 (statement -> printStatement .)
-    FALSE           reduce using rule 19 (statement -> printStatement .)
-    NULL            reduce using rule 19 (statement -> printStatement .)
-    LPAREN          reduce using rule 19 (statement -> printStatement .)
-    NOT             reduce using rule 19 (statement -> printStatement .)
-    MINUS           reduce using rule 19 (statement -> printStatement .)
-    $end            reduce using rule 19 (statement -> printStatement .)
-    RBRACE          reduce using rule 19 (statement -> printStatement .)
+    SEMICOLON       shift and go to state 46
 
 
 state 14
 
-    (20) statement -> returnStatement .
+    (20) statement -> returnStatement . SEMICOLON
 
-    FUNC            reduce using rule 20 (statement -> returnStatement .)
-    CLASS           reduce using rule 20 (statement -> returnStatement .)
-    INT             reduce using rule 20 (statement -> returnStatement .)
-    BOOL            reduce using rule 20 (statement -> returnStatement .)
-    VOID            reduce using rule 20 (statement -> returnStatement .)
-    ID              reduce using rule 20 (statement -> returnStatement .)
-    IF              reduce using rule 20 (statement -> returnStatement .)
-    WHILE           reduce using rule 20 (statement -> returnStatement .)
-    PRINT           reduce using rule 20 (statement -> returnStatement .)
-    RETURN          reduce using rule 20 (statement -> returnStatement .)
-    NEW             reduce using rule 20 (statement -> returnStatement .)
-    NUMBER          reduce using rule 20 (statement -> returnStatement .)
-    TRUE            reduce using rule 20 (statement -> returnStatement .)
-    FALSE           reduce using rule 20 (statement -> returnStatement .)
-    NULL            reduce using rule 20 (statement -> returnStatement .)
-    LPAREN          reduce using rule 20 (statement -> returnStatement .)
-    NOT             reduce using rule 20 (statement -> returnStatement .)
-    MINUS           reduce using rule 20 (statement -> returnStatement .)
-    $end            reduce using rule 20 (statement -> returnStatement .)
-    RBRACE          reduce using rule 20 (statement -> returnStatement .)
+    SEMICOLON       shift and go to state 47
 
 
 state 15
 
     (71) funcDeclaration -> FUNC . ID LPAREN parameter_list RPAREN type LBRACE declaration_list RBRACE
 
-    ID              shift and go to state 44
+    ID              shift and go to state 48
 
 
 state 16
@@ -734,7 +640,7 @@ state 16
 
     NEW             shift and go to state 28
     NUMBER          shift and go to state 33
-    ID              shift and go to state 46
+    ID              shift and go to state 50
     TRUE            shift and go to state 34
     FALSE           shift and go to state 35
     NULL            shift and go to state 36
@@ -742,7 +648,7 @@ state 16
     NOT             shift and go to state 41
     MINUS           shift and go to state 39
 
-    expression                     shift and go to state 45
+    expression                     shift and go to state 49
     assignment                     shift and go to state 21
     property                       shift and go to state 26
     logical                        shift and go to state 27
@@ -758,7 +664,7 @@ state 17
 
     (8) class -> CLASS . ID extends LBRACE classDeclarationList RBRACE
 
-    ID              shift and go to state 47
+    ID              shift and go to state 51
 
 
 state 18
@@ -789,28 +695,9 @@ state 21
 
     (33) expression -> assignment .
 
-    FUNC            reduce using rule 33 (expression -> assignment .)
-    CLASS           reduce using rule 33 (expression -> assignment .)
-    INT             reduce using rule 33 (expression -> assignment .)
-    BOOL            reduce using rule 33 (expression -> assignment .)
-    VOID            reduce using rule 33 (expression -> assignment .)
-    ID              reduce using rule 33 (expression -> assignment .)
-    IF              reduce using rule 33 (expression -> assignment .)
-    WHILE           reduce using rule 33 (expression -> assignment .)
-    PRINT           reduce using rule 33 (expression -> assignment .)
-    RETURN          reduce using rule 33 (expression -> assignment .)
-    NEW             reduce using rule 33 (expression -> assignment .)
-    NUMBER          reduce using rule 33 (expression -> assignment .)
-    TRUE            reduce using rule 33 (expression -> assignment .)
-    FALSE           reduce using rule 33 (expression -> assignment .)
-    NULL            reduce using rule 33 (expression -> assignment .)
-    LPAREN          reduce using rule 33 (expression -> assignment .)
-    NOT             reduce using rule 33 (expression -> assignment .)
-    MINUS           reduce using rule 33 (expression -> assignment .)
-    $end            reduce using rule 33 (expression -> assignment .)
+    SEMICOLON       reduce using rule 33 (expression -> assignment .)
     RPAREN          reduce using rule 33 (expression -> assignment .)
     THEN            reduce using rule 33 (expression -> assignment .)
-    RBRACE          reduce using rule 33 (expression -> assignment .)
     COMMA           reduce using rule 33 (expression -> assignment .)
 
 
@@ -856,7 +743,7 @@ state 22
 
     NEW             shift and go to state 28
     NUMBER          shift and go to state 33
-    ID              shift and go to state 46
+    ID              shift and go to state 50
     TRUE            shift and go to state 34
     FALSE           shift and go to state 35
     NULL            shift and go to state 36
@@ -864,7 +751,7 @@ state 22
     NOT             shift and go to state 41
     MINUS           shift and go to state 39
 
-    expression                     shift and go to state 48
+    expression                     shift and go to state 52
     assignment                     shift and go to state 21
     property                       shift and go to state 26
     logical                        shift and go to state 27
@@ -917,7 +804,7 @@ state 23
 
     NEW             shift and go to state 28
     NUMBER          shift and go to state 33
-    ID              shift and go to state 46
+    ID              shift and go to state 50
     TRUE            shift and go to state 34
     FALSE           shift and go to state 35
     NULL            shift and go to state 36
@@ -925,7 +812,7 @@ state 23
     NOT             shift and go to state 41
     MINUS           shift and go to state 39
 
-    expression                     shift and go to state 49
+    expression                     shift and go to state 53
     assignment                     shift and go to state 21
     property                       shift and go to state 26
     logical                        shift and go to state 27
@@ -978,7 +865,7 @@ state 24
 
     NEW             shift and go to state 28
     NUMBER          shift and go to state 33
-    ID              shift and go to state 46
+    ID              shift and go to state 50
     TRUE            shift and go to state 34
     FALSE           shift and go to state 35
     NULL            shift and go to state 36
@@ -986,7 +873,7 @@ state 24
     NOT             shift and go to state 41
     MINUS           shift and go to state 39
 
-    expression                     shift and go to state 50
+    expression                     shift and go to state 54
     assignment                     shift and go to state 21
     property                       shift and go to state 26
     logical                        shift and go to state 27
@@ -1038,29 +925,10 @@ state 25
     (54) unary -> . MINUS unary
     (55) unary -> . property
 
-  ! shift/reduce conflict for NEW resolved as shift
-  ! shift/reduce conflict for NUMBER resolved as shift
-  ! shift/reduce conflict for ID resolved as shift
-  ! shift/reduce conflict for TRUE resolved as shift
-  ! shift/reduce conflict for FALSE resolved as shift
-  ! shift/reduce conflict for NULL resolved as shift
-  ! shift/reduce conflict for LPAREN resolved as shift
-  ! shift/reduce conflict for NOT resolved as shift
-  ! shift/reduce conflict for MINUS resolved as shift
-    FUNC            reduce using rule 22 (returnStatement -> RETURN .)
-    CLASS           reduce using rule 22 (returnStatement -> RETURN .)
-    INT             reduce using rule 22 (returnStatement -> RETURN .)
-    BOOL            reduce using rule 22 (returnStatement -> RETURN .)
-    VOID            reduce using rule 22 (returnStatement -> RETURN .)
-    IF              reduce using rule 22 (returnStatement -> RETURN .)
-    WHILE           reduce using rule 22 (returnStatement -> RETURN .)
-    PRINT           reduce using rule 22 (returnStatement -> RETURN .)
-    RETURN          reduce using rule 22 (returnStatement -> RETURN .)
-    $end            reduce using rule 22 (returnStatement -> RETURN .)
-    RBRACE          reduce using rule 22 (returnStatement -> RETURN .)
+    SEMICOLON       reduce using rule 22 (returnStatement -> RETURN .)
     NEW             shift and go to state 28
     NUMBER          shift and go to state 33
-    ID              shift and go to state 46
+    ID              shift and go to state 50
     TRUE            shift and go to state 34
     FALSE           shift and go to state 35
     NULL            shift and go to state 36
@@ -1068,17 +936,7 @@ state 25
     NOT             shift and go to state 41
     MINUS           shift and go to state 39
 
-  ! ID              [ reduce using rule 22 (returnStatement -> RETURN .) ]
-  ! NEW             [ reduce using rule 22 (returnStatement -> RETURN .) ]
-  ! NUMBER          [ reduce using rule 22 (returnStatement -> RETURN .) ]
-  ! TRUE            [ reduce using rule 22 (returnStatement -> RETURN .) ]
-  ! FALSE           [ reduce using rule 22 (returnStatement -> RETURN .) ]
-  ! NULL            [ reduce using rule 22 (returnStatement -> RETURN .) ]
-  ! LPAREN          [ reduce using rule 22 (returnStatement -> RETURN .) ]
-  ! NOT             [ reduce using rule 22 (returnStatement -> RETURN .) ]
-  ! MINUS           [ reduce using rule 22 (returnStatement -> RETURN .) ]
-
-    expression                     shift and go to state 51
+    expression                     shift and go to state 55
     assignment                     shift and go to state 21
     property                       shift and go to state 26
     logical                        shift and go to state 27
@@ -1097,10 +955,9 @@ state 26
     (58) property -> property . LPAREN arguments RPAREN
     (55) unary -> property .
 
-  ! shift/reduce conflict for LPAREN resolved as shift
-    ASSIGN          shift and go to state 52
-    DOT             shift and go to state 53
-    LPAREN          shift and go to state 54
+    ASSIGN          shift and go to state 56
+    DOT             shift and go to state 57
+    LPAREN          shift and go to state 58
     TIMES           reduce using rule 55 (unary -> property .)
     DIVIDE          reduce using rule 55 (unary -> property .)
     PLUS            reduce using rule 55 (unary -> property .)
@@ -1113,29 +970,10 @@ state 26
     NOTEQUALS       reduce using rule 55 (unary -> property .)
     OR              reduce using rule 55 (unary -> property .)
     AND             reduce using rule 55 (unary -> property .)
-    FUNC            reduce using rule 55 (unary -> property .)
-    CLASS           reduce using rule 55 (unary -> property .)
-    INT             reduce using rule 55 (unary -> property .)
-    BOOL            reduce using rule 55 (unary -> property .)
-    VOID            reduce using rule 55 (unary -> property .)
-    ID              reduce using rule 55 (unary -> property .)
-    IF              reduce using rule 55 (unary -> property .)
-    WHILE           reduce using rule 55 (unary -> property .)
-    PRINT           reduce using rule 55 (unary -> property .)
-    RETURN          reduce using rule 55 (unary -> property .)
-    NEW             reduce using rule 55 (unary -> property .)
-    NUMBER          reduce using rule 55 (unary -> property .)
-    TRUE            reduce using rule 55 (unary -> property .)
-    FALSE           reduce using rule 55 (unary -> property .)
-    NULL            reduce using rule 55 (unary -> property .)
-    NOT             reduce using rule 55 (unary -> property .)
-    $end            reduce using rule 55 (unary -> property .)
+    SEMICOLON       reduce using rule 55 (unary -> property .)
     RPAREN          reduce using rule 55 (unary -> property .)
     THEN            reduce using rule 55 (unary -> property .)
-    RBRACE          reduce using rule 55 (unary -> property .)
     COMMA           reduce using rule 55 (unary -> property .)
-
-  ! LPAREN          [ reduce using rule 55 (unary -> property .) ]
 
 
 state 27
@@ -1144,31 +982,12 @@ state 27
     (36) logical -> logical . OR equality
     (37) logical -> logical . AND equality
 
-    FUNC            reduce using rule 35 (assignment -> logical .)
-    CLASS           reduce using rule 35 (assignment -> logical .)
-    INT             reduce using rule 35 (assignment -> logical .)
-    BOOL            reduce using rule 35 (assignment -> logical .)
-    VOID            reduce using rule 35 (assignment -> logical .)
-    ID              reduce using rule 35 (assignment -> logical .)
-    IF              reduce using rule 35 (assignment -> logical .)
-    WHILE           reduce using rule 35 (assignment -> logical .)
-    PRINT           reduce using rule 35 (assignment -> logical .)
-    RETURN          reduce using rule 35 (assignment -> logical .)
-    NEW             reduce using rule 35 (assignment -> logical .)
-    NUMBER          reduce using rule 35 (assignment -> logical .)
-    TRUE            reduce using rule 35 (assignment -> logical .)
-    FALSE           reduce using rule 35 (assignment -> logical .)
-    NULL            reduce using rule 35 (assignment -> logical .)
-    LPAREN          reduce using rule 35 (assignment -> logical .)
-    NOT             reduce using rule 35 (assignment -> logical .)
-    MINUS           reduce using rule 35 (assignment -> logical .)
-    $end            reduce using rule 35 (assignment -> logical .)
+    SEMICOLON       reduce using rule 35 (assignment -> logical .)
     RPAREN          reduce using rule 35 (assignment -> logical .)
     THEN            reduce using rule 35 (assignment -> logical .)
-    RBRACE          reduce using rule 35 (assignment -> logical .)
     COMMA           reduce using rule 35 (assignment -> logical .)
-    OR              shift and go to state 55
-    AND             shift and go to state 56
+    OR              shift and go to state 59
+    AND             shift and go to state 60
 
 
 state 28
@@ -1182,13 +1001,13 @@ state 28
     (67) primary -> . LPAREN expression RPAREN
 
     NUMBER          shift and go to state 33
-    ID              shift and go to state 46
+    ID              shift and go to state 50
     TRUE            shift and go to state 34
     FALSE           shift and go to state 35
     NULL            shift and go to state 36
     LPAREN          shift and go to state 16
 
-    primary                        shift and go to state 57
+    primary                        shift and go to state 61
 
 state 29
 
@@ -1196,7 +1015,7 @@ state 29
     (61) call -> primary .
 
   ! shift/reduce conflict for LPAREN resolved as shift
-    LPAREN          shift and go to state 58
+    LPAREN          shift and go to state 62
     ASSIGN          reduce using rule 61 (call -> primary .)
     DOT             reduce using rule 61 (call -> primary .)
     TIMES           reduce using rule 61 (call -> primary .)
@@ -1211,26 +1030,9 @@ state 29
     NOTEQUALS       reduce using rule 61 (call -> primary .)
     OR              reduce using rule 61 (call -> primary .)
     AND             reduce using rule 61 (call -> primary .)
-    FUNC            reduce using rule 61 (call -> primary .)
-    CLASS           reduce using rule 61 (call -> primary .)
-    INT             reduce using rule 61 (call -> primary .)
-    BOOL            reduce using rule 61 (call -> primary .)
-    VOID            reduce using rule 61 (call -> primary .)
-    ID              reduce using rule 61 (call -> primary .)
-    IF              reduce using rule 61 (call -> primary .)
-    WHILE           reduce using rule 61 (call -> primary .)
-    PRINT           reduce using rule 61 (call -> primary .)
-    RETURN          reduce using rule 61 (call -> primary .)
-    NEW             reduce using rule 61 (call -> primary .)
-    NUMBER          reduce using rule 61 (call -> primary .)
-    TRUE            reduce using rule 61 (call -> primary .)
-    FALSE           reduce using rule 61 (call -> primary .)
-    NULL            reduce using rule 61 (call -> primary .)
-    NOT             reduce using rule 61 (call -> primary .)
-    $end            reduce using rule 61 (call -> primary .)
+    SEMICOLON       reduce using rule 61 (call -> primary .)
     RPAREN          reduce using rule 61 (call -> primary .)
     THEN            reduce using rule 61 (call -> primary .)
-    RBRACE          reduce using rule 61 (call -> primary .)
     COMMA           reduce using rule 61 (call -> primary .)
 
   ! LPAREN          [ reduce using rule 61 (call -> primary .) ]
@@ -1255,26 +1057,9 @@ state 30
     NOTEQUALS       reduce using rule 59 (property -> call .)
     OR              reduce using rule 59 (property -> call .)
     AND             reduce using rule 59 (property -> call .)
-    FUNC            reduce using rule 59 (property -> call .)
-    CLASS           reduce using rule 59 (property -> call .)
-    INT             reduce using rule 59 (property -> call .)
-    BOOL            reduce using rule 59 (property -> call .)
-    VOID            reduce using rule 59 (property -> call .)
-    ID              reduce using rule 59 (property -> call .)
-    IF              reduce using rule 59 (property -> call .)
-    WHILE           reduce using rule 59 (property -> call .)
-    PRINT           reduce using rule 59 (property -> call .)
-    RETURN          reduce using rule 59 (property -> call .)
-    NEW             reduce using rule 59 (property -> call .)
-    NUMBER          reduce using rule 59 (property -> call .)
-    TRUE            reduce using rule 59 (property -> call .)
-    FALSE           reduce using rule 59 (property -> call .)
-    NULL            reduce using rule 59 (property -> call .)
-    NOT             reduce using rule 59 (property -> call .)
-    $end            reduce using rule 59 (property -> call .)
+    SEMICOLON       reduce using rule 59 (property -> call .)
     RPAREN          reduce using rule 59 (property -> call .)
     THEN            reduce using rule 59 (property -> call .)
-    RBRACE          reduce using rule 59 (property -> call .)
     COMMA           reduce using rule 59 (property -> call .)
 
 
@@ -1286,31 +1071,12 @@ state 31
 
     OR              reduce using rule 38 (logical -> equality .)
     AND             reduce using rule 38 (logical -> equality .)
-    FUNC            reduce using rule 38 (logical -> equality .)
-    CLASS           reduce using rule 38 (logical -> equality .)
-    INT             reduce using rule 38 (logical -> equality .)
-    BOOL            reduce using rule 38 (logical -> equality .)
-    VOID            reduce using rule 38 (logical -> equality .)
-    ID              reduce using rule 38 (logical -> equality .)
-    IF              reduce using rule 38 (logical -> equality .)
-    WHILE           reduce using rule 38 (logical -> equality .)
-    PRINT           reduce using rule 38 (logical -> equality .)
-    RETURN          reduce using rule 38 (logical -> equality .)
-    NEW             reduce using rule 38 (logical -> equality .)
-    NUMBER          reduce using rule 38 (logical -> equality .)
-    TRUE            reduce using rule 38 (logical -> equality .)
-    FALSE           reduce using rule 38 (logical -> equality .)
-    NULL            reduce using rule 38 (logical -> equality .)
-    LPAREN          reduce using rule 38 (logical -> equality .)
-    NOT             reduce using rule 38 (logical -> equality .)
-    MINUS           reduce using rule 38 (logical -> equality .)
-    $end            reduce using rule 38 (logical -> equality .)
+    SEMICOLON       reduce using rule 38 (logical -> equality .)
     RPAREN          reduce using rule 38 (logical -> equality .)
     THEN            reduce using rule 38 (logical -> equality .)
-    RBRACE          reduce using rule 38 (logical -> equality .)
     COMMA           reduce using rule 38 (logical -> equality .)
-    EQUALS          shift and go to state 59
-    NOTEQUALS       shift and go to state 60
+    EQUALS          shift and go to state 63
+    NOTEQUALS       shift and go to state 64
 
 
 state 32
@@ -1325,33 +1091,14 @@ state 32
     NOTEQUALS       reduce using rule 41 (equality -> comparison .)
     OR              reduce using rule 41 (equality -> comparison .)
     AND             reduce using rule 41 (equality -> comparison .)
-    FUNC            reduce using rule 41 (equality -> comparison .)
-    CLASS           reduce using rule 41 (equality -> comparison .)
-    INT             reduce using rule 41 (equality -> comparison .)
-    BOOL            reduce using rule 41 (equality -> comparison .)
-    VOID            reduce using rule 41 (equality -> comparison .)
-    ID              reduce using rule 41 (equality -> comparison .)
-    IF              reduce using rule 41 (equality -> comparison .)
-    WHILE           reduce using rule 41 (equality -> comparison .)
-    PRINT           reduce using rule 41 (equality -> comparison .)
-    RETURN          reduce using rule 41 (equality -> comparison .)
-    NEW             reduce using rule 41 (equality -> comparison .)
-    NUMBER          reduce using rule 41 (equality -> comparison .)
-    TRUE            reduce using rule 41 (equality -> comparison .)
-    FALSE           reduce using rule 41 (equality -> comparison .)
-    NULL            reduce using rule 41 (equality -> comparison .)
-    LPAREN          reduce using rule 41 (equality -> comparison .)
-    NOT             reduce using rule 41 (equality -> comparison .)
-    MINUS           reduce using rule 41 (equality -> comparison .)
-    $end            reduce using rule 41 (equality -> comparison .)
+    SEMICOLON       reduce using rule 41 (equality -> comparison .)
     RPAREN          reduce using rule 41 (equality -> comparison .)
     THEN            reduce using rule 41 (equality -> comparison .)
-    RBRACE          reduce using rule 41 (equality -> comparison .)
     COMMA           reduce using rule 41 (equality -> comparison .)
-    GREATER         shift and go to state 61
-    LESS            shift and go to state 62
-    GREATEROREQUAL  shift and go to state 63
-    LESSOREQUAL     shift and go to state 64
+    GREATER         shift and go to state 65
+    LESS            shift and go to state 66
+    GREATEROREQUAL  shift and go to state 67
+    LESSOREQUAL     shift and go to state 68
 
 
 state 33
@@ -1373,26 +1120,9 @@ state 33
     NOTEQUALS       reduce using rule 62 (primary -> NUMBER .)
     OR              reduce using rule 62 (primary -> NUMBER .)
     AND             reduce using rule 62 (primary -> NUMBER .)
-    FUNC            reduce using rule 62 (primary -> NUMBER .)
-    CLASS           reduce using rule 62 (primary -> NUMBER .)
-    INT             reduce using rule 62 (primary -> NUMBER .)
-    BOOL            reduce using rule 62 (primary -> NUMBER .)
-    VOID            reduce using rule 62 (primary -> NUMBER .)
-    ID              reduce using rule 62 (primary -> NUMBER .)
-    IF              reduce using rule 62 (primary -> NUMBER .)
-    WHILE           reduce using rule 62 (primary -> NUMBER .)
-    PRINT           reduce using rule 62 (primary -> NUMBER .)
-    RETURN          reduce using rule 62 (primary -> NUMBER .)
-    NEW             reduce using rule 62 (primary -> NUMBER .)
-    NUMBER          reduce using rule 62 (primary -> NUMBER .)
-    TRUE            reduce using rule 62 (primary -> NUMBER .)
-    FALSE           reduce using rule 62 (primary -> NUMBER .)
-    NULL            reduce using rule 62 (primary -> NUMBER .)
-    NOT             reduce using rule 62 (primary -> NUMBER .)
-    $end            reduce using rule 62 (primary -> NUMBER .)
+    SEMICOLON       reduce using rule 62 (primary -> NUMBER .)
     RPAREN          reduce using rule 62 (primary -> NUMBER .)
     THEN            reduce using rule 62 (primary -> NUMBER .)
-    RBRACE          reduce using rule 62 (primary -> NUMBER .)
     COMMA           reduce using rule 62 (primary -> NUMBER .)
 
 
@@ -1415,26 +1145,9 @@ state 34
     NOTEQUALS       reduce using rule 64 (primary -> TRUE .)
     OR              reduce using rule 64 (primary -> TRUE .)
     AND             reduce using rule 64 (primary -> TRUE .)
-    FUNC            reduce using rule 64 (primary -> TRUE .)
-    CLASS           reduce using rule 64 (primary -> TRUE .)
-    INT             reduce using rule 64 (primary -> TRUE .)
-    BOOL            reduce using rule 64 (primary -> TRUE .)
-    VOID            reduce using rule 64 (primary -> TRUE .)
-    ID              reduce using rule 64 (primary -> TRUE .)
-    IF              reduce using rule 64 (primary -> TRUE .)
-    WHILE           reduce using rule 64 (primary -> TRUE .)
-    PRINT           reduce using rule 64 (primary -> TRUE .)
-    RETURN          reduce using rule 64 (primary -> TRUE .)
-    NEW             reduce using rule 64 (primary -> TRUE .)
-    NUMBER          reduce using rule 64 (primary -> TRUE .)
-    TRUE            reduce using rule 64 (primary -> TRUE .)
-    FALSE           reduce using rule 64 (primary -> TRUE .)
-    NULL            reduce using rule 64 (primary -> TRUE .)
-    NOT             reduce using rule 64 (primary -> TRUE .)
-    $end            reduce using rule 64 (primary -> TRUE .)
+    SEMICOLON       reduce using rule 64 (primary -> TRUE .)
     RPAREN          reduce using rule 64 (primary -> TRUE .)
     THEN            reduce using rule 64 (primary -> TRUE .)
-    RBRACE          reduce using rule 64 (primary -> TRUE .)
     COMMA           reduce using rule 64 (primary -> TRUE .)
 
 
@@ -1457,26 +1170,9 @@ state 35
     NOTEQUALS       reduce using rule 65 (primary -> FALSE .)
     OR              reduce using rule 65 (primary -> FALSE .)
     AND             reduce using rule 65 (primary -> FALSE .)
-    FUNC            reduce using rule 65 (primary -> FALSE .)
-    CLASS           reduce using rule 65 (primary -> FALSE .)
-    INT             reduce using rule 65 (primary -> FALSE .)
-    BOOL            reduce using rule 65 (primary -> FALSE .)
-    VOID            reduce using rule 65 (primary -> FALSE .)
-    ID              reduce using rule 65 (primary -> FALSE .)
-    IF              reduce using rule 65 (primary -> FALSE .)
-    WHILE           reduce using rule 65 (primary -> FALSE .)
-    PRINT           reduce using rule 65 (primary -> FALSE .)
-    RETURN          reduce using rule 65 (primary -> FALSE .)
-    NEW             reduce using rule 65 (primary -> FALSE .)
-    NUMBER          reduce using rule 65 (primary -> FALSE .)
-    TRUE            reduce using rule 65 (primary -> FALSE .)
-    FALSE           reduce using rule 65 (primary -> FALSE .)
-    NULL            reduce using rule 65 (primary -> FALSE .)
-    NOT             reduce using rule 65 (primary -> FALSE .)
-    $end            reduce using rule 65 (primary -> FALSE .)
+    SEMICOLON       reduce using rule 65 (primary -> FALSE .)
     RPAREN          reduce using rule 65 (primary -> FALSE .)
     THEN            reduce using rule 65 (primary -> FALSE .)
-    RBRACE          reduce using rule 65 (primary -> FALSE .)
     COMMA           reduce using rule 65 (primary -> FALSE .)
 
 
@@ -1499,26 +1195,9 @@ state 36
     NOTEQUALS       reduce using rule 66 (primary -> NULL .)
     OR              reduce using rule 66 (primary -> NULL .)
     AND             reduce using rule 66 (primary -> NULL .)
-    FUNC            reduce using rule 66 (primary -> NULL .)
-    CLASS           reduce using rule 66 (primary -> NULL .)
-    INT             reduce using rule 66 (primary -> NULL .)
-    BOOL            reduce using rule 66 (primary -> NULL .)
-    VOID            reduce using rule 66 (primary -> NULL .)
-    ID              reduce using rule 66 (primary -> NULL .)
-    IF              reduce using rule 66 (primary -> NULL .)
-    WHILE           reduce using rule 66 (primary -> NULL .)
-    PRINT           reduce using rule 66 (primary -> NULL .)
-    RETURN          reduce using rule 66 (primary -> NULL .)
-    NEW             reduce using rule 66 (primary -> NULL .)
-    NUMBER          reduce using rule 66 (primary -> NULL .)
-    TRUE            reduce using rule 66 (primary -> NULL .)
-    FALSE           reduce using rule 66 (primary -> NULL .)
-    NULL            reduce using rule 66 (primary -> NULL .)
-    NOT             reduce using rule 66 (primary -> NULL .)
-    $end            reduce using rule 66 (primary -> NULL .)
+    SEMICOLON       reduce using rule 66 (primary -> NULL .)
     RPAREN          reduce using rule 66 (primary -> NULL .)
     THEN            reduce using rule 66 (primary -> NULL .)
-    RBRACE          reduce using rule 66 (primary -> NULL .)
     COMMA           reduce using rule 66 (primary -> NULL .)
 
 
@@ -1528,7 +1207,6 @@ state 37
     (47) term -> term . PLUS factor
     (48) term -> term . MINUS factor
 
-  ! shift/reduce conflict for MINUS resolved as shift
     GREATER         reduce using rule 46 (comparison -> term .)
     LESS            reduce using rule 46 (comparison -> term .)
     GREATEROREQUAL  reduce using rule 46 (comparison -> term .)
@@ -1537,32 +1215,12 @@ state 37
     NOTEQUALS       reduce using rule 46 (comparison -> term .)
     OR              reduce using rule 46 (comparison -> term .)
     AND             reduce using rule 46 (comparison -> term .)
-    FUNC            reduce using rule 46 (comparison -> term .)
-    CLASS           reduce using rule 46 (comparison -> term .)
-    INT             reduce using rule 46 (comparison -> term .)
-    BOOL            reduce using rule 46 (comparison -> term .)
-    VOID            reduce using rule 46 (comparison -> term .)
-    ID              reduce using rule 46 (comparison -> term .)
-    IF              reduce using rule 46 (comparison -> term .)
-    WHILE           reduce using rule 46 (comparison -> term .)
-    PRINT           reduce using rule 46 (comparison -> term .)
-    RETURN          reduce using rule 46 (comparison -> term .)
-    NEW             reduce using rule 46 (comparison -> term .)
-    NUMBER          reduce using rule 46 (comparison -> term .)
-    TRUE            reduce using rule 46 (comparison -> term .)
-    FALSE           reduce using rule 46 (comparison -> term .)
-    NULL            reduce using rule 46 (comparison -> term .)
-    LPAREN          reduce using rule 46 (comparison -> term .)
-    NOT             reduce using rule 46 (comparison -> term .)
-    $end            reduce using rule 46 (comparison -> term .)
+    SEMICOLON       reduce using rule 46 (comparison -> term .)
     RPAREN          reduce using rule 46 (comparison -> term .)
     THEN            reduce using rule 46 (comparison -> term .)
-    RBRACE          reduce using rule 46 (comparison -> term .)
     COMMA           reduce using rule 46 (comparison -> term .)
-    PLUS            shift and go to state 65
-    MINUS           shift and go to state 66
-
-  ! MINUS           [ reduce using rule 46 (comparison -> term .) ]
+    PLUS            shift and go to state 69
+    MINUS           shift and go to state 70
 
 
 state 38
@@ -1581,30 +1239,12 @@ state 38
     NOTEQUALS       reduce using rule 49 (term -> factor .)
     OR              reduce using rule 49 (term -> factor .)
     AND             reduce using rule 49 (term -> factor .)
-    FUNC            reduce using rule 49 (term -> factor .)
-    CLASS           reduce using rule 49 (term -> factor .)
-    INT             reduce using rule 49 (term -> factor .)
-    BOOL            reduce using rule 49 (term -> factor .)
-    VOID            reduce using rule 49 (term -> factor .)
-    ID              reduce using rule 49 (term -> factor .)
-    IF              reduce using rule 49 (term -> factor .)
-    WHILE           reduce using rule 49 (term -> factor .)
-    PRINT           reduce using rule 49 (term -> factor .)
-    RETURN          reduce using rule 49 (term -> factor .)
-    NEW             reduce using rule 49 (term -> factor .)
-    NUMBER          reduce using rule 49 (term -> factor .)
-    TRUE            reduce using rule 49 (term -> factor .)
-    FALSE           reduce using rule 49 (term -> factor .)
-    NULL            reduce using rule 49 (term -> factor .)
-    LPAREN          reduce using rule 49 (term -> factor .)
-    NOT             reduce using rule 49 (term -> factor .)
-    $end            reduce using rule 49 (term -> factor .)
+    SEMICOLON       reduce using rule 49 (term -> factor .)
     RPAREN          reduce using rule 49 (term -> factor .)
     THEN            reduce using rule 49 (term -> factor .)
-    RBRACE          reduce using rule 49 (term -> factor .)
     COMMA           reduce using rule 49 (term -> factor .)
-    TIMES           shift and go to state 67
-    DIVIDE          shift and go to state 68
+    TIMES           shift and go to state 71
+    DIVIDE          shift and go to state 72
 
 
 state 39
@@ -1630,14 +1270,14 @@ state 39
     MINUS           shift and go to state 39
     NEW             shift and go to state 28
     NUMBER          shift and go to state 33
-    ID              shift and go to state 46
+    ID              shift and go to state 50
     TRUE            shift and go to state 34
     FALSE           shift and go to state 35
     NULL            shift and go to state 36
     LPAREN          shift and go to state 16
 
-    unary                          shift and go to state 69
-    property                       shift and go to state 70
+    unary                          shift and go to state 73
+    property                       shift and go to state 74
     primary                        shift and go to state 29
     call                           shift and go to state 30
 
@@ -1657,27 +1297,9 @@ state 40
     NOTEQUALS       reduce using rule 52 (factor -> unary .)
     OR              reduce using rule 52 (factor -> unary .)
     AND             reduce using rule 52 (factor -> unary .)
-    FUNC            reduce using rule 52 (factor -> unary .)
-    CLASS           reduce using rule 52 (factor -> unary .)
-    INT             reduce using rule 52 (factor -> unary .)
-    BOOL            reduce using rule 52 (factor -> unary .)
-    VOID            reduce using rule 52 (factor -> unary .)
-    ID              reduce using rule 52 (factor -> unary .)
-    IF              reduce using rule 52 (factor -> unary .)
-    WHILE           reduce using rule 52 (factor -> unary .)
-    PRINT           reduce using rule 52 (factor -> unary .)
-    RETURN          reduce using rule 52 (factor -> unary .)
-    NEW             reduce using rule 52 (factor -> unary .)
-    NUMBER          reduce using rule 52 (factor -> unary .)
-    TRUE            reduce using rule 52 (factor -> unary .)
-    FALSE           reduce using rule 52 (factor -> unary .)
-    NULL            reduce using rule 52 (factor -> unary .)
-    LPAREN          reduce using rule 52 (factor -> unary .)
-    NOT             reduce using rule 52 (factor -> unary .)
-    $end            reduce using rule 52 (factor -> unary .)
+    SEMICOLON       reduce using rule 52 (factor -> unary .)
     RPAREN          reduce using rule 52 (factor -> unary .)
     THEN            reduce using rule 52 (factor -> unary .)
-    RBRACE          reduce using rule 52 (factor -> unary .)
     COMMA           reduce using rule 52 (factor -> unary .)
 
 
@@ -1704,14 +1326,14 @@ state 41
     MINUS           shift and go to state 39
     NEW             shift and go to state 28
     NUMBER          shift and go to state 33
-    ID              shift and go to state 46
+    ID              shift and go to state 50
     TRUE            shift and go to state 34
     FALSE           shift and go to state 35
     NULL            shift and go to state 36
     LPAREN          shift and go to state 16
 
-    unary                          shift and go to state 71
-    property                       shift and go to state 70
+    unary                          shift and go to state 75
+    property                       shift and go to state 74
     primary                        shift and go to state 29
     call                           shift and go to state 30
 
@@ -1743,47 +1365,132 @@ state 42
 
 state 43
 
-    (27) varDeclaration -> type ID .
-    (28) varDeclaration -> type ID . ASSIGN expression
+    (4) declaration -> varDeclaration SEMICOLON .
 
-    FUNC            reduce using rule 27 (varDeclaration -> type ID .)
-    CLASS           reduce using rule 27 (varDeclaration -> type ID .)
-    INT             reduce using rule 27 (varDeclaration -> type ID .)
-    BOOL            reduce using rule 27 (varDeclaration -> type ID .)
-    VOID            reduce using rule 27 (varDeclaration -> type ID .)
-    ID              reduce using rule 27 (varDeclaration -> type ID .)
-    IF              reduce using rule 27 (varDeclaration -> type ID .)
-    WHILE           reduce using rule 27 (varDeclaration -> type ID .)
-    PRINT           reduce using rule 27 (varDeclaration -> type ID .)
-    RETURN          reduce using rule 27 (varDeclaration -> type ID .)
-    NEW             reduce using rule 27 (varDeclaration -> type ID .)
-    NUMBER          reduce using rule 27 (varDeclaration -> type ID .)
-    TRUE            reduce using rule 27 (varDeclaration -> type ID .)
-    FALSE           reduce using rule 27 (varDeclaration -> type ID .)
-    NULL            reduce using rule 27 (varDeclaration -> type ID .)
-    LPAREN          reduce using rule 27 (varDeclaration -> type ID .)
-    NOT             reduce using rule 27 (varDeclaration -> type ID .)
-    MINUS           reduce using rule 27 (varDeclaration -> type ID .)
-    $end            reduce using rule 27 (varDeclaration -> type ID .)
-    RBRACE          reduce using rule 27 (varDeclaration -> type ID .)
-    ASSIGN          shift and go to state 72
+    FUNC            reduce using rule 4 (declaration -> varDeclaration SEMICOLON .)
+    CLASS           reduce using rule 4 (declaration -> varDeclaration SEMICOLON .)
+    INT             reduce using rule 4 (declaration -> varDeclaration SEMICOLON .)
+    BOOL            reduce using rule 4 (declaration -> varDeclaration SEMICOLON .)
+    VOID            reduce using rule 4 (declaration -> varDeclaration SEMICOLON .)
+    ID              reduce using rule 4 (declaration -> varDeclaration SEMICOLON .)
+    IF              reduce using rule 4 (declaration -> varDeclaration SEMICOLON .)
+    WHILE           reduce using rule 4 (declaration -> varDeclaration SEMICOLON .)
+    PRINT           reduce using rule 4 (declaration -> varDeclaration SEMICOLON .)
+    RETURN          reduce using rule 4 (declaration -> varDeclaration SEMICOLON .)
+    NEW             reduce using rule 4 (declaration -> varDeclaration SEMICOLON .)
+    NUMBER          reduce using rule 4 (declaration -> varDeclaration SEMICOLON .)
+    TRUE            reduce using rule 4 (declaration -> varDeclaration SEMICOLON .)
+    FALSE           reduce using rule 4 (declaration -> varDeclaration SEMICOLON .)
+    NULL            reduce using rule 4 (declaration -> varDeclaration SEMICOLON .)
+    LPAREN          reduce using rule 4 (declaration -> varDeclaration SEMICOLON .)
+    NOT             reduce using rule 4 (declaration -> varDeclaration SEMICOLON .)
+    MINUS           reduce using rule 4 (declaration -> varDeclaration SEMICOLON .)
+    $end            reduce using rule 4 (declaration -> varDeclaration SEMICOLON .)
+    RBRACE          reduce using rule 4 (declaration -> varDeclaration SEMICOLON .)
 
 
 state 44
 
-    (71) funcDeclaration -> FUNC ID . LPAREN parameter_list RPAREN type LBRACE declaration_list RBRACE
+    (27) varDeclaration -> type ID .
+    (28) varDeclaration -> type ID . ASSIGN expression
 
-    LPAREN          shift and go to state 73
+    SEMICOLON       reduce using rule 27 (varDeclaration -> type ID .)
+    ASSIGN          shift and go to state 76
 
 
 state 45
 
-    (67) primary -> LPAREN expression . RPAREN
+    (16) statement -> expression SEMICOLON .
 
-    RPAREN          shift and go to state 74
+    FUNC            reduce using rule 16 (statement -> expression SEMICOLON .)
+    CLASS           reduce using rule 16 (statement -> expression SEMICOLON .)
+    INT             reduce using rule 16 (statement -> expression SEMICOLON .)
+    BOOL            reduce using rule 16 (statement -> expression SEMICOLON .)
+    VOID            reduce using rule 16 (statement -> expression SEMICOLON .)
+    ID              reduce using rule 16 (statement -> expression SEMICOLON .)
+    IF              reduce using rule 16 (statement -> expression SEMICOLON .)
+    WHILE           reduce using rule 16 (statement -> expression SEMICOLON .)
+    PRINT           reduce using rule 16 (statement -> expression SEMICOLON .)
+    RETURN          reduce using rule 16 (statement -> expression SEMICOLON .)
+    NEW             reduce using rule 16 (statement -> expression SEMICOLON .)
+    NUMBER          reduce using rule 16 (statement -> expression SEMICOLON .)
+    TRUE            reduce using rule 16 (statement -> expression SEMICOLON .)
+    FALSE           reduce using rule 16 (statement -> expression SEMICOLON .)
+    NULL            reduce using rule 16 (statement -> expression SEMICOLON .)
+    LPAREN          reduce using rule 16 (statement -> expression SEMICOLON .)
+    NOT             reduce using rule 16 (statement -> expression SEMICOLON .)
+    MINUS           reduce using rule 16 (statement -> expression SEMICOLON .)
+    $end            reduce using rule 16 (statement -> expression SEMICOLON .)
+    RBRACE          reduce using rule 16 (statement -> expression SEMICOLON .)
 
 
 state 46
+
+    (19) statement -> printStatement SEMICOLON .
+
+    FUNC            reduce using rule 19 (statement -> printStatement SEMICOLON .)
+    CLASS           reduce using rule 19 (statement -> printStatement SEMICOLON .)
+    INT             reduce using rule 19 (statement -> printStatement SEMICOLON .)
+    BOOL            reduce using rule 19 (statement -> printStatement SEMICOLON .)
+    VOID            reduce using rule 19 (statement -> printStatement SEMICOLON .)
+    ID              reduce using rule 19 (statement -> printStatement SEMICOLON .)
+    IF              reduce using rule 19 (statement -> printStatement SEMICOLON .)
+    WHILE           reduce using rule 19 (statement -> printStatement SEMICOLON .)
+    PRINT           reduce using rule 19 (statement -> printStatement SEMICOLON .)
+    RETURN          reduce using rule 19 (statement -> printStatement SEMICOLON .)
+    NEW             reduce using rule 19 (statement -> printStatement SEMICOLON .)
+    NUMBER          reduce using rule 19 (statement -> printStatement SEMICOLON .)
+    TRUE            reduce using rule 19 (statement -> printStatement SEMICOLON .)
+    FALSE           reduce using rule 19 (statement -> printStatement SEMICOLON .)
+    NULL            reduce using rule 19 (statement -> printStatement SEMICOLON .)
+    LPAREN          reduce using rule 19 (statement -> printStatement SEMICOLON .)
+    NOT             reduce using rule 19 (statement -> printStatement SEMICOLON .)
+    MINUS           reduce using rule 19 (statement -> printStatement SEMICOLON .)
+    $end            reduce using rule 19 (statement -> printStatement SEMICOLON .)
+    RBRACE          reduce using rule 19 (statement -> printStatement SEMICOLON .)
+
+
+state 47
+
+    (20) statement -> returnStatement SEMICOLON .
+
+    FUNC            reduce using rule 20 (statement -> returnStatement SEMICOLON .)
+    CLASS           reduce using rule 20 (statement -> returnStatement SEMICOLON .)
+    INT             reduce using rule 20 (statement -> returnStatement SEMICOLON .)
+    BOOL            reduce using rule 20 (statement -> returnStatement SEMICOLON .)
+    VOID            reduce using rule 20 (statement -> returnStatement SEMICOLON .)
+    ID              reduce using rule 20 (statement -> returnStatement SEMICOLON .)
+    IF              reduce using rule 20 (statement -> returnStatement SEMICOLON .)
+    WHILE           reduce using rule 20 (statement -> returnStatement SEMICOLON .)
+    PRINT           reduce using rule 20 (statement -> returnStatement SEMICOLON .)
+    RETURN          reduce using rule 20 (statement -> returnStatement SEMICOLON .)
+    NEW             reduce using rule 20 (statement -> returnStatement SEMICOLON .)
+    NUMBER          reduce using rule 20 (statement -> returnStatement SEMICOLON .)
+    TRUE            reduce using rule 20 (statement -> returnStatement SEMICOLON .)
+    FALSE           reduce using rule 20 (statement -> returnStatement SEMICOLON .)
+    NULL            reduce using rule 20 (statement -> returnStatement SEMICOLON .)
+    LPAREN          reduce using rule 20 (statement -> returnStatement SEMICOLON .)
+    NOT             reduce using rule 20 (statement -> returnStatement SEMICOLON .)
+    MINUS           reduce using rule 20 (statement -> returnStatement SEMICOLON .)
+    $end            reduce using rule 20 (statement -> returnStatement SEMICOLON .)
+    RBRACE          reduce using rule 20 (statement -> returnStatement SEMICOLON .)
+
+
+state 48
+
+    (71) funcDeclaration -> FUNC ID . LPAREN parameter_list RPAREN type LBRACE declaration_list RBRACE
+
+    LPAREN          shift and go to state 77
+
+
+state 49
+
+    (67) primary -> LPAREN expression . RPAREN
+
+    RPAREN          shift and go to state 78
+
+
+state 50
 
     (63) primary -> ID .
 
@@ -1804,108 +1511,53 @@ state 46
     AND             reduce using rule 63 (primary -> ID .)
     RPAREN          reduce using rule 63 (primary -> ID .)
     THEN            reduce using rule 63 (primary -> ID .)
-    FUNC            reduce using rule 63 (primary -> ID .)
-    CLASS           reduce using rule 63 (primary -> ID .)
-    INT             reduce using rule 63 (primary -> ID .)
-    BOOL            reduce using rule 63 (primary -> ID .)
-    VOID            reduce using rule 63 (primary -> ID .)
-    ID              reduce using rule 63 (primary -> ID .)
-    IF              reduce using rule 63 (primary -> ID .)
-    WHILE           reduce using rule 63 (primary -> ID .)
-    PRINT           reduce using rule 63 (primary -> ID .)
-    RETURN          reduce using rule 63 (primary -> ID .)
-    NEW             reduce using rule 63 (primary -> ID .)
-    NUMBER          reduce using rule 63 (primary -> ID .)
-    TRUE            reduce using rule 63 (primary -> ID .)
-    FALSE           reduce using rule 63 (primary -> ID .)
-    NULL            reduce using rule 63 (primary -> ID .)
-    NOT             reduce using rule 63 (primary -> ID .)
-    $end            reduce using rule 63 (primary -> ID .)
-    RBRACE          reduce using rule 63 (primary -> ID .)
+    SEMICOLON       reduce using rule 63 (primary -> ID .)
     COMMA           reduce using rule 63 (primary -> ID .)
 
 
-state 47
+state 51
 
     (8) class -> CLASS ID . extends LBRACE classDeclarationList RBRACE
     (9) extends -> . EXTENDS ID
     (10) extends -> . empty
     (75) empty -> .
 
-    EXTENDS         shift and go to state 76
+    EXTENDS         shift and go to state 80
     LBRACE          reduce using rule 75 (empty -> .)
 
-    extends                        shift and go to state 75
-    empty                          shift and go to state 77
+    extends                        shift and go to state 79
+    empty                          shift and go to state 81
 
-state 48
+state 52
 
     (23) ifStatement -> IF expression . THEN LBRACE declaration_list RBRACE
     (24) ifStatement -> IF expression . THEN LBRACE declaration_list RBRACE ELSE LBRACE declaration_list RBRACE
 
-    THEN            shift and go to state 78
+    THEN            shift and go to state 82
 
 
-state 49
+state 53
 
     (25) whileStatement -> WHILE expression . THEN LBRACE declaration_list RBRACE
 
-    THEN            shift and go to state 79
+    THEN            shift and go to state 83
 
 
-state 50
+state 54
 
     (26) printStatement -> PRINT expression .
 
-    FUNC            reduce using rule 26 (printStatement -> PRINT expression .)
-    CLASS           reduce using rule 26 (printStatement -> PRINT expression .)
-    INT             reduce using rule 26 (printStatement -> PRINT expression .)
-    BOOL            reduce using rule 26 (printStatement -> PRINT expression .)
-    VOID            reduce using rule 26 (printStatement -> PRINT expression .)
-    ID              reduce using rule 26 (printStatement -> PRINT expression .)
-    IF              reduce using rule 26 (printStatement -> PRINT expression .)
-    WHILE           reduce using rule 26 (printStatement -> PRINT expression .)
-    PRINT           reduce using rule 26 (printStatement -> PRINT expression .)
-    RETURN          reduce using rule 26 (printStatement -> PRINT expression .)
-    NEW             reduce using rule 26 (printStatement -> PRINT expression .)
-    NUMBER          reduce using rule 26 (printStatement -> PRINT expression .)
-    TRUE            reduce using rule 26 (printStatement -> PRINT expression .)
-    FALSE           reduce using rule 26 (printStatement -> PRINT expression .)
-    NULL            reduce using rule 26 (printStatement -> PRINT expression .)
-    LPAREN          reduce using rule 26 (printStatement -> PRINT expression .)
-    NOT             reduce using rule 26 (printStatement -> PRINT expression .)
-    MINUS           reduce using rule 26 (printStatement -> PRINT expression .)
-    $end            reduce using rule 26 (printStatement -> PRINT expression .)
-    RBRACE          reduce using rule 26 (printStatement -> PRINT expression .)
+    SEMICOLON       reduce using rule 26 (printStatement -> PRINT expression .)
 
 
-state 51
+state 55
 
     (21) returnStatement -> RETURN expression .
 
-    FUNC            reduce using rule 21 (returnStatement -> RETURN expression .)
-    CLASS           reduce using rule 21 (returnStatement -> RETURN expression .)
-    INT             reduce using rule 21 (returnStatement -> RETURN expression .)
-    BOOL            reduce using rule 21 (returnStatement -> RETURN expression .)
-    VOID            reduce using rule 21 (returnStatement -> RETURN expression .)
-    ID              reduce using rule 21 (returnStatement -> RETURN expression .)
-    IF              reduce using rule 21 (returnStatement -> RETURN expression .)
-    WHILE           reduce using rule 21 (returnStatement -> RETURN expression .)
-    PRINT           reduce using rule 21 (returnStatement -> RETURN expression .)
-    RETURN          reduce using rule 21 (returnStatement -> RETURN expression .)
-    NEW             reduce using rule 21 (returnStatement -> RETURN expression .)
-    NUMBER          reduce using rule 21 (returnStatement -> RETURN expression .)
-    TRUE            reduce using rule 21 (returnStatement -> RETURN expression .)
-    FALSE           reduce using rule 21 (returnStatement -> RETURN expression .)
-    NULL            reduce using rule 21 (returnStatement -> RETURN expression .)
-    LPAREN          reduce using rule 21 (returnStatement -> RETURN expression .)
-    NOT             reduce using rule 21 (returnStatement -> RETURN expression .)
-    MINUS           reduce using rule 21 (returnStatement -> RETURN expression .)
-    $end            reduce using rule 21 (returnStatement -> RETURN expression .)
-    RBRACE          reduce using rule 21 (returnStatement -> RETURN expression .)
+    SEMICOLON       reduce using rule 21 (returnStatement -> RETURN expression .)
 
 
-state 52
+state 56
 
     (34) assignment -> property ASSIGN . logical
     (36) logical -> . logical OR equality
@@ -1945,14 +1597,14 @@ state 52
     MINUS           shift and go to state 39
     NEW             shift and go to state 28
     NUMBER          shift and go to state 33
-    ID              shift and go to state 46
+    ID              shift and go to state 50
     TRUE            shift and go to state 34
     FALSE           shift and go to state 35
     NULL            shift and go to state 36
     LPAREN          shift and go to state 16
 
-    property                       shift and go to state 70
-    logical                        shift and go to state 80
+    property                       shift and go to state 74
+    logical                        shift and go to state 84
     equality                       shift and go to state 31
     comparison                     shift and go to state 32
     term                           shift and go to state 37
@@ -1961,14 +1613,14 @@ state 52
     primary                        shift and go to state 29
     call                           shift and go to state 30
 
-state 53
+state 57
 
     (57) property -> property DOT . ID
 
-    ID              shift and go to state 81
+    ID              shift and go to state 85
 
 
-state 54
+state 58
 
     (58) property -> property LPAREN . arguments RPAREN
     (68) arguments -> . arguments COMMA expression
@@ -2014,7 +1666,7 @@ state 54
     COMMA           reduce using rule 70 (arguments -> .)
     NEW             shift and go to state 28
     NUMBER          shift and go to state 33
-    ID              shift and go to state 46
+    ID              shift and go to state 50
     TRUE            shift and go to state 34
     FALSE           shift and go to state 35
     NULL            shift and go to state 36
@@ -2023,8 +1675,8 @@ state 54
     MINUS           shift and go to state 39
 
     property                       shift and go to state 26
-    arguments                      shift and go to state 82
-    expression                     shift and go to state 83
+    arguments                      shift and go to state 86
+    expression                     shift and go to state 87
     assignment                     shift and go to state 21
     logical                        shift and go to state 27
     primary                        shift and go to state 29
@@ -2035,7 +1687,7 @@ state 54
     factor                         shift and go to state 38
     unary                          shift and go to state 40
 
-state 55
+state 59
 
     (36) logical -> logical OR . equality
     (39) equality -> . equality EQUALS comparison
@@ -2072,22 +1724,22 @@ state 55
     MINUS           shift and go to state 39
     NEW             shift and go to state 28
     NUMBER          shift and go to state 33
-    ID              shift and go to state 46
+    ID              shift and go to state 50
     TRUE            shift and go to state 34
     FALSE           shift and go to state 35
     NULL            shift and go to state 36
     LPAREN          shift and go to state 16
 
-    equality                       shift and go to state 84
+    equality                       shift and go to state 88
     comparison                     shift and go to state 32
     term                           shift and go to state 37
     factor                         shift and go to state 38
     unary                          shift and go to state 40
-    property                       shift and go to state 70
+    property                       shift and go to state 74
     primary                        shift and go to state 29
     call                           shift and go to state 30
 
-state 56
+state 60
 
     (37) logical -> logical AND . equality
     (39) equality -> . equality EQUALS comparison
@@ -2124,29 +1776,29 @@ state 56
     MINUS           shift and go to state 39
     NEW             shift and go to state 28
     NUMBER          shift and go to state 33
-    ID              shift and go to state 46
+    ID              shift and go to state 50
     TRUE            shift and go to state 34
     FALSE           shift and go to state 35
     NULL            shift and go to state 36
     LPAREN          shift and go to state 16
 
-    equality                       shift and go to state 85
+    equality                       shift and go to state 89
     comparison                     shift and go to state 32
     term                           shift and go to state 37
     factor                         shift and go to state 38
     unary                          shift and go to state 40
-    property                       shift and go to state 70
+    property                       shift and go to state 74
     primary                        shift and go to state 29
     call                           shift and go to state 30
 
-state 57
+state 61
 
     (56) property -> NEW primary . LPAREN RPAREN
 
-    LPAREN          shift and go to state 86
+    LPAREN          shift and go to state 90
 
 
-state 58
+state 62
 
     (60) call -> primary LPAREN . arguments RPAREN
     (68) arguments -> . arguments COMMA expression
@@ -2192,7 +1844,7 @@ state 58
     COMMA           reduce using rule 70 (arguments -> .)
     NEW             shift and go to state 28
     NUMBER          shift and go to state 33
-    ID              shift and go to state 46
+    ID              shift and go to state 50
     TRUE            shift and go to state 34
     FALSE           shift and go to state 35
     NULL            shift and go to state 36
@@ -2201,8 +1853,8 @@ state 58
     MINUS           shift and go to state 39
 
     primary                        shift and go to state 29
-    arguments                      shift and go to state 87
-    expression                     shift and go to state 83
+    arguments                      shift and go to state 91
+    expression                     shift and go to state 87
     assignment                     shift and go to state 21
     property                       shift and go to state 26
     logical                        shift and go to state 27
@@ -2213,7 +1865,7 @@ state 58
     factor                         shift and go to state 38
     unary                          shift and go to state 40
 
-state 59
+state 63
 
     (39) equality -> equality EQUALS . comparison
     (42) comparison -> . comparison GREATER term
@@ -2247,21 +1899,21 @@ state 59
     MINUS           shift and go to state 39
     NEW             shift and go to state 28
     NUMBER          shift and go to state 33
-    ID              shift and go to state 46
+    ID              shift and go to state 50
     TRUE            shift and go to state 34
     FALSE           shift and go to state 35
     NULL            shift and go to state 36
     LPAREN          shift and go to state 16
 
-    comparison                     shift and go to state 88
+    comparison                     shift and go to state 92
     term                           shift and go to state 37
     factor                         shift and go to state 38
     unary                          shift and go to state 40
-    property                       shift and go to state 70
+    property                       shift and go to state 74
     primary                        shift and go to state 29
     call                           shift and go to state 30
 
-state 60
+state 64
 
     (40) equality -> equality NOTEQUALS . comparison
     (42) comparison -> . comparison GREATER term
@@ -2295,21 +1947,21 @@ state 60
     MINUS           shift and go to state 39
     NEW             shift and go to state 28
     NUMBER          shift and go to state 33
-    ID              shift and go to state 46
+    ID              shift and go to state 50
     TRUE            shift and go to state 34
     FALSE           shift and go to state 35
     NULL            shift and go to state 36
     LPAREN          shift and go to state 16
 
-    comparison                     shift and go to state 89
+    comparison                     shift and go to state 93
     term                           shift and go to state 37
     factor                         shift and go to state 38
     unary                          shift and go to state 40
-    property                       shift and go to state 70
+    property                       shift and go to state 74
     primary                        shift and go to state 29
     call                           shift and go to state 30
 
-state 61
+state 65
 
     (42) comparison -> comparison GREATER . term
     (47) term -> . term PLUS factor
@@ -2338,20 +1990,20 @@ state 61
     MINUS           shift and go to state 39
     NEW             shift and go to state 28
     NUMBER          shift and go to state 33
-    ID              shift and go to state 46
+    ID              shift and go to state 50
     TRUE            shift and go to state 34
     FALSE           shift and go to state 35
     NULL            shift and go to state 36
     LPAREN          shift and go to state 16
 
-    term                           shift and go to state 90
+    term                           shift and go to state 94
     factor                         shift and go to state 38
     unary                          shift and go to state 40
-    property                       shift and go to state 70
+    property                       shift and go to state 74
     primary                        shift and go to state 29
     call                           shift and go to state 30
 
-state 62
+state 66
 
     (43) comparison -> comparison LESS . term
     (47) term -> . term PLUS factor
@@ -2380,20 +2032,20 @@ state 62
     MINUS           shift and go to state 39
     NEW             shift and go to state 28
     NUMBER          shift and go to state 33
-    ID              shift and go to state 46
+    ID              shift and go to state 50
     TRUE            shift and go to state 34
     FALSE           shift and go to state 35
     NULL            shift and go to state 36
     LPAREN          shift and go to state 16
 
-    term                           shift and go to state 91
+    term                           shift and go to state 95
     factor                         shift and go to state 38
     unary                          shift and go to state 40
-    property                       shift and go to state 70
+    property                       shift and go to state 74
     primary                        shift and go to state 29
     call                           shift and go to state 30
 
-state 63
+state 67
 
     (44) comparison -> comparison GREATEROREQUAL . term
     (47) term -> . term PLUS factor
@@ -2422,20 +2074,20 @@ state 63
     MINUS           shift and go to state 39
     NEW             shift and go to state 28
     NUMBER          shift and go to state 33
-    ID              shift and go to state 46
+    ID              shift and go to state 50
     TRUE            shift and go to state 34
     FALSE           shift and go to state 35
     NULL            shift and go to state 36
     LPAREN          shift and go to state 16
 
-    term                           shift and go to state 92
+    term                           shift and go to state 96
     factor                         shift and go to state 38
     unary                          shift and go to state 40
-    property                       shift and go to state 70
+    property                       shift and go to state 74
     primary                        shift and go to state 29
     call                           shift and go to state 30
 
-state 64
+state 68
 
     (45) comparison -> comparison LESSOREQUAL . term
     (47) term -> . term PLUS factor
@@ -2464,20 +2116,20 @@ state 64
     MINUS           shift and go to state 39
     NEW             shift and go to state 28
     NUMBER          shift and go to state 33
-    ID              shift and go to state 46
+    ID              shift and go to state 50
     TRUE            shift and go to state 34
     FALSE           shift and go to state 35
     NULL            shift and go to state 36
     LPAREN          shift and go to state 16
 
-    term                           shift and go to state 93
+    term                           shift and go to state 97
     factor                         shift and go to state 38
     unary                          shift and go to state 40
-    property                       shift and go to state 70
+    property                       shift and go to state 74
     primary                        shift and go to state 29
     call                           shift and go to state 30
 
-state 65
+state 69
 
     (47) term -> term PLUS . factor
     (50) factor -> . factor TIMES unary
@@ -2503,19 +2155,19 @@ state 65
     MINUS           shift and go to state 39
     NEW             shift and go to state 28
     NUMBER          shift and go to state 33
-    ID              shift and go to state 46
+    ID              shift and go to state 50
     TRUE            shift and go to state 34
     FALSE           shift and go to state 35
     NULL            shift and go to state 36
     LPAREN          shift and go to state 16
 
-    factor                         shift and go to state 94
+    factor                         shift and go to state 98
     unary                          shift and go to state 40
-    property                       shift and go to state 70
+    property                       shift and go to state 74
     primary                        shift and go to state 29
     call                           shift and go to state 30
 
-state 66
+state 70
 
     (48) term -> term MINUS . factor
     (50) factor -> . factor TIMES unary
@@ -2541,19 +2193,19 @@ state 66
     MINUS           shift and go to state 39
     NEW             shift and go to state 28
     NUMBER          shift and go to state 33
-    ID              shift and go to state 46
+    ID              shift and go to state 50
     TRUE            shift and go to state 34
     FALSE           shift and go to state 35
     NULL            shift and go to state 36
     LPAREN          shift and go to state 16
 
-    factor                         shift and go to state 95
+    factor                         shift and go to state 99
     unary                          shift and go to state 40
-    property                       shift and go to state 70
+    property                       shift and go to state 74
     primary                        shift and go to state 29
     call                           shift and go to state 30
 
-state 67
+state 71
 
     (50) factor -> factor TIMES . unary
     (53) unary -> . NOT unary
@@ -2576,18 +2228,18 @@ state 67
     MINUS           shift and go to state 39
     NEW             shift and go to state 28
     NUMBER          shift and go to state 33
-    ID              shift and go to state 46
+    ID              shift and go to state 50
     TRUE            shift and go to state 34
     FALSE           shift and go to state 35
     NULL            shift and go to state 36
     LPAREN          shift and go to state 16
 
-    unary                          shift and go to state 96
-    property                       shift and go to state 70
+    unary                          shift and go to state 100
+    property                       shift and go to state 74
     primary                        shift and go to state 29
     call                           shift and go to state 30
 
-state 68
+state 72
 
     (51) factor -> factor DIVIDE . unary
     (53) unary -> . NOT unary
@@ -2610,18 +2262,18 @@ state 68
     MINUS           shift and go to state 39
     NEW             shift and go to state 28
     NUMBER          shift and go to state 33
-    ID              shift and go to state 46
+    ID              shift and go to state 50
     TRUE            shift and go to state 34
     FALSE           shift and go to state 35
     NULL            shift and go to state 36
     LPAREN          shift and go to state 16
 
-    unary                          shift and go to state 97
-    property                       shift and go to state 70
+    unary                          shift and go to state 101
+    property                       shift and go to state 74
     primary                        shift and go to state 29
     call                           shift and go to state 30
 
-state 69
+state 73
 
     (54) unary -> MINUS unary .
 
@@ -2637,37 +2289,18 @@ state 69
     NOTEQUALS       reduce using rule 54 (unary -> MINUS unary .)
     OR              reduce using rule 54 (unary -> MINUS unary .)
     AND             reduce using rule 54 (unary -> MINUS unary .)
-    FUNC            reduce using rule 54 (unary -> MINUS unary .)
-    CLASS           reduce using rule 54 (unary -> MINUS unary .)
-    INT             reduce using rule 54 (unary -> MINUS unary .)
-    BOOL            reduce using rule 54 (unary -> MINUS unary .)
-    VOID            reduce using rule 54 (unary -> MINUS unary .)
-    ID              reduce using rule 54 (unary -> MINUS unary .)
-    IF              reduce using rule 54 (unary -> MINUS unary .)
-    WHILE           reduce using rule 54 (unary -> MINUS unary .)
-    PRINT           reduce using rule 54 (unary -> MINUS unary .)
-    RETURN          reduce using rule 54 (unary -> MINUS unary .)
-    NEW             reduce using rule 54 (unary -> MINUS unary .)
-    NUMBER          reduce using rule 54 (unary -> MINUS unary .)
-    TRUE            reduce using rule 54 (unary -> MINUS unary .)
-    FALSE           reduce using rule 54 (unary -> MINUS unary .)
-    NULL            reduce using rule 54 (unary -> MINUS unary .)
-    LPAREN          reduce using rule 54 (unary -> MINUS unary .)
-    NOT             reduce using rule 54 (unary -> MINUS unary .)
-    $end            reduce using rule 54 (unary -> MINUS unary .)
+    SEMICOLON       reduce using rule 54 (unary -> MINUS unary .)
     RPAREN          reduce using rule 54 (unary -> MINUS unary .)
     THEN            reduce using rule 54 (unary -> MINUS unary .)
-    RBRACE          reduce using rule 54 (unary -> MINUS unary .)
     COMMA           reduce using rule 54 (unary -> MINUS unary .)
 
 
-state 70
+state 74
 
     (55) unary -> property .
     (57) property -> property . DOT ID
     (58) property -> property . LPAREN arguments RPAREN
 
-  ! shift/reduce conflict for LPAREN resolved as shift
     TIMES           reduce using rule 55 (unary -> property .)
     DIVIDE          reduce using rule 55 (unary -> property .)
     PLUS            reduce using rule 55 (unary -> property .)
@@ -2680,34 +2313,15 @@ state 70
     NOTEQUALS       reduce using rule 55 (unary -> property .)
     OR              reduce using rule 55 (unary -> property .)
     AND             reduce using rule 55 (unary -> property .)
-    FUNC            reduce using rule 55 (unary -> property .)
-    CLASS           reduce using rule 55 (unary -> property .)
-    INT             reduce using rule 55 (unary -> property .)
-    BOOL            reduce using rule 55 (unary -> property .)
-    VOID            reduce using rule 55 (unary -> property .)
-    ID              reduce using rule 55 (unary -> property .)
-    IF              reduce using rule 55 (unary -> property .)
-    WHILE           reduce using rule 55 (unary -> property .)
-    PRINT           reduce using rule 55 (unary -> property .)
-    RETURN          reduce using rule 55 (unary -> property .)
-    NEW             reduce using rule 55 (unary -> property .)
-    NUMBER          reduce using rule 55 (unary -> property .)
-    TRUE            reduce using rule 55 (unary -> property .)
-    FALSE           reduce using rule 55 (unary -> property .)
-    NULL            reduce using rule 55 (unary -> property .)
-    NOT             reduce using rule 55 (unary -> property .)
-    $end            reduce using rule 55 (unary -> property .)
+    SEMICOLON       reduce using rule 55 (unary -> property .)
     RPAREN          reduce using rule 55 (unary -> property .)
     THEN            reduce using rule 55 (unary -> property .)
-    RBRACE          reduce using rule 55 (unary -> property .)
     COMMA           reduce using rule 55 (unary -> property .)
-    DOT             shift and go to state 53
-    LPAREN          shift and go to state 54
-
-  ! LPAREN          [ reduce using rule 55 (unary -> property .) ]
+    DOT             shift and go to state 57
+    LPAREN          shift and go to state 58
 
 
-state 71
+state 75
 
     (53) unary -> NOT unary .
 
@@ -2723,31 +2337,13 @@ state 71
     NOTEQUALS       reduce using rule 53 (unary -> NOT unary .)
     OR              reduce using rule 53 (unary -> NOT unary .)
     AND             reduce using rule 53 (unary -> NOT unary .)
-    FUNC            reduce using rule 53 (unary -> NOT unary .)
-    CLASS           reduce using rule 53 (unary -> NOT unary .)
-    INT             reduce using rule 53 (unary -> NOT unary .)
-    BOOL            reduce using rule 53 (unary -> NOT unary .)
-    VOID            reduce using rule 53 (unary -> NOT unary .)
-    ID              reduce using rule 53 (unary -> NOT unary .)
-    IF              reduce using rule 53 (unary -> NOT unary .)
-    WHILE           reduce using rule 53 (unary -> NOT unary .)
-    PRINT           reduce using rule 53 (unary -> NOT unary .)
-    RETURN          reduce using rule 53 (unary -> NOT unary .)
-    NEW             reduce using rule 53 (unary -> NOT unary .)
-    NUMBER          reduce using rule 53 (unary -> NOT unary .)
-    TRUE            reduce using rule 53 (unary -> NOT unary .)
-    FALSE           reduce using rule 53 (unary -> NOT unary .)
-    NULL            reduce using rule 53 (unary -> NOT unary .)
-    LPAREN          reduce using rule 53 (unary -> NOT unary .)
-    NOT             reduce using rule 53 (unary -> NOT unary .)
-    $end            reduce using rule 53 (unary -> NOT unary .)
+    SEMICOLON       reduce using rule 53 (unary -> NOT unary .)
     RPAREN          reduce using rule 53 (unary -> NOT unary .)
     THEN            reduce using rule 53 (unary -> NOT unary .)
-    RBRACE          reduce using rule 53 (unary -> NOT unary .)
     COMMA           reduce using rule 53 (unary -> NOT unary .)
 
 
-state 72
+state 76
 
     (28) varDeclaration -> type ID ASSIGN . expression
     (33) expression -> . assignment
@@ -2788,7 +2384,7 @@ state 72
 
     NEW             shift and go to state 28
     NUMBER          shift and go to state 33
-    ID              shift and go to state 46
+    ID              shift and go to state 50
     TRUE            shift and go to state 34
     FALSE           shift and go to state 35
     NULL            shift and go to state 36
@@ -2796,7 +2392,7 @@ state 72
     NOT             shift and go to state 41
     MINUS           shift and go to state 39
 
-    expression                     shift and go to state 98
+    expression                     shift and go to state 102
     assignment                     shift and go to state 21
     property                       shift and go to state 26
     logical                        shift and go to state 27
@@ -2808,7 +2404,7 @@ state 72
     factor                         shift and go to state 38
     unary                          shift and go to state 40
 
-state 73
+state 77
 
     (71) funcDeclaration -> FUNC ID LPAREN . parameter_list RPAREN type LBRACE declaration_list RBRACE
     (72) parameter_list -> . parameter_list COMMA type ID
@@ -2824,12 +2420,12 @@ state 73
     INT             shift and go to state 18
     BOOL            shift and go to state 19
     VOID            shift and go to state 20
-    ID              shift and go to state 99
+    ID              shift and go to state 103
 
-    parameter_list                 shift and go to state 100
-    type                           shift and go to state 101
+    parameter_list                 shift and go to state 104
+    type                           shift and go to state 105
 
-state 74
+state 78
 
     (67) primary -> LPAREN expression RPAREN .
 
@@ -2848,99 +2444,63 @@ state 74
     NOTEQUALS       reduce using rule 67 (primary -> LPAREN expression RPAREN .)
     OR              reduce using rule 67 (primary -> LPAREN expression RPAREN .)
     AND             reduce using rule 67 (primary -> LPAREN expression RPAREN .)
-    FUNC            reduce using rule 67 (primary -> LPAREN expression RPAREN .)
-    CLASS           reduce using rule 67 (primary -> LPAREN expression RPAREN .)
-    INT             reduce using rule 67 (primary -> LPAREN expression RPAREN .)
-    BOOL            reduce using rule 67 (primary -> LPAREN expression RPAREN .)
-    VOID            reduce using rule 67 (primary -> LPAREN expression RPAREN .)
-    ID              reduce using rule 67 (primary -> LPAREN expression RPAREN .)
-    IF              reduce using rule 67 (primary -> LPAREN expression RPAREN .)
-    WHILE           reduce using rule 67 (primary -> LPAREN expression RPAREN .)
-    PRINT           reduce using rule 67 (primary -> LPAREN expression RPAREN .)
-    RETURN          reduce using rule 67 (primary -> LPAREN expression RPAREN .)
-    NEW             reduce using rule 67 (primary -> LPAREN expression RPAREN .)
-    NUMBER          reduce using rule 67 (primary -> LPAREN expression RPAREN .)
-    TRUE            reduce using rule 67 (primary -> LPAREN expression RPAREN .)
-    FALSE           reduce using rule 67 (primary -> LPAREN expression RPAREN .)
-    NULL            reduce using rule 67 (primary -> LPAREN expression RPAREN .)
-    NOT             reduce using rule 67 (primary -> LPAREN expression RPAREN .)
-    $end            reduce using rule 67 (primary -> LPAREN expression RPAREN .)
+    SEMICOLON       reduce using rule 67 (primary -> LPAREN expression RPAREN .)
     RPAREN          reduce using rule 67 (primary -> LPAREN expression RPAREN .)
     THEN            reduce using rule 67 (primary -> LPAREN expression RPAREN .)
-    RBRACE          reduce using rule 67 (primary -> LPAREN expression RPAREN .)
     COMMA           reduce using rule 67 (primary -> LPAREN expression RPAREN .)
 
 
-state 75
+state 79
 
     (8) class -> CLASS ID extends . LBRACE classDeclarationList RBRACE
 
-    LBRACE          shift and go to state 102
+    LBRACE          shift and go to state 106
 
 
-state 76
+state 80
 
     (9) extends -> EXTENDS . ID
 
-    ID              shift and go to state 103
+    ID              shift and go to state 107
 
 
-state 77
+state 81
 
     (10) extends -> empty .
 
     LBRACE          reduce using rule 10 (extends -> empty .)
 
 
-state 78
+state 82
 
     (23) ifStatement -> IF expression THEN . LBRACE declaration_list RBRACE
     (24) ifStatement -> IF expression THEN . LBRACE declaration_list RBRACE ELSE LBRACE declaration_list RBRACE
 
-    LBRACE          shift and go to state 104
+    LBRACE          shift and go to state 108
 
 
-state 79
+state 83
 
     (25) whileStatement -> WHILE expression THEN . LBRACE declaration_list RBRACE
 
-    LBRACE          shift and go to state 105
+    LBRACE          shift and go to state 109
 
 
-state 80
+state 84
 
     (34) assignment -> property ASSIGN logical .
     (36) logical -> logical . OR equality
     (37) logical -> logical . AND equality
 
-    FUNC            reduce using rule 34 (assignment -> property ASSIGN logical .)
-    CLASS           reduce using rule 34 (assignment -> property ASSIGN logical .)
-    INT             reduce using rule 34 (assignment -> property ASSIGN logical .)
-    BOOL            reduce using rule 34 (assignment -> property ASSIGN logical .)
-    VOID            reduce using rule 34 (assignment -> property ASSIGN logical .)
-    ID              reduce using rule 34 (assignment -> property ASSIGN logical .)
-    IF              reduce using rule 34 (assignment -> property ASSIGN logical .)
-    WHILE           reduce using rule 34 (assignment -> property ASSIGN logical .)
-    PRINT           reduce using rule 34 (assignment -> property ASSIGN logical .)
-    RETURN          reduce using rule 34 (assignment -> property ASSIGN logical .)
-    NEW             reduce using rule 34 (assignment -> property ASSIGN logical .)
-    NUMBER          reduce using rule 34 (assignment -> property ASSIGN logical .)
-    TRUE            reduce using rule 34 (assignment -> property ASSIGN logical .)
-    FALSE           reduce using rule 34 (assignment -> property ASSIGN logical .)
-    NULL            reduce using rule 34 (assignment -> property ASSIGN logical .)
-    LPAREN          reduce using rule 34 (assignment -> property ASSIGN logical .)
-    NOT             reduce using rule 34 (assignment -> property ASSIGN logical .)
-    MINUS           reduce using rule 34 (assignment -> property ASSIGN logical .)
-    $end            reduce using rule 34 (assignment -> property ASSIGN logical .)
+    SEMICOLON       reduce using rule 34 (assignment -> property ASSIGN logical .)
     RPAREN          reduce using rule 34 (assignment -> property ASSIGN logical .)
     THEN            reduce using rule 34 (assignment -> property ASSIGN logical .)
-    RBRACE          reduce using rule 34 (assignment -> property ASSIGN logical .)
     COMMA           reduce using rule 34 (assignment -> property ASSIGN logical .)
-    OR              shift and go to state 55
-    AND             shift and go to state 56
+    OR              shift and go to state 59
+    AND             shift and go to state 60
 
 
-state 81
+state 85
 
     (57) property -> property DOT ID .
 
@@ -2959,39 +2519,22 @@ state 81
     NOTEQUALS       reduce using rule 57 (property -> property DOT ID .)
     OR              reduce using rule 57 (property -> property DOT ID .)
     AND             reduce using rule 57 (property -> property DOT ID .)
-    FUNC            reduce using rule 57 (property -> property DOT ID .)
-    CLASS           reduce using rule 57 (property -> property DOT ID .)
-    INT             reduce using rule 57 (property -> property DOT ID .)
-    BOOL            reduce using rule 57 (property -> property DOT ID .)
-    VOID            reduce using rule 57 (property -> property DOT ID .)
-    ID              reduce using rule 57 (property -> property DOT ID .)
-    IF              reduce using rule 57 (property -> property DOT ID .)
-    WHILE           reduce using rule 57 (property -> property DOT ID .)
-    PRINT           reduce using rule 57 (property -> property DOT ID .)
-    RETURN          reduce using rule 57 (property -> property DOT ID .)
-    NEW             reduce using rule 57 (property -> property DOT ID .)
-    NUMBER          reduce using rule 57 (property -> property DOT ID .)
-    TRUE            reduce using rule 57 (property -> property DOT ID .)
-    FALSE           reduce using rule 57 (property -> property DOT ID .)
-    NULL            reduce using rule 57 (property -> property DOT ID .)
-    NOT             reduce using rule 57 (property -> property DOT ID .)
-    $end            reduce using rule 57 (property -> property DOT ID .)
+    SEMICOLON       reduce using rule 57 (property -> property DOT ID .)
     RPAREN          reduce using rule 57 (property -> property DOT ID .)
     THEN            reduce using rule 57 (property -> property DOT ID .)
-    RBRACE          reduce using rule 57 (property -> property DOT ID .)
     COMMA           reduce using rule 57 (property -> property DOT ID .)
 
 
-state 82
+state 86
 
     (58) property -> property LPAREN arguments . RPAREN
     (68) arguments -> arguments . COMMA expression
 
-    RPAREN          shift and go to state 106
-    COMMA           shift and go to state 107
+    RPAREN          shift and go to state 110
+    COMMA           shift and go to state 111
 
 
-state 83
+state 87
 
     (69) arguments -> expression .
 
@@ -2999,7 +2542,7 @@ state 83
     COMMA           reduce using rule 69 (arguments -> expression .)
 
 
-state 84
+state 88
 
     (36) logical -> logical OR equality .
     (39) equality -> equality . EQUALS comparison
@@ -3007,34 +2550,15 @@ state 84
 
     OR              reduce using rule 36 (logical -> logical OR equality .)
     AND             reduce using rule 36 (logical -> logical OR equality .)
-    FUNC            reduce using rule 36 (logical -> logical OR equality .)
-    CLASS           reduce using rule 36 (logical -> logical OR equality .)
-    INT             reduce using rule 36 (logical -> logical OR equality .)
-    BOOL            reduce using rule 36 (logical -> logical OR equality .)
-    VOID            reduce using rule 36 (logical -> logical OR equality .)
-    ID              reduce using rule 36 (logical -> logical OR equality .)
-    IF              reduce using rule 36 (logical -> logical OR equality .)
-    WHILE           reduce using rule 36 (logical -> logical OR equality .)
-    PRINT           reduce using rule 36 (logical -> logical OR equality .)
-    RETURN          reduce using rule 36 (logical -> logical OR equality .)
-    NEW             reduce using rule 36 (logical -> logical OR equality .)
-    NUMBER          reduce using rule 36 (logical -> logical OR equality .)
-    TRUE            reduce using rule 36 (logical -> logical OR equality .)
-    FALSE           reduce using rule 36 (logical -> logical OR equality .)
-    NULL            reduce using rule 36 (logical -> logical OR equality .)
-    LPAREN          reduce using rule 36 (logical -> logical OR equality .)
-    NOT             reduce using rule 36 (logical -> logical OR equality .)
-    MINUS           reduce using rule 36 (logical -> logical OR equality .)
-    $end            reduce using rule 36 (logical -> logical OR equality .)
+    SEMICOLON       reduce using rule 36 (logical -> logical OR equality .)
     RPAREN          reduce using rule 36 (logical -> logical OR equality .)
     THEN            reduce using rule 36 (logical -> logical OR equality .)
-    RBRACE          reduce using rule 36 (logical -> logical OR equality .)
     COMMA           reduce using rule 36 (logical -> logical OR equality .)
-    EQUALS          shift and go to state 59
-    NOTEQUALS       shift and go to state 60
+    EQUALS          shift and go to state 63
+    NOTEQUALS       shift and go to state 64
 
 
-state 85
+state 89
 
     (37) logical -> logical AND equality .
     (39) equality -> equality . EQUALS comparison
@@ -3042,50 +2566,31 @@ state 85
 
     OR              reduce using rule 37 (logical -> logical AND equality .)
     AND             reduce using rule 37 (logical -> logical AND equality .)
-    FUNC            reduce using rule 37 (logical -> logical AND equality .)
-    CLASS           reduce using rule 37 (logical -> logical AND equality .)
-    INT             reduce using rule 37 (logical -> logical AND equality .)
-    BOOL            reduce using rule 37 (logical -> logical AND equality .)
-    VOID            reduce using rule 37 (logical -> logical AND equality .)
-    ID              reduce using rule 37 (logical -> logical AND equality .)
-    IF              reduce using rule 37 (logical -> logical AND equality .)
-    WHILE           reduce using rule 37 (logical -> logical AND equality .)
-    PRINT           reduce using rule 37 (logical -> logical AND equality .)
-    RETURN          reduce using rule 37 (logical -> logical AND equality .)
-    NEW             reduce using rule 37 (logical -> logical AND equality .)
-    NUMBER          reduce using rule 37 (logical -> logical AND equality .)
-    TRUE            reduce using rule 37 (logical -> logical AND equality .)
-    FALSE           reduce using rule 37 (logical -> logical AND equality .)
-    NULL            reduce using rule 37 (logical -> logical AND equality .)
-    LPAREN          reduce using rule 37 (logical -> logical AND equality .)
-    NOT             reduce using rule 37 (logical -> logical AND equality .)
-    MINUS           reduce using rule 37 (logical -> logical AND equality .)
-    $end            reduce using rule 37 (logical -> logical AND equality .)
+    SEMICOLON       reduce using rule 37 (logical -> logical AND equality .)
     RPAREN          reduce using rule 37 (logical -> logical AND equality .)
     THEN            reduce using rule 37 (logical -> logical AND equality .)
-    RBRACE          reduce using rule 37 (logical -> logical AND equality .)
     COMMA           reduce using rule 37 (logical -> logical AND equality .)
-    EQUALS          shift and go to state 59
-    NOTEQUALS       shift and go to state 60
+    EQUALS          shift and go to state 63
+    NOTEQUALS       shift and go to state 64
 
 
-state 86
+state 90
 
     (56) property -> NEW primary LPAREN . RPAREN
 
-    RPAREN          shift and go to state 108
+    RPAREN          shift and go to state 112
 
 
-state 87
+state 91
 
     (60) call -> primary LPAREN arguments . RPAREN
     (68) arguments -> arguments . COMMA expression
 
-    RPAREN          shift and go to state 109
-    COMMA           shift and go to state 107
+    RPAREN          shift and go to state 113
+    COMMA           shift and go to state 111
 
 
-state 88
+state 92
 
     (39) equality -> equality EQUALS comparison .
     (42) comparison -> comparison . GREATER term
@@ -3097,36 +2602,17 @@ state 88
     NOTEQUALS       reduce using rule 39 (equality -> equality EQUALS comparison .)
     OR              reduce using rule 39 (equality -> equality EQUALS comparison .)
     AND             reduce using rule 39 (equality -> equality EQUALS comparison .)
-    FUNC            reduce using rule 39 (equality -> equality EQUALS comparison .)
-    CLASS           reduce using rule 39 (equality -> equality EQUALS comparison .)
-    INT             reduce using rule 39 (equality -> equality EQUALS comparison .)
-    BOOL            reduce using rule 39 (equality -> equality EQUALS comparison .)
-    VOID            reduce using rule 39 (equality -> equality EQUALS comparison .)
-    ID              reduce using rule 39 (equality -> equality EQUALS comparison .)
-    IF              reduce using rule 39 (equality -> equality EQUALS comparison .)
-    WHILE           reduce using rule 39 (equality -> equality EQUALS comparison .)
-    PRINT           reduce using rule 39 (equality -> equality EQUALS comparison .)
-    RETURN          reduce using rule 39 (equality -> equality EQUALS comparison .)
-    NEW             reduce using rule 39 (equality -> equality EQUALS comparison .)
-    NUMBER          reduce using rule 39 (equality -> equality EQUALS comparison .)
-    TRUE            reduce using rule 39 (equality -> equality EQUALS comparison .)
-    FALSE           reduce using rule 39 (equality -> equality EQUALS comparison .)
-    NULL            reduce using rule 39 (equality -> equality EQUALS comparison .)
-    LPAREN          reduce using rule 39 (equality -> equality EQUALS comparison .)
-    NOT             reduce using rule 39 (equality -> equality EQUALS comparison .)
-    MINUS           reduce using rule 39 (equality -> equality EQUALS comparison .)
-    $end            reduce using rule 39 (equality -> equality EQUALS comparison .)
+    SEMICOLON       reduce using rule 39 (equality -> equality EQUALS comparison .)
     RPAREN          reduce using rule 39 (equality -> equality EQUALS comparison .)
     THEN            reduce using rule 39 (equality -> equality EQUALS comparison .)
-    RBRACE          reduce using rule 39 (equality -> equality EQUALS comparison .)
     COMMA           reduce using rule 39 (equality -> equality EQUALS comparison .)
-    GREATER         shift and go to state 61
-    LESS            shift and go to state 62
-    GREATEROREQUAL  shift and go to state 63
-    LESSOREQUAL     shift and go to state 64
+    GREATER         shift and go to state 65
+    LESS            shift and go to state 66
+    GREATEROREQUAL  shift and go to state 67
+    LESSOREQUAL     shift and go to state 68
 
 
-state 89
+state 93
 
     (40) equality -> equality NOTEQUALS comparison .
     (42) comparison -> comparison . GREATER term
@@ -3138,42 +2624,22 @@ state 89
     NOTEQUALS       reduce using rule 40 (equality -> equality NOTEQUALS comparison .)
     OR              reduce using rule 40 (equality -> equality NOTEQUALS comparison .)
     AND             reduce using rule 40 (equality -> equality NOTEQUALS comparison .)
-    FUNC            reduce using rule 40 (equality -> equality NOTEQUALS comparison .)
-    CLASS           reduce using rule 40 (equality -> equality NOTEQUALS comparison .)
-    INT             reduce using rule 40 (equality -> equality NOTEQUALS comparison .)
-    BOOL            reduce using rule 40 (equality -> equality NOTEQUALS comparison .)
-    VOID            reduce using rule 40 (equality -> equality NOTEQUALS comparison .)
-    ID              reduce using rule 40 (equality -> equality NOTEQUALS comparison .)
-    IF              reduce using rule 40 (equality -> equality NOTEQUALS comparison .)
-    WHILE           reduce using rule 40 (equality -> equality NOTEQUALS comparison .)
-    PRINT           reduce using rule 40 (equality -> equality NOTEQUALS comparison .)
-    RETURN          reduce using rule 40 (equality -> equality NOTEQUALS comparison .)
-    NEW             reduce using rule 40 (equality -> equality NOTEQUALS comparison .)
-    NUMBER          reduce using rule 40 (equality -> equality NOTEQUALS comparison .)
-    TRUE            reduce using rule 40 (equality -> equality NOTEQUALS comparison .)
-    FALSE           reduce using rule 40 (equality -> equality NOTEQUALS comparison .)
-    NULL            reduce using rule 40 (equality -> equality NOTEQUALS comparison .)
-    LPAREN          reduce using rule 40 (equality -> equality NOTEQUALS comparison .)
-    NOT             reduce using rule 40 (equality -> equality NOTEQUALS comparison .)
-    MINUS           reduce using rule 40 (equality -> equality NOTEQUALS comparison .)
-    $end            reduce using rule 40 (equality -> equality NOTEQUALS comparison .)
+    SEMICOLON       reduce using rule 40 (equality -> equality NOTEQUALS comparison .)
     RPAREN          reduce using rule 40 (equality -> equality NOTEQUALS comparison .)
     THEN            reduce using rule 40 (equality -> equality NOTEQUALS comparison .)
-    RBRACE          reduce using rule 40 (equality -> equality NOTEQUALS comparison .)
     COMMA           reduce using rule 40 (equality -> equality NOTEQUALS comparison .)
-    GREATER         shift and go to state 61
-    LESS            shift and go to state 62
-    GREATEROREQUAL  shift and go to state 63
-    LESSOREQUAL     shift and go to state 64
+    GREATER         shift and go to state 65
+    LESS            shift and go to state 66
+    GREATEROREQUAL  shift and go to state 67
+    LESSOREQUAL     shift and go to state 68
 
 
-state 90
+state 94
 
     (42) comparison -> comparison GREATER term .
     (47) term -> term . PLUS factor
     (48) term -> term . MINUS factor
 
-  ! shift/reduce conflict for MINUS resolved as shift
     GREATER         reduce using rule 42 (comparison -> comparison GREATER term .)
     LESS            reduce using rule 42 (comparison -> comparison GREATER term .)
     GREATEROREQUAL  reduce using rule 42 (comparison -> comparison GREATER term .)
@@ -3182,41 +2648,20 @@ state 90
     NOTEQUALS       reduce using rule 42 (comparison -> comparison GREATER term .)
     OR              reduce using rule 42 (comparison -> comparison GREATER term .)
     AND             reduce using rule 42 (comparison -> comparison GREATER term .)
-    FUNC            reduce using rule 42 (comparison -> comparison GREATER term .)
-    CLASS           reduce using rule 42 (comparison -> comparison GREATER term .)
-    INT             reduce using rule 42 (comparison -> comparison GREATER term .)
-    BOOL            reduce using rule 42 (comparison -> comparison GREATER term .)
-    VOID            reduce using rule 42 (comparison -> comparison GREATER term .)
-    ID              reduce using rule 42 (comparison -> comparison GREATER term .)
-    IF              reduce using rule 42 (comparison -> comparison GREATER term .)
-    WHILE           reduce using rule 42 (comparison -> comparison GREATER term .)
-    PRINT           reduce using rule 42 (comparison -> comparison GREATER term .)
-    RETURN          reduce using rule 42 (comparison -> comparison GREATER term .)
-    NEW             reduce using rule 42 (comparison -> comparison GREATER term .)
-    NUMBER          reduce using rule 42 (comparison -> comparison GREATER term .)
-    TRUE            reduce using rule 42 (comparison -> comparison GREATER term .)
-    FALSE           reduce using rule 42 (comparison -> comparison GREATER term .)
-    NULL            reduce using rule 42 (comparison -> comparison GREATER term .)
-    LPAREN          reduce using rule 42 (comparison -> comparison GREATER term .)
-    NOT             reduce using rule 42 (comparison -> comparison GREATER term .)
-    $end            reduce using rule 42 (comparison -> comparison GREATER term .)
+    SEMICOLON       reduce using rule 42 (comparison -> comparison GREATER term .)
     RPAREN          reduce using rule 42 (comparison -> comparison GREATER term .)
     THEN            reduce using rule 42 (comparison -> comparison GREATER term .)
-    RBRACE          reduce using rule 42 (comparison -> comparison GREATER term .)
     COMMA           reduce using rule 42 (comparison -> comparison GREATER term .)
-    PLUS            shift and go to state 65
-    MINUS           shift and go to state 66
-
-  ! MINUS           [ reduce using rule 42 (comparison -> comparison GREATER term .) ]
+    PLUS            shift and go to state 69
+    MINUS           shift and go to state 70
 
 
-state 91
+state 95
 
     (43) comparison -> comparison LESS term .
     (47) term -> term . PLUS factor
     (48) term -> term . MINUS factor
 
-  ! shift/reduce conflict for MINUS resolved as shift
     GREATER         reduce using rule 43 (comparison -> comparison LESS term .)
     LESS            reduce using rule 43 (comparison -> comparison LESS term .)
     GREATEROREQUAL  reduce using rule 43 (comparison -> comparison LESS term .)
@@ -3225,41 +2670,20 @@ state 91
     NOTEQUALS       reduce using rule 43 (comparison -> comparison LESS term .)
     OR              reduce using rule 43 (comparison -> comparison LESS term .)
     AND             reduce using rule 43 (comparison -> comparison LESS term .)
-    FUNC            reduce using rule 43 (comparison -> comparison LESS term .)
-    CLASS           reduce using rule 43 (comparison -> comparison LESS term .)
-    INT             reduce using rule 43 (comparison -> comparison LESS term .)
-    BOOL            reduce using rule 43 (comparison -> comparison LESS term .)
-    VOID            reduce using rule 43 (comparison -> comparison LESS term .)
-    ID              reduce using rule 43 (comparison -> comparison LESS term .)
-    IF              reduce using rule 43 (comparison -> comparison LESS term .)
-    WHILE           reduce using rule 43 (comparison -> comparison LESS term .)
-    PRINT           reduce using rule 43 (comparison -> comparison LESS term .)
-    RETURN          reduce using rule 43 (comparison -> comparison LESS term .)
-    NEW             reduce using rule 43 (comparison -> comparison LESS term .)
-    NUMBER          reduce using rule 43 (comparison -> comparison LESS term .)
-    TRUE            reduce using rule 43 (comparison -> comparison LESS term .)
-    FALSE           reduce using rule 43 (comparison -> comparison LESS term .)
-    NULL            reduce using rule 43 (comparison -> comparison LESS term .)
-    LPAREN          reduce using rule 43 (comparison -> comparison LESS term .)
-    NOT             reduce using rule 43 (comparison -> comparison LESS term .)
-    $end            reduce using rule 43 (comparison -> comparison LESS term .)
+    SEMICOLON       reduce using rule 43 (comparison -> comparison LESS term .)
     RPAREN          reduce using rule 43 (comparison -> comparison LESS term .)
     THEN            reduce using rule 43 (comparison -> comparison LESS term .)
-    RBRACE          reduce using rule 43 (comparison -> comparison LESS term .)
     COMMA           reduce using rule 43 (comparison -> comparison LESS term .)
-    PLUS            shift and go to state 65
-    MINUS           shift and go to state 66
-
-  ! MINUS           [ reduce using rule 43 (comparison -> comparison LESS term .) ]
+    PLUS            shift and go to state 69
+    MINUS           shift and go to state 70
 
 
-state 92
+state 96
 
     (44) comparison -> comparison GREATEROREQUAL term .
     (47) term -> term . PLUS factor
     (48) term -> term . MINUS factor
 
-  ! shift/reduce conflict for MINUS resolved as shift
     GREATER         reduce using rule 44 (comparison -> comparison GREATEROREQUAL term .)
     LESS            reduce using rule 44 (comparison -> comparison GREATEROREQUAL term .)
     GREATEROREQUAL  reduce using rule 44 (comparison -> comparison GREATEROREQUAL term .)
@@ -3268,41 +2692,20 @@ state 92
     NOTEQUALS       reduce using rule 44 (comparison -> comparison GREATEROREQUAL term .)
     OR              reduce using rule 44 (comparison -> comparison GREATEROREQUAL term .)
     AND             reduce using rule 44 (comparison -> comparison GREATEROREQUAL term .)
-    FUNC            reduce using rule 44 (comparison -> comparison GREATEROREQUAL term .)
-    CLASS           reduce using rule 44 (comparison -> comparison GREATEROREQUAL term .)
-    INT             reduce using rule 44 (comparison -> comparison GREATEROREQUAL term .)
-    BOOL            reduce using rule 44 (comparison -> comparison GREATEROREQUAL term .)
-    VOID            reduce using rule 44 (comparison -> comparison GREATEROREQUAL term .)
-    ID              reduce using rule 44 (comparison -> comparison GREATEROREQUAL term .)
-    IF              reduce using rule 44 (comparison -> comparison GREATEROREQUAL term .)
-    WHILE           reduce using rule 44 (comparison -> comparison GREATEROREQUAL term .)
-    PRINT           reduce using rule 44 (comparison -> comparison GREATEROREQUAL term .)
-    RETURN          reduce using rule 44 (comparison -> comparison GREATEROREQUAL term .)
-    NEW             reduce using rule 44 (comparison -> comparison GREATEROREQUAL term .)
-    NUMBER          reduce using rule 44 (comparison -> comparison GREATEROREQUAL term .)
-    TRUE            reduce using rule 44 (comparison -> comparison GREATEROREQUAL term .)
-    FALSE           reduce using rule 44 (comparison -> comparison GREATEROREQUAL term .)
-    NULL            reduce using rule 44 (comparison -> comparison GREATEROREQUAL term .)
-    LPAREN          reduce using rule 44 (comparison -> comparison GREATEROREQUAL term .)
-    NOT             reduce using rule 44 (comparison -> comparison GREATEROREQUAL term .)
-    $end            reduce using rule 44 (comparison -> comparison GREATEROREQUAL term .)
+    SEMICOLON       reduce using rule 44 (comparison -> comparison GREATEROREQUAL term .)
     RPAREN          reduce using rule 44 (comparison -> comparison GREATEROREQUAL term .)
     THEN            reduce using rule 44 (comparison -> comparison GREATEROREQUAL term .)
-    RBRACE          reduce using rule 44 (comparison -> comparison GREATEROREQUAL term .)
     COMMA           reduce using rule 44 (comparison -> comparison GREATEROREQUAL term .)
-    PLUS            shift and go to state 65
-    MINUS           shift and go to state 66
-
-  ! MINUS           [ reduce using rule 44 (comparison -> comparison GREATEROREQUAL term .) ]
+    PLUS            shift and go to state 69
+    MINUS           shift and go to state 70
 
 
-state 93
+state 97
 
     (45) comparison -> comparison LESSOREQUAL term .
     (47) term -> term . PLUS factor
     (48) term -> term . MINUS factor
 
-  ! shift/reduce conflict for MINUS resolved as shift
     GREATER         reduce using rule 45 (comparison -> comparison LESSOREQUAL term .)
     LESS            reduce using rule 45 (comparison -> comparison LESSOREQUAL term .)
     GREATEROREQUAL  reduce using rule 45 (comparison -> comparison LESSOREQUAL term .)
@@ -3311,35 +2714,15 @@ state 93
     NOTEQUALS       reduce using rule 45 (comparison -> comparison LESSOREQUAL term .)
     OR              reduce using rule 45 (comparison -> comparison LESSOREQUAL term .)
     AND             reduce using rule 45 (comparison -> comparison LESSOREQUAL term .)
-    FUNC            reduce using rule 45 (comparison -> comparison LESSOREQUAL term .)
-    CLASS           reduce using rule 45 (comparison -> comparison LESSOREQUAL term .)
-    INT             reduce using rule 45 (comparison -> comparison LESSOREQUAL term .)
-    BOOL            reduce using rule 45 (comparison -> comparison LESSOREQUAL term .)
-    VOID            reduce using rule 45 (comparison -> comparison LESSOREQUAL term .)
-    ID              reduce using rule 45 (comparison -> comparison LESSOREQUAL term .)
-    IF              reduce using rule 45 (comparison -> comparison LESSOREQUAL term .)
-    WHILE           reduce using rule 45 (comparison -> comparison LESSOREQUAL term .)
-    PRINT           reduce using rule 45 (comparison -> comparison LESSOREQUAL term .)
-    RETURN          reduce using rule 45 (comparison -> comparison LESSOREQUAL term .)
-    NEW             reduce using rule 45 (comparison -> comparison LESSOREQUAL term .)
-    NUMBER          reduce using rule 45 (comparison -> comparison LESSOREQUAL term .)
-    TRUE            reduce using rule 45 (comparison -> comparison LESSOREQUAL term .)
-    FALSE           reduce using rule 45 (comparison -> comparison LESSOREQUAL term .)
-    NULL            reduce using rule 45 (comparison -> comparison LESSOREQUAL term .)
-    LPAREN          reduce using rule 45 (comparison -> comparison LESSOREQUAL term .)
-    NOT             reduce using rule 45 (comparison -> comparison LESSOREQUAL term .)
-    $end            reduce using rule 45 (comparison -> comparison LESSOREQUAL term .)
+    SEMICOLON       reduce using rule 45 (comparison -> comparison LESSOREQUAL term .)
     RPAREN          reduce using rule 45 (comparison -> comparison LESSOREQUAL term .)
     THEN            reduce using rule 45 (comparison -> comparison LESSOREQUAL term .)
-    RBRACE          reduce using rule 45 (comparison -> comparison LESSOREQUAL term .)
     COMMA           reduce using rule 45 (comparison -> comparison LESSOREQUAL term .)
-    PLUS            shift and go to state 65
-    MINUS           shift and go to state 66
-
-  ! MINUS           [ reduce using rule 45 (comparison -> comparison LESSOREQUAL term .) ]
+    PLUS            shift and go to state 69
+    MINUS           shift and go to state 70
 
 
-state 94
+state 98
 
     (47) term -> term PLUS factor .
     (50) factor -> factor . TIMES unary
@@ -3355,33 +2738,15 @@ state 94
     NOTEQUALS       reduce using rule 47 (term -> term PLUS factor .)
     OR              reduce using rule 47 (term -> term PLUS factor .)
     AND             reduce using rule 47 (term -> term PLUS factor .)
-    FUNC            reduce using rule 47 (term -> term PLUS factor .)
-    CLASS           reduce using rule 47 (term -> term PLUS factor .)
-    INT             reduce using rule 47 (term -> term PLUS factor .)
-    BOOL            reduce using rule 47 (term -> term PLUS factor .)
-    VOID            reduce using rule 47 (term -> term PLUS factor .)
-    ID              reduce using rule 47 (term -> term PLUS factor .)
-    IF              reduce using rule 47 (term -> term PLUS factor .)
-    WHILE           reduce using rule 47 (term -> term PLUS factor .)
-    PRINT           reduce using rule 47 (term -> term PLUS factor .)
-    RETURN          reduce using rule 47 (term -> term PLUS factor .)
-    NEW             reduce using rule 47 (term -> term PLUS factor .)
-    NUMBER          reduce using rule 47 (term -> term PLUS factor .)
-    TRUE            reduce using rule 47 (term -> term PLUS factor .)
-    FALSE           reduce using rule 47 (term -> term PLUS factor .)
-    NULL            reduce using rule 47 (term -> term PLUS factor .)
-    LPAREN          reduce using rule 47 (term -> term PLUS factor .)
-    NOT             reduce using rule 47 (term -> term PLUS factor .)
-    $end            reduce using rule 47 (term -> term PLUS factor .)
+    SEMICOLON       reduce using rule 47 (term -> term PLUS factor .)
     RPAREN          reduce using rule 47 (term -> term PLUS factor .)
     THEN            reduce using rule 47 (term -> term PLUS factor .)
-    RBRACE          reduce using rule 47 (term -> term PLUS factor .)
     COMMA           reduce using rule 47 (term -> term PLUS factor .)
-    TIMES           shift and go to state 67
-    DIVIDE          shift and go to state 68
+    TIMES           shift and go to state 71
+    DIVIDE          shift and go to state 72
 
 
-state 95
+state 99
 
     (48) term -> term MINUS factor .
     (50) factor -> factor . TIMES unary
@@ -3397,33 +2762,15 @@ state 95
     NOTEQUALS       reduce using rule 48 (term -> term MINUS factor .)
     OR              reduce using rule 48 (term -> term MINUS factor .)
     AND             reduce using rule 48 (term -> term MINUS factor .)
-    FUNC            reduce using rule 48 (term -> term MINUS factor .)
-    CLASS           reduce using rule 48 (term -> term MINUS factor .)
-    INT             reduce using rule 48 (term -> term MINUS factor .)
-    BOOL            reduce using rule 48 (term -> term MINUS factor .)
-    VOID            reduce using rule 48 (term -> term MINUS factor .)
-    ID              reduce using rule 48 (term -> term MINUS factor .)
-    IF              reduce using rule 48 (term -> term MINUS factor .)
-    WHILE           reduce using rule 48 (term -> term MINUS factor .)
-    PRINT           reduce using rule 48 (term -> term MINUS factor .)
-    RETURN          reduce using rule 48 (term -> term MINUS factor .)
-    NEW             reduce using rule 48 (term -> term MINUS factor .)
-    NUMBER          reduce using rule 48 (term -> term MINUS factor .)
-    TRUE            reduce using rule 48 (term -> term MINUS factor .)
-    FALSE           reduce using rule 48 (term -> term MINUS factor .)
-    NULL            reduce using rule 48 (term -> term MINUS factor .)
-    LPAREN          reduce using rule 48 (term -> term MINUS factor .)
-    NOT             reduce using rule 48 (term -> term MINUS factor .)
-    $end            reduce using rule 48 (term -> term MINUS factor .)
+    SEMICOLON       reduce using rule 48 (term -> term MINUS factor .)
     RPAREN          reduce using rule 48 (term -> term MINUS factor .)
     THEN            reduce using rule 48 (term -> term MINUS factor .)
-    RBRACE          reduce using rule 48 (term -> term MINUS factor .)
     COMMA           reduce using rule 48 (term -> term MINUS factor .)
-    TIMES           shift and go to state 67
-    DIVIDE          shift and go to state 68
+    TIMES           shift and go to state 71
+    DIVIDE          shift and go to state 72
 
 
-state 96
+state 100
 
     (50) factor -> factor TIMES unary .
 
@@ -3439,31 +2786,13 @@ state 96
     NOTEQUALS       reduce using rule 50 (factor -> factor TIMES unary .)
     OR              reduce using rule 50 (factor -> factor TIMES unary .)
     AND             reduce using rule 50 (factor -> factor TIMES unary .)
-    FUNC            reduce using rule 50 (factor -> factor TIMES unary .)
-    CLASS           reduce using rule 50 (factor -> factor TIMES unary .)
-    INT             reduce using rule 50 (factor -> factor TIMES unary .)
-    BOOL            reduce using rule 50 (factor -> factor TIMES unary .)
-    VOID            reduce using rule 50 (factor -> factor TIMES unary .)
-    ID              reduce using rule 50 (factor -> factor TIMES unary .)
-    IF              reduce using rule 50 (factor -> factor TIMES unary .)
-    WHILE           reduce using rule 50 (factor -> factor TIMES unary .)
-    PRINT           reduce using rule 50 (factor -> factor TIMES unary .)
-    RETURN          reduce using rule 50 (factor -> factor TIMES unary .)
-    NEW             reduce using rule 50 (factor -> factor TIMES unary .)
-    NUMBER          reduce using rule 50 (factor -> factor TIMES unary .)
-    TRUE            reduce using rule 50 (factor -> factor TIMES unary .)
-    FALSE           reduce using rule 50 (factor -> factor TIMES unary .)
-    NULL            reduce using rule 50 (factor -> factor TIMES unary .)
-    LPAREN          reduce using rule 50 (factor -> factor TIMES unary .)
-    NOT             reduce using rule 50 (factor -> factor TIMES unary .)
-    $end            reduce using rule 50 (factor -> factor TIMES unary .)
+    SEMICOLON       reduce using rule 50 (factor -> factor TIMES unary .)
     RPAREN          reduce using rule 50 (factor -> factor TIMES unary .)
     THEN            reduce using rule 50 (factor -> factor TIMES unary .)
-    RBRACE          reduce using rule 50 (factor -> factor TIMES unary .)
     COMMA           reduce using rule 50 (factor -> factor TIMES unary .)
 
 
-state 97
+state 101
 
     (51) factor -> factor DIVIDE unary .
 
@@ -3479,57 +2808,20 @@ state 97
     NOTEQUALS       reduce using rule 51 (factor -> factor DIVIDE unary .)
     OR              reduce using rule 51 (factor -> factor DIVIDE unary .)
     AND             reduce using rule 51 (factor -> factor DIVIDE unary .)
-    FUNC            reduce using rule 51 (factor -> factor DIVIDE unary .)
-    CLASS           reduce using rule 51 (factor -> factor DIVIDE unary .)
-    INT             reduce using rule 51 (factor -> factor DIVIDE unary .)
-    BOOL            reduce using rule 51 (factor -> factor DIVIDE unary .)
-    VOID            reduce using rule 51 (factor -> factor DIVIDE unary .)
-    ID              reduce using rule 51 (factor -> factor DIVIDE unary .)
-    IF              reduce using rule 51 (factor -> factor DIVIDE unary .)
-    WHILE           reduce using rule 51 (factor -> factor DIVIDE unary .)
-    PRINT           reduce using rule 51 (factor -> factor DIVIDE unary .)
-    RETURN          reduce using rule 51 (factor -> factor DIVIDE unary .)
-    NEW             reduce using rule 51 (factor -> factor DIVIDE unary .)
-    NUMBER          reduce using rule 51 (factor -> factor DIVIDE unary .)
-    TRUE            reduce using rule 51 (factor -> factor DIVIDE unary .)
-    FALSE           reduce using rule 51 (factor -> factor DIVIDE unary .)
-    NULL            reduce using rule 51 (factor -> factor DIVIDE unary .)
-    LPAREN          reduce using rule 51 (factor -> factor DIVIDE unary .)
-    NOT             reduce using rule 51 (factor -> factor DIVIDE unary .)
-    $end            reduce using rule 51 (factor -> factor DIVIDE unary .)
+    SEMICOLON       reduce using rule 51 (factor -> factor DIVIDE unary .)
     RPAREN          reduce using rule 51 (factor -> factor DIVIDE unary .)
     THEN            reduce using rule 51 (factor -> factor DIVIDE unary .)
-    RBRACE          reduce using rule 51 (factor -> factor DIVIDE unary .)
     COMMA           reduce using rule 51 (factor -> factor DIVIDE unary .)
 
 
-state 98
+state 102
 
     (28) varDeclaration -> type ID ASSIGN expression .
 
-    FUNC            reduce using rule 28 (varDeclaration -> type ID ASSIGN expression .)
-    CLASS           reduce using rule 28 (varDeclaration -> type ID ASSIGN expression .)
-    INT             reduce using rule 28 (varDeclaration -> type ID ASSIGN expression .)
-    BOOL            reduce using rule 28 (varDeclaration -> type ID ASSIGN expression .)
-    VOID            reduce using rule 28 (varDeclaration -> type ID ASSIGN expression .)
-    ID              reduce using rule 28 (varDeclaration -> type ID ASSIGN expression .)
-    IF              reduce using rule 28 (varDeclaration -> type ID ASSIGN expression .)
-    WHILE           reduce using rule 28 (varDeclaration -> type ID ASSIGN expression .)
-    PRINT           reduce using rule 28 (varDeclaration -> type ID ASSIGN expression .)
-    RETURN          reduce using rule 28 (varDeclaration -> type ID ASSIGN expression .)
-    NEW             reduce using rule 28 (varDeclaration -> type ID ASSIGN expression .)
-    NUMBER          reduce using rule 28 (varDeclaration -> type ID ASSIGN expression .)
-    TRUE            reduce using rule 28 (varDeclaration -> type ID ASSIGN expression .)
-    FALSE           reduce using rule 28 (varDeclaration -> type ID ASSIGN expression .)
-    NULL            reduce using rule 28 (varDeclaration -> type ID ASSIGN expression .)
-    LPAREN          reduce using rule 28 (varDeclaration -> type ID ASSIGN expression .)
-    NOT             reduce using rule 28 (varDeclaration -> type ID ASSIGN expression .)
-    MINUS           reduce using rule 28 (varDeclaration -> type ID ASSIGN expression .)
-    $end            reduce using rule 28 (varDeclaration -> type ID ASSIGN expression .)
-    RBRACE          reduce using rule 28 (varDeclaration -> type ID ASSIGN expression .)
+    SEMICOLON       reduce using rule 28 (varDeclaration -> type ID ASSIGN expression .)
 
 
-state 99
+state 103
 
     (32) type -> ID .
 
@@ -3537,28 +2829,28 @@ state 99
     LBRACE          reduce using rule 32 (type -> ID .)
 
 
-state 100
+state 104
 
     (71) funcDeclaration -> FUNC ID LPAREN parameter_list . RPAREN type LBRACE declaration_list RBRACE
     (72) parameter_list -> parameter_list . COMMA type ID
 
-    RPAREN          shift and go to state 110
-    COMMA           shift and go to state 111
+    RPAREN          shift and go to state 114
+    COMMA           shift and go to state 115
 
 
-state 101
+state 105
 
     (73) parameter_list -> type . ID
 
-    ID              shift and go to state 112
+    ID              shift and go to state 116
 
 
-state 102
+state 106
 
     (8) class -> CLASS ID extends LBRACE . classDeclarationList RBRACE
     (11) classDeclarationList -> . classDeclarationList classDeclaration
     (12) classDeclarationList -> . classDeclaration
-    (13) classDeclaration -> . varDeclaration
+    (13) classDeclaration -> . varDeclaration SEMICOLON
     (14) classDeclaration -> . methodDeclaration
     (27) varDeclaration -> . type ID
     (28) varDeclaration -> . type ID ASSIGN expression
@@ -3568,42 +2860,42 @@ state 102
     (31) type -> . VOID
     (32) type -> . ID
 
-    FUNC            shift and go to state 117
+    FUNC            shift and go to state 121
     INT             shift and go to state 18
     BOOL            shift and go to state 19
     VOID            shift and go to state 20
-    ID              shift and go to state 99
+    ID              shift and go to state 103
 
-    classDeclarationList           shift and go to state 113
-    classDeclaration               shift and go to state 114
-    varDeclaration                 shift and go to state 115
-    methodDeclaration              shift and go to state 116
+    classDeclarationList           shift and go to state 117
+    classDeclaration               shift and go to state 118
+    varDeclaration                 shift and go to state 119
+    methodDeclaration              shift and go to state 120
     type                           shift and go to state 8
 
-state 103
+state 107
 
     (9) extends -> EXTENDS ID .
 
     LBRACE          reduce using rule 9 (extends -> EXTENDS ID .)
 
 
-state 104
+state 108
 
     (23) ifStatement -> IF expression THEN LBRACE . declaration_list RBRACE
     (24) ifStatement -> IF expression THEN LBRACE . declaration_list RBRACE ELSE LBRACE declaration_list RBRACE
     (2) declaration_list -> . declaration
     (3) declaration_list -> . declaration_list declaration
-    (4) declaration -> . varDeclaration
+    (4) declaration -> . varDeclaration SEMICOLON
     (5) declaration -> . statement
     (6) declaration -> . funcDeclaration
     (7) declaration -> . class
     (27) varDeclaration -> . type ID
     (28) varDeclaration -> . type ID ASSIGN expression
-    (16) statement -> . expression
+    (16) statement -> . expression SEMICOLON
     (17) statement -> . ifStatement
     (18) statement -> . whileStatement
-    (19) statement -> . printStatement
-    (20) statement -> . returnStatement
+    (19) statement -> . printStatement SEMICOLON
+    (20) statement -> . returnStatement SEMICOLON
     (71) funcDeclaration -> . FUNC ID LPAREN parameter_list RPAREN type LBRACE declaration_list RBRACE
     (8) class -> . CLASS ID extends LBRACE classDeclarationList RBRACE
     (29) type -> . INT
@@ -3672,7 +2964,7 @@ state 104
     MINUS           shift and go to state 39
 
     expression                     shift and go to state 10
-    declaration_list               shift and go to state 118
+    declaration_list               shift and go to state 122
     declaration                    shift and go to state 3
     varDeclaration                 shift and go to state 4
     statement                      shift and go to state 5
@@ -3694,22 +2986,22 @@ state 104
     factor                         shift and go to state 38
     unary                          shift and go to state 40
 
-state 105
+state 109
 
     (25) whileStatement -> WHILE expression THEN LBRACE . declaration_list RBRACE
     (2) declaration_list -> . declaration
     (3) declaration_list -> . declaration_list declaration
-    (4) declaration -> . varDeclaration
+    (4) declaration -> . varDeclaration SEMICOLON
     (5) declaration -> . statement
     (6) declaration -> . funcDeclaration
     (7) declaration -> . class
     (27) varDeclaration -> . type ID
     (28) varDeclaration -> . type ID ASSIGN expression
-    (16) statement -> . expression
+    (16) statement -> . expression SEMICOLON
     (17) statement -> . ifStatement
     (18) statement -> . whileStatement
-    (19) statement -> . printStatement
-    (20) statement -> . returnStatement
+    (19) statement -> . printStatement SEMICOLON
+    (20) statement -> . returnStatement SEMICOLON
     (71) funcDeclaration -> . FUNC ID LPAREN parameter_list RPAREN type LBRACE declaration_list RBRACE
     (8) class -> . CLASS ID extends LBRACE classDeclarationList RBRACE
     (29) type -> . INT
@@ -3778,7 +3070,7 @@ state 105
     MINUS           shift and go to state 39
 
     expression                     shift and go to state 10
-    declaration_list               shift and go to state 119
+    declaration_list               shift and go to state 123
     declaration                    shift and go to state 3
     varDeclaration                 shift and go to state 4
     statement                      shift and go to state 5
@@ -3800,7 +3092,7 @@ state 105
     factor                         shift and go to state 38
     unary                          shift and go to state 40
 
-state 106
+state 110
 
     (58) property -> property LPAREN arguments RPAREN .
 
@@ -3819,30 +3111,13 @@ state 106
     NOTEQUALS       reduce using rule 58 (property -> property LPAREN arguments RPAREN .)
     OR              reduce using rule 58 (property -> property LPAREN arguments RPAREN .)
     AND             reduce using rule 58 (property -> property LPAREN arguments RPAREN .)
-    FUNC            reduce using rule 58 (property -> property LPAREN arguments RPAREN .)
-    CLASS           reduce using rule 58 (property -> property LPAREN arguments RPAREN .)
-    INT             reduce using rule 58 (property -> property LPAREN arguments RPAREN .)
-    BOOL            reduce using rule 58 (property -> property LPAREN arguments RPAREN .)
-    VOID            reduce using rule 58 (property -> property LPAREN arguments RPAREN .)
-    ID              reduce using rule 58 (property -> property LPAREN arguments RPAREN .)
-    IF              reduce using rule 58 (property -> property LPAREN arguments RPAREN .)
-    WHILE           reduce using rule 58 (property -> property LPAREN arguments RPAREN .)
-    PRINT           reduce using rule 58 (property -> property LPAREN arguments RPAREN .)
-    RETURN          reduce using rule 58 (property -> property LPAREN arguments RPAREN .)
-    NEW             reduce using rule 58 (property -> property LPAREN arguments RPAREN .)
-    NUMBER          reduce using rule 58 (property -> property LPAREN arguments RPAREN .)
-    TRUE            reduce using rule 58 (property -> property LPAREN arguments RPAREN .)
-    FALSE           reduce using rule 58 (property -> property LPAREN arguments RPAREN .)
-    NULL            reduce using rule 58 (property -> property LPAREN arguments RPAREN .)
-    NOT             reduce using rule 58 (property -> property LPAREN arguments RPAREN .)
-    $end            reduce using rule 58 (property -> property LPAREN arguments RPAREN .)
+    SEMICOLON       reduce using rule 58 (property -> property LPAREN arguments RPAREN .)
     RPAREN          reduce using rule 58 (property -> property LPAREN arguments RPAREN .)
     THEN            reduce using rule 58 (property -> property LPAREN arguments RPAREN .)
-    RBRACE          reduce using rule 58 (property -> property LPAREN arguments RPAREN .)
     COMMA           reduce using rule 58 (property -> property LPAREN arguments RPAREN .)
 
 
-state 107
+state 111
 
     (68) arguments -> arguments COMMA . expression
     (33) expression -> . assignment
@@ -3883,7 +3158,7 @@ state 107
 
     NEW             shift and go to state 28
     NUMBER          shift and go to state 33
-    ID              shift and go to state 46
+    ID              shift and go to state 50
     TRUE            shift and go to state 34
     FALSE           shift and go to state 35
     NULL            shift and go to state 36
@@ -3891,7 +3166,7 @@ state 107
     NOT             shift and go to state 41
     MINUS           shift and go to state 39
 
-    expression                     shift and go to state 120
+    expression                     shift and go to state 124
     assignment                     shift and go to state 21
     property                       shift and go to state 26
     logical                        shift and go to state 27
@@ -3903,7 +3178,7 @@ state 107
     factor                         shift and go to state 38
     unary                          shift and go to state 40
 
-state 108
+state 112
 
     (56) property -> NEW primary LPAREN RPAREN .
 
@@ -3922,30 +3197,13 @@ state 108
     NOTEQUALS       reduce using rule 56 (property -> NEW primary LPAREN RPAREN .)
     OR              reduce using rule 56 (property -> NEW primary LPAREN RPAREN .)
     AND             reduce using rule 56 (property -> NEW primary LPAREN RPAREN .)
-    FUNC            reduce using rule 56 (property -> NEW primary LPAREN RPAREN .)
-    CLASS           reduce using rule 56 (property -> NEW primary LPAREN RPAREN .)
-    INT             reduce using rule 56 (property -> NEW primary LPAREN RPAREN .)
-    BOOL            reduce using rule 56 (property -> NEW primary LPAREN RPAREN .)
-    VOID            reduce using rule 56 (property -> NEW primary LPAREN RPAREN .)
-    ID              reduce using rule 56 (property -> NEW primary LPAREN RPAREN .)
-    IF              reduce using rule 56 (property -> NEW primary LPAREN RPAREN .)
-    WHILE           reduce using rule 56 (property -> NEW primary LPAREN RPAREN .)
-    PRINT           reduce using rule 56 (property -> NEW primary LPAREN RPAREN .)
-    RETURN          reduce using rule 56 (property -> NEW primary LPAREN RPAREN .)
-    NEW             reduce using rule 56 (property -> NEW primary LPAREN RPAREN .)
-    NUMBER          reduce using rule 56 (property -> NEW primary LPAREN RPAREN .)
-    TRUE            reduce using rule 56 (property -> NEW primary LPAREN RPAREN .)
-    FALSE           reduce using rule 56 (property -> NEW primary LPAREN RPAREN .)
-    NULL            reduce using rule 56 (property -> NEW primary LPAREN RPAREN .)
-    NOT             reduce using rule 56 (property -> NEW primary LPAREN RPAREN .)
-    $end            reduce using rule 56 (property -> NEW primary LPAREN RPAREN .)
+    SEMICOLON       reduce using rule 56 (property -> NEW primary LPAREN RPAREN .)
     RPAREN          reduce using rule 56 (property -> NEW primary LPAREN RPAREN .)
     THEN            reduce using rule 56 (property -> NEW primary LPAREN RPAREN .)
-    RBRACE          reduce using rule 56 (property -> NEW primary LPAREN RPAREN .)
     COMMA           reduce using rule 56 (property -> NEW primary LPAREN RPAREN .)
 
 
-state 109
+state 113
 
     (60) call -> primary LPAREN arguments RPAREN .
 
@@ -3964,30 +3222,13 @@ state 109
     NOTEQUALS       reduce using rule 60 (call -> primary LPAREN arguments RPAREN .)
     OR              reduce using rule 60 (call -> primary LPAREN arguments RPAREN .)
     AND             reduce using rule 60 (call -> primary LPAREN arguments RPAREN .)
-    FUNC            reduce using rule 60 (call -> primary LPAREN arguments RPAREN .)
-    CLASS           reduce using rule 60 (call -> primary LPAREN arguments RPAREN .)
-    INT             reduce using rule 60 (call -> primary LPAREN arguments RPAREN .)
-    BOOL            reduce using rule 60 (call -> primary LPAREN arguments RPAREN .)
-    VOID            reduce using rule 60 (call -> primary LPAREN arguments RPAREN .)
-    ID              reduce using rule 60 (call -> primary LPAREN arguments RPAREN .)
-    IF              reduce using rule 60 (call -> primary LPAREN arguments RPAREN .)
-    WHILE           reduce using rule 60 (call -> primary LPAREN arguments RPAREN .)
-    PRINT           reduce using rule 60 (call -> primary LPAREN arguments RPAREN .)
-    RETURN          reduce using rule 60 (call -> primary LPAREN arguments RPAREN .)
-    NEW             reduce using rule 60 (call -> primary LPAREN arguments RPAREN .)
-    NUMBER          reduce using rule 60 (call -> primary LPAREN arguments RPAREN .)
-    TRUE            reduce using rule 60 (call -> primary LPAREN arguments RPAREN .)
-    FALSE           reduce using rule 60 (call -> primary LPAREN arguments RPAREN .)
-    NULL            reduce using rule 60 (call -> primary LPAREN arguments RPAREN .)
-    NOT             reduce using rule 60 (call -> primary LPAREN arguments RPAREN .)
-    $end            reduce using rule 60 (call -> primary LPAREN arguments RPAREN .)
+    SEMICOLON       reduce using rule 60 (call -> primary LPAREN arguments RPAREN .)
     RPAREN          reduce using rule 60 (call -> primary LPAREN arguments RPAREN .)
     THEN            reduce using rule 60 (call -> primary LPAREN arguments RPAREN .)
-    RBRACE          reduce using rule 60 (call -> primary LPAREN arguments RPAREN .)
     COMMA           reduce using rule 60 (call -> primary LPAREN arguments RPAREN .)
 
 
-state 110
+state 114
 
     (71) funcDeclaration -> FUNC ID LPAREN parameter_list RPAREN . type LBRACE declaration_list RBRACE
     (29) type -> . INT
@@ -3998,11 +3239,11 @@ state 110
     INT             shift and go to state 18
     BOOL            shift and go to state 19
     VOID            shift and go to state 20
-    ID              shift and go to state 99
+    ID              shift and go to state 103
 
-    type                           shift and go to state 121
+    type                           shift and go to state 125
 
-state 111
+state 115
 
     (72) parameter_list -> parameter_list COMMA . type ID
     (29) type -> . INT
@@ -4013,11 +3254,11 @@ state 111
     INT             shift and go to state 18
     BOOL            shift and go to state 19
     VOID            shift and go to state 20
-    ID              shift and go to state 99
+    ID              shift and go to state 103
 
-    type                           shift and go to state 122
+    type                           shift and go to state 126
 
-state 112
+state 116
 
     (73) parameter_list -> type ID .
 
@@ -4025,11 +3266,11 @@ state 112
     COMMA           reduce using rule 73 (parameter_list -> type ID .)
 
 
-state 113
+state 117
 
     (8) class -> CLASS ID extends LBRACE classDeclarationList . RBRACE
     (11) classDeclarationList -> classDeclarationList . classDeclaration
-    (13) classDeclaration -> . varDeclaration
+    (13) classDeclaration -> . varDeclaration SEMICOLON
     (14) classDeclaration -> . methodDeclaration
     (27) varDeclaration -> . type ID
     (28) varDeclaration -> . type ID ASSIGN expression
@@ -4039,19 +3280,19 @@ state 113
     (31) type -> . VOID
     (32) type -> . ID
 
-    RBRACE          shift and go to state 123
-    FUNC            shift and go to state 117
+    RBRACE          shift and go to state 127
+    FUNC            shift and go to state 121
     INT             shift and go to state 18
     BOOL            shift and go to state 19
     VOID            shift and go to state 20
-    ID              shift and go to state 99
+    ID              shift and go to state 103
 
-    classDeclaration               shift and go to state 124
-    varDeclaration                 shift and go to state 115
-    methodDeclaration              shift and go to state 116
+    classDeclaration               shift and go to state 128
+    varDeclaration                 shift and go to state 119
+    methodDeclaration              shift and go to state 120
     type                           shift and go to state 8
 
-state 114
+state 118
 
     (12) classDeclarationList -> classDeclaration .
 
@@ -4063,19 +3304,14 @@ state 114
     ID              reduce using rule 12 (classDeclarationList -> classDeclaration .)
 
 
-state 115
+state 119
 
-    (13) classDeclaration -> varDeclaration .
+    (13) classDeclaration -> varDeclaration . SEMICOLON
 
-    RBRACE          reduce using rule 13 (classDeclaration -> varDeclaration .)
-    FUNC            reduce using rule 13 (classDeclaration -> varDeclaration .)
-    INT             reduce using rule 13 (classDeclaration -> varDeclaration .)
-    BOOL            reduce using rule 13 (classDeclaration -> varDeclaration .)
-    VOID            reduce using rule 13 (classDeclaration -> varDeclaration .)
-    ID              reduce using rule 13 (classDeclaration -> varDeclaration .)
+    SEMICOLON       shift and go to state 129
 
 
-state 116
+state 120
 
     (14) classDeclaration -> methodDeclaration .
 
@@ -4087,29 +3323,29 @@ state 116
     ID              reduce using rule 14 (classDeclaration -> methodDeclaration .)
 
 
-state 117
+state 121
 
     (15) methodDeclaration -> FUNC . ID LPAREN parameter_list RPAREN type LBRACE declaration_list RBRACE
 
-    ID              shift and go to state 125
+    ID              shift and go to state 130
 
 
-state 118
+state 122
 
     (23) ifStatement -> IF expression THEN LBRACE declaration_list . RBRACE
     (24) ifStatement -> IF expression THEN LBRACE declaration_list . RBRACE ELSE LBRACE declaration_list RBRACE
     (3) declaration_list -> declaration_list . declaration
-    (4) declaration -> . varDeclaration
+    (4) declaration -> . varDeclaration SEMICOLON
     (5) declaration -> . statement
     (6) declaration -> . funcDeclaration
     (7) declaration -> . class
     (27) varDeclaration -> . type ID
     (28) varDeclaration -> . type ID ASSIGN expression
-    (16) statement -> . expression
+    (16) statement -> . expression SEMICOLON
     (17) statement -> . ifStatement
     (18) statement -> . whileStatement
-    (19) statement -> . printStatement
-    (20) statement -> . returnStatement
+    (19) statement -> . printStatement SEMICOLON
+    (20) statement -> . returnStatement SEMICOLON
     (71) funcDeclaration -> . FUNC ID LPAREN parameter_list RPAREN type LBRACE declaration_list RBRACE
     (8) class -> . CLASS ID extends LBRACE classDeclarationList RBRACE
     (29) type -> . INT
@@ -4158,7 +3394,7 @@ state 118
     (54) unary -> . MINUS unary
     (55) unary -> . property
 
-    RBRACE          shift and go to state 126
+    RBRACE          shift and go to state 131
     FUNC            shift and go to state 15
     CLASS           shift and go to state 17
     INT             shift and go to state 18
@@ -4200,21 +3436,21 @@ state 118
     factor                         shift and go to state 38
     unary                          shift and go to state 40
 
-state 119
+state 123
 
     (25) whileStatement -> WHILE expression THEN LBRACE declaration_list . RBRACE
     (3) declaration_list -> declaration_list . declaration
-    (4) declaration -> . varDeclaration
+    (4) declaration -> . varDeclaration SEMICOLON
     (5) declaration -> . statement
     (6) declaration -> . funcDeclaration
     (7) declaration -> . class
     (27) varDeclaration -> . type ID
     (28) varDeclaration -> . type ID ASSIGN expression
-    (16) statement -> . expression
+    (16) statement -> . expression SEMICOLON
     (17) statement -> . ifStatement
     (18) statement -> . whileStatement
-    (19) statement -> . printStatement
-    (20) statement -> . returnStatement
+    (19) statement -> . printStatement SEMICOLON
+    (20) statement -> . returnStatement SEMICOLON
     (71) funcDeclaration -> . FUNC ID LPAREN parameter_list RPAREN type LBRACE declaration_list RBRACE
     (8) class -> . CLASS ID extends LBRACE classDeclarationList RBRACE
     (29) type -> . INT
@@ -4263,7 +3499,7 @@ state 119
     (54) unary -> . MINUS unary
     (55) unary -> . property
 
-    RBRACE          shift and go to state 127
+    RBRACE          shift and go to state 132
     FUNC            shift and go to state 15
     CLASS           shift and go to state 17
     INT             shift and go to state 18
@@ -4305,7 +3541,7 @@ state 119
     factor                         shift and go to state 38
     unary                          shift and go to state 40
 
-state 120
+state 124
 
     (68) arguments -> arguments COMMA expression .
 
@@ -4313,21 +3549,21 @@ state 120
     COMMA           reduce using rule 68 (arguments -> arguments COMMA expression .)
 
 
-state 121
+state 125
 
     (71) funcDeclaration -> FUNC ID LPAREN parameter_list RPAREN type . LBRACE declaration_list RBRACE
 
-    LBRACE          shift and go to state 128
+    LBRACE          shift and go to state 133
 
 
-state 122
+state 126
 
     (72) parameter_list -> parameter_list COMMA type . ID
 
-    ID              shift and go to state 129
+    ID              shift and go to state 134
 
 
-state 123
+state 127
 
     (8) class -> CLASS ID extends LBRACE classDeclarationList RBRACE .
 
@@ -4353,7 +3589,7 @@ state 123
     RBRACE          reduce using rule 8 (class -> CLASS ID extends LBRACE classDeclarationList RBRACE .)
 
 
-state 124
+state 128
 
     (11) classDeclarationList -> classDeclarationList classDeclaration .
 
@@ -4365,14 +3601,26 @@ state 124
     ID              reduce using rule 11 (classDeclarationList -> classDeclarationList classDeclaration .)
 
 
-state 125
+state 129
+
+    (13) classDeclaration -> varDeclaration SEMICOLON .
+
+    RBRACE          reduce using rule 13 (classDeclaration -> varDeclaration SEMICOLON .)
+    FUNC            reduce using rule 13 (classDeclaration -> varDeclaration SEMICOLON .)
+    INT             reduce using rule 13 (classDeclaration -> varDeclaration SEMICOLON .)
+    BOOL            reduce using rule 13 (classDeclaration -> varDeclaration SEMICOLON .)
+    VOID            reduce using rule 13 (classDeclaration -> varDeclaration SEMICOLON .)
+    ID              reduce using rule 13 (classDeclaration -> varDeclaration SEMICOLON .)
+
+
+state 130
 
     (15) methodDeclaration -> FUNC ID . LPAREN parameter_list RPAREN type LBRACE declaration_list RBRACE
 
-    LPAREN          shift and go to state 130
+    LPAREN          shift and go to state 135
 
 
-state 126
+state 131
 
     (23) ifStatement -> IF expression THEN LBRACE declaration_list RBRACE .
     (24) ifStatement -> IF expression THEN LBRACE declaration_list RBRACE . ELSE LBRACE declaration_list RBRACE
@@ -4397,10 +3645,10 @@ state 126
     MINUS           reduce using rule 23 (ifStatement -> IF expression THEN LBRACE declaration_list RBRACE .)
     $end            reduce using rule 23 (ifStatement -> IF expression THEN LBRACE declaration_list RBRACE .)
     RBRACE          reduce using rule 23 (ifStatement -> IF expression THEN LBRACE declaration_list RBRACE .)
-    ELSE            shift and go to state 131
+    ELSE            shift and go to state 136
 
 
-state 127
+state 132
 
     (25) whileStatement -> WHILE expression THEN LBRACE declaration_list RBRACE .
 
@@ -4426,22 +3674,22 @@ state 127
     RBRACE          reduce using rule 25 (whileStatement -> WHILE expression THEN LBRACE declaration_list RBRACE .)
 
 
-state 128
+state 133
 
     (71) funcDeclaration -> FUNC ID LPAREN parameter_list RPAREN type LBRACE . declaration_list RBRACE
     (2) declaration_list -> . declaration
     (3) declaration_list -> . declaration_list declaration
-    (4) declaration -> . varDeclaration
+    (4) declaration -> . varDeclaration SEMICOLON
     (5) declaration -> . statement
     (6) declaration -> . funcDeclaration
     (7) declaration -> . class
     (27) varDeclaration -> . type ID
     (28) varDeclaration -> . type ID ASSIGN expression
-    (16) statement -> . expression
+    (16) statement -> . expression SEMICOLON
     (17) statement -> . ifStatement
     (18) statement -> . whileStatement
-    (19) statement -> . printStatement
-    (20) statement -> . returnStatement
+    (19) statement -> . printStatement SEMICOLON
+    (20) statement -> . returnStatement SEMICOLON
     (71) funcDeclaration -> . FUNC ID LPAREN parameter_list RPAREN type LBRACE declaration_list RBRACE
     (8) class -> . CLASS ID extends LBRACE classDeclarationList RBRACE
     (29) type -> . INT
@@ -4510,7 +3758,7 @@ state 128
     MINUS           shift and go to state 39
 
     type                           shift and go to state 8
-    declaration_list               shift and go to state 132
+    declaration_list               shift and go to state 137
     declaration                    shift and go to state 3
     varDeclaration                 shift and go to state 4
     statement                      shift and go to state 5
@@ -4532,7 +3780,7 @@ state 128
     factor                         shift and go to state 38
     unary                          shift and go to state 40
 
-state 129
+state 134
 
     (72) parameter_list -> parameter_list COMMA type ID .
 
@@ -4540,7 +3788,7 @@ state 129
     COMMA           reduce using rule 72 (parameter_list -> parameter_list COMMA type ID .)
 
 
-state 130
+state 135
 
     (15) methodDeclaration -> FUNC ID LPAREN . parameter_list RPAREN type LBRACE declaration_list RBRACE
     (72) parameter_list -> . parameter_list COMMA type ID
@@ -4556,33 +3804,33 @@ state 130
     INT             shift and go to state 18
     BOOL            shift and go to state 19
     VOID            shift and go to state 20
-    ID              shift and go to state 99
+    ID              shift and go to state 103
 
-    parameter_list                 shift and go to state 133
-    type                           shift and go to state 101
+    parameter_list                 shift and go to state 138
+    type                           shift and go to state 105
 
-state 131
+state 136
 
     (24) ifStatement -> IF expression THEN LBRACE declaration_list RBRACE ELSE . LBRACE declaration_list RBRACE
 
-    LBRACE          shift and go to state 134
+    LBRACE          shift and go to state 139
 
 
-state 132
+state 137
 
     (71) funcDeclaration -> FUNC ID LPAREN parameter_list RPAREN type LBRACE declaration_list . RBRACE
     (3) declaration_list -> declaration_list . declaration
-    (4) declaration -> . varDeclaration
+    (4) declaration -> . varDeclaration SEMICOLON
     (5) declaration -> . statement
     (6) declaration -> . funcDeclaration
     (7) declaration -> . class
     (27) varDeclaration -> . type ID
     (28) varDeclaration -> . type ID ASSIGN expression
-    (16) statement -> . expression
+    (16) statement -> . expression SEMICOLON
     (17) statement -> . ifStatement
     (18) statement -> . whileStatement
-    (19) statement -> . printStatement
-    (20) statement -> . returnStatement
+    (19) statement -> . printStatement SEMICOLON
+    (20) statement -> . returnStatement SEMICOLON
     (71) funcDeclaration -> . FUNC ID LPAREN parameter_list RPAREN type LBRACE declaration_list RBRACE
     (8) class -> . CLASS ID extends LBRACE classDeclarationList RBRACE
     (29) type -> . INT
@@ -4631,7 +3879,7 @@ state 132
     (54) unary -> . MINUS unary
     (55) unary -> . property
 
-    RBRACE          shift and go to state 135
+    RBRACE          shift and go to state 140
     FUNC            shift and go to state 15
     CLASS           shift and go to state 17
     INT             shift and go to state 18
@@ -4673,31 +3921,31 @@ state 132
     factor                         shift and go to state 38
     unary                          shift and go to state 40
 
-state 133
+state 138
 
     (15) methodDeclaration -> FUNC ID LPAREN parameter_list . RPAREN type LBRACE declaration_list RBRACE
     (72) parameter_list -> parameter_list . COMMA type ID
 
-    RPAREN          shift and go to state 136
-    COMMA           shift and go to state 111
+    RPAREN          shift and go to state 141
+    COMMA           shift and go to state 115
 
 
-state 134
+state 139
 
     (24) ifStatement -> IF expression THEN LBRACE declaration_list RBRACE ELSE LBRACE . declaration_list RBRACE
     (2) declaration_list -> . declaration
     (3) declaration_list -> . declaration_list declaration
-    (4) declaration -> . varDeclaration
+    (4) declaration -> . varDeclaration SEMICOLON
     (5) declaration -> . statement
     (6) declaration -> . funcDeclaration
     (7) declaration -> . class
     (27) varDeclaration -> . type ID
     (28) varDeclaration -> . type ID ASSIGN expression
-    (16) statement -> . expression
+    (16) statement -> . expression SEMICOLON
     (17) statement -> . ifStatement
     (18) statement -> . whileStatement
-    (19) statement -> . printStatement
-    (20) statement -> . returnStatement
+    (19) statement -> . printStatement SEMICOLON
+    (20) statement -> . returnStatement SEMICOLON
     (71) funcDeclaration -> . FUNC ID LPAREN parameter_list RPAREN type LBRACE declaration_list RBRACE
     (8) class -> . CLASS ID extends LBRACE classDeclarationList RBRACE
     (29) type -> . INT
@@ -4766,7 +4014,7 @@ state 134
     MINUS           shift and go to state 39
 
     expression                     shift and go to state 10
-    declaration_list               shift and go to state 137
+    declaration_list               shift and go to state 142
     declaration                    shift and go to state 3
     varDeclaration                 shift and go to state 4
     statement                      shift and go to state 5
@@ -4788,7 +4036,7 @@ state 134
     factor                         shift and go to state 38
     unary                          shift and go to state 40
 
-state 135
+state 140
 
     (71) funcDeclaration -> FUNC ID LPAREN parameter_list RPAREN type LBRACE declaration_list RBRACE .
 
@@ -4814,7 +4062,7 @@ state 135
     RBRACE          reduce using rule 71 (funcDeclaration -> FUNC ID LPAREN parameter_list RPAREN type LBRACE declaration_list RBRACE .)
 
 
-state 136
+state 141
 
     (15) methodDeclaration -> FUNC ID LPAREN parameter_list RPAREN . type LBRACE declaration_list RBRACE
     (29) type -> . INT
@@ -4825,25 +4073,25 @@ state 136
     INT             shift and go to state 18
     BOOL            shift and go to state 19
     VOID            shift and go to state 20
-    ID              shift and go to state 99
+    ID              shift and go to state 103
 
-    type                           shift and go to state 138
+    type                           shift and go to state 143
 
-state 137
+state 142
 
     (24) ifStatement -> IF expression THEN LBRACE declaration_list RBRACE ELSE LBRACE declaration_list . RBRACE
     (3) declaration_list -> declaration_list . declaration
-    (4) declaration -> . varDeclaration
+    (4) declaration -> . varDeclaration SEMICOLON
     (5) declaration -> . statement
     (6) declaration -> . funcDeclaration
     (7) declaration -> . class
     (27) varDeclaration -> . type ID
     (28) varDeclaration -> . type ID ASSIGN expression
-    (16) statement -> . expression
+    (16) statement -> . expression SEMICOLON
     (17) statement -> . ifStatement
     (18) statement -> . whileStatement
-    (19) statement -> . printStatement
-    (20) statement -> . returnStatement
+    (19) statement -> . printStatement SEMICOLON
+    (20) statement -> . returnStatement SEMICOLON
     (71) funcDeclaration -> . FUNC ID LPAREN parameter_list RPAREN type LBRACE declaration_list RBRACE
     (8) class -> . CLASS ID extends LBRACE classDeclarationList RBRACE
     (29) type -> . INT
@@ -4892,7 +4140,7 @@ state 137
     (54) unary -> . MINUS unary
     (55) unary -> . property
 
-    RBRACE          shift and go to state 139
+    RBRACE          shift and go to state 144
     FUNC            shift and go to state 15
     CLASS           shift and go to state 17
     INT             shift and go to state 18
@@ -4934,14 +4182,14 @@ state 137
     factor                         shift and go to state 38
     unary                          shift and go to state 40
 
-state 138
+state 143
 
     (15) methodDeclaration -> FUNC ID LPAREN parameter_list RPAREN type . LBRACE declaration_list RBRACE
 
-    LBRACE          shift and go to state 140
+    LBRACE          shift and go to state 145
 
 
-state 139
+state 144
 
     (24) ifStatement -> IF expression THEN LBRACE declaration_list RBRACE ELSE LBRACE declaration_list RBRACE .
 
@@ -4967,22 +4215,22 @@ state 139
     RBRACE          reduce using rule 24 (ifStatement -> IF expression THEN LBRACE declaration_list RBRACE ELSE LBRACE declaration_list RBRACE .)
 
 
-state 140
+state 145
 
     (15) methodDeclaration -> FUNC ID LPAREN parameter_list RPAREN type LBRACE . declaration_list RBRACE
     (2) declaration_list -> . declaration
     (3) declaration_list -> . declaration_list declaration
-    (4) declaration -> . varDeclaration
+    (4) declaration -> . varDeclaration SEMICOLON
     (5) declaration -> . statement
     (6) declaration -> . funcDeclaration
     (7) declaration -> . class
     (27) varDeclaration -> . type ID
     (28) varDeclaration -> . type ID ASSIGN expression
-    (16) statement -> . expression
+    (16) statement -> . expression SEMICOLON
     (17) statement -> . ifStatement
     (18) statement -> . whileStatement
-    (19) statement -> . printStatement
-    (20) statement -> . returnStatement
+    (19) statement -> . printStatement SEMICOLON
+    (20) statement -> . returnStatement SEMICOLON
     (71) funcDeclaration -> . FUNC ID LPAREN parameter_list RPAREN type LBRACE declaration_list RBRACE
     (8) class -> . CLASS ID extends LBRACE classDeclarationList RBRACE
     (29) type -> . INT
@@ -5051,7 +4299,7 @@ state 140
     MINUS           shift and go to state 39
 
     type                           shift and go to state 8
-    declaration_list               shift and go to state 141
+    declaration_list               shift and go to state 146
     declaration                    shift and go to state 3
     varDeclaration                 shift and go to state 4
     statement                      shift and go to state 5
@@ -5073,21 +4321,21 @@ state 140
     factor                         shift and go to state 38
     unary                          shift and go to state 40
 
-state 141
+state 146
 
     (15) methodDeclaration -> FUNC ID LPAREN parameter_list RPAREN type LBRACE declaration_list . RBRACE
     (3) declaration_list -> declaration_list . declaration
-    (4) declaration -> . varDeclaration
+    (4) declaration -> . varDeclaration SEMICOLON
     (5) declaration -> . statement
     (6) declaration -> . funcDeclaration
     (7) declaration -> . class
     (27) varDeclaration -> . type ID
     (28) varDeclaration -> . type ID ASSIGN expression
-    (16) statement -> . expression
+    (16) statement -> . expression SEMICOLON
     (17) statement -> . ifStatement
     (18) statement -> . whileStatement
-    (19) statement -> . printStatement
-    (20) statement -> . returnStatement
+    (19) statement -> . printStatement SEMICOLON
+    (20) statement -> . returnStatement SEMICOLON
     (71) funcDeclaration -> . FUNC ID LPAREN parameter_list RPAREN type LBRACE declaration_list RBRACE
     (8) class -> . CLASS ID extends LBRACE classDeclarationList RBRACE
     (29) type -> . INT
@@ -5136,7 +4384,7 @@ state 141
     (54) unary -> . MINUS unary
     (55) unary -> . property
 
-    RBRACE          shift and go to state 142
+    RBRACE          shift and go to state 147
     FUNC            shift and go to state 15
     CLASS           shift and go to state 17
     INT             shift and go to state 18
@@ -5178,7 +4426,7 @@ state 141
     factor                         shift and go to state 38
     unary                          shift and go to state 40
 
-state 142
+state 147
 
     (15) methodDeclaration -> FUNC ID LPAREN parameter_list RPAREN type LBRACE declaration_list RBRACE .
 
@@ -5192,22 +4440,4 @@ state 142
 WARNING: 
 WARNING: Conflicts:
 WARNING: 
-WARNING: shift/reduce conflict for NEW in state 25 resolved as shift
-WARNING: shift/reduce conflict for NUMBER in state 25 resolved as shift
-WARNING: shift/reduce conflict for ID in state 25 resolved as shift
-WARNING: shift/reduce conflict for TRUE in state 25 resolved as shift
-WARNING: shift/reduce conflict for FALSE in state 25 resolved as shift
-WARNING: shift/reduce conflict for NULL in state 25 resolved as shift
-WARNING: shift/reduce conflict for LPAREN in state 25 resolved as shift
-WARNING: shift/reduce conflict for NOT in state 25 resolved as shift
-WARNING: shift/reduce conflict for MINUS in state 25 resolved as shift
-WARNING: shift/reduce conflict for LPAREN in state 26 resolved as shift
 WARNING: shift/reduce conflict for LPAREN in state 29 resolved as shift
-WARNING: shift/reduce conflict for MINUS in state 37 resolved as shift
-WARNING: shift/reduce conflict for LPAREN in state 70 resolved as shift
-WARNING: shift/reduce conflict for MINUS in state 90 resolved as shift
-WARNING: shift/reduce conflict for MINUS in state 91 resolved as shift
-WARNING: shift/reduce conflict for MINUS in state 92 resolved as shift
-WARNING: shift/reduce conflict for MINUS in state 93 resolved as shift
-WARNING: reduce/reduce conflict in state 9 resolved using rule (type -> ID)
-WARNING: rejected rule (primary -> ID) in state 9

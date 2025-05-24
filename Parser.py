@@ -26,7 +26,7 @@ class Parser:
 
     # Declaration
     def p_declaration(self, p):
-        '''declaration : varDeclaration
+        '''declaration : varDeclaration SEMICOLON
                     | statement
                     | funcDeclaration
                     | class'''
@@ -57,7 +57,7 @@ class Parser:
         p[0] = [p[1]]
 
     def p_classDeclaration(self, p):
-        '''classDeclaration : varDeclaration
+        '''classDeclaration : varDeclaration SEMICOLON
                             | methodDeclaration'''
         p[0] = p[1]
 
@@ -67,11 +67,11 @@ class Parser:
 
     # Statements
     def p_statement(self, p):
-        '''statement : expression
+        '''statement : expression SEMICOLON
                     | ifStatement
                     | whileStatement
-                    | printStatement
-                    | returnStatement''' 
+                    | printStatement SEMICOLON
+                    | returnStatement SEMICOLON''' 
         p[0] = p[1]
 
     # Return statement
