@@ -10,14 +10,26 @@ from errorTester import *
 # The line numbers match the error messages + 10.  
 data = '''
 
-class tiger {
-    int a = 2
-    func one() void {
-        print 3
-    }
+int ra 
+if ra then {
+    print -1
+} else {
+    print 5
 }
-tiger tigger = new tiger()
-print tigger.a
+
+ra = 5
+if ra then {
+    print 6
+} else {
+    print -1
+}
+
+ra = null
+if ra then {
+    print -1
+} else {
+    print 7
+}
 '''
     
 

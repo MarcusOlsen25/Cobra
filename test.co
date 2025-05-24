@@ -349,3 +349,40 @@ if (f and t) or ((f or t) and (t and t)) then {
     print 46
 }
 
+
+int ra
+bool re
+Box ro
+
+if ra then {
+    print 47
+} else {
+    print -1
+}
+
+ra = null
+re = null
+ro = null
+
+if ra or re or ro then {
+    print -1 
+} else {
+    print 48
+}
+
+ra = 5
+re = false
+
+if ra or re then {
+    print 49
+} else {
+    print -1
+}
+
+sko marcus box diego
+
+if marcus and diego then {
+    print -1000
+} else {
+    print -1
+}

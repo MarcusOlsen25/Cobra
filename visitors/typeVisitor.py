@@ -104,10 +104,11 @@ class TypeVisitor(Visitor):
                         else:
                             self.addTypeError(f"Illegal type in binary operation in line {expr.lineno}.", expr.lineno)
                     case "and" | "or":
-                        if left_type == "bool" and right_type == "bool":
-                            return "bool"
-                        else:
-                            self.addTypeError(f"Illegal type in binary operation in line {expr.lineno}.", expr.lineno)
+                        return "bool"
+                        # if left_type == "bool" and right_type == "bool":
+                        #     return "bool"
+                        # else:
+                        #     self.addTypeError(f"Illegal type in binary operation in line {expr.lineno}.", expr.lineno)
                     case "==" | "!=":
                         return "bool"
             elif isinstance(expr, UnaryExpression):

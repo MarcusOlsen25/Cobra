@@ -732,7 +732,7 @@ end_getTotal_Accumulator:
 main:
 	pushq %rbp			# Save base pointer
 	movq %rsp, %rbp			# Make stack pointer new base pointer
-	subq $176, %rsp			# Allocate space for local variables on the stack
+	subq $216, %rsp			# Allocate space for local variables on the stack
 	movq $1, %rax			# Put a number in %rax
 	movq %rax, -8(%rbp)			# Move initialized value into space on stack
 	movq %rbp, %rax			# Prepare to access variable from another scope
@@ -3158,7 +3158,334 @@ end_then_37:			# Clean up then block stack frame
 	addq $8, %rsp			# Deallocate space on stack for static link
 	jmp end_37			# Skip the else
 end_37:
-	addq $176, %rsp			# Deallocate space for local variables on the stack
+	movq %rbp, %rax			# Prepare to access variable from another scope
+	movq -184(%rax), %rax		# Move value into %rax
+	cmp $0, %rax			# Check the condition
+	je else_part_38			# Skip to the else if the condition is false
+	movq %rbp, %rax			# Prepare static link
+	pushq %rax			# Push static link
+	subq $16, %rsp			# Add dummy spaces
+	pushq %rbp			# Save base pointer
+	movq %rsp, %rbp			# Make stack pointer new base pointer
+	subq $0, %rsp			# Allocate space for local variables on the stack
+	movq $47, %rax			# Put a number in %rax
+			# Start print statement
+	leaq form(%rip), %rdi		# Passing string address (1. argument)
+	movq %rax, %rsi			# Passing %rax (2. argument)
+	movq $0, %rax			# No floating point registers used
+	testq $15, %rsp			# Test for 16 byte alignment
+	jz print_align_64		# Jump if aligned
+	addq $-8, %rsp			# 16 byte aligning
+	callq printf@plt		# Call printf
+	addq $8, %rsp			# Reverting alignment
+	jmp end_print_64
+print_align_64:
+	callq printf@plt		# Call printf
+end_print_64:
+			# End print statement
+end_then_38:			# Clean up then block stack frame
+	addq $0, %rsp			# Deallocate space for local variables on the stack
+	popq %rbp			# Restore base pointer
+	addq $16, %rsp			# Remove dummy spaces
+	addq $8, %rsp			# Deallocate space on stack for static link
+	jmp end_38			# Skip the else
+else_part_38:
+	movq %rbp, %rax			# Prepare static link
+	pushq %rax			# Push static link
+	subq $16, %rsp			# Add dummy spaces
+	pushq %rbp			# Save base pointer
+	movq %rsp, %rbp			# Make stack pointer new base pointer
+	subq $0, %rsp			# Allocate space for local variables on the stack
+	movq $1, %rax			# Put a number in %rax
+	negq %rax			# Negate value
+			# Start print statement
+	leaq form(%rip), %rdi		# Passing string address (1. argument)
+	movq %rax, %rsi			# Passing %rax (2. argument)
+	movq $0, %rax			# No floating point registers used
+	testq $15, %rsp			# Test for 16 byte alignment
+	jz print_align_65		# Jump if aligned
+	addq $-8, %rsp			# 16 byte aligning
+	callq printf@plt		# Call printf
+	addq $8, %rsp			# Reverting alignment
+	jmp end_print_65
+print_align_65:
+	callq printf@plt		# Call printf
+end_print_65:
+			# End print statement
+end_else_38:
+	addq $0, %rsp			# Deallocate space for local variables on the stack
+	popq %rbp			# Restore base pointer
+	addq $16, %rsp			# Remove dummy spaces
+	addq $8, %rsp			# Deallocate space on stack for static link
+end_38:
+	movq $0, %rax			# Put a number in %rax
+	movq %rax, %rdx			# Move right side of assignment into %rdx
+	movq %rbp, %rax			# Prepare to access variable from another scope
+	movq -184(%rax), %rax		# Move value into %rax
+	movq %rbp, %rax			# Prepare to access variable from another scope
+	movq %rdx, -184(%rax)		# Move right side into location of left side of assign
+	movq $0, %rax			# Put a number in %rax
+	movq %rax, %rdx			# Move right side of assignment into %rdx
+	movq %rbp, %rax			# Prepare to access variable from another scope
+	movq -192(%rax), %rax		# Move value into %rax
+	movq %rbp, %rax			# Prepare to access variable from another scope
+	movq %rdx, -192(%rax)		# Move right side into location of left side of assign
+	movq $0, %rax			# Put a number in %rax
+	movq %rax, %rdx			# Move right side of assignment into %rdx
+	movq %rbp, %rax			# Prepare to access variable from another scope
+	movq -200(%rax), %rax		# Move value into %rax
+	movq %rbp, %rax			# Prepare to access variable from another scope
+	movq %rdx, -200(%rax)		# Move right side into location of left side of assign
+	movq %rbp, %rax			# Prepare to access variable from another scope
+	movq -200(%rax), %rax		# Move value into %rax
+	pushq %rax			# Push right side to stack
+	movq %rbp, %rax			# Prepare to access variable from another scope
+	movq -192(%rax), %rax		# Move value into %rax
+	pushq %rax			# Push right side to stack
+	movq %rbp, %rax			# Prepare to access variable from another scope
+	movq -184(%rax), %rax		# Move value into %rax
+	popq %rbx			# Pop right side into %rbx
+	movq $0, %rdx			# Put FALSE in %rdx
+	cmp %rax, %rdx			# Check if the left side is false
+	jne logical_true_33		# Skip to the true
+	cmp %rbx, %rdx			# Check if the right side is false
+	jne logical_true_33		# Skip to the true
+	movq $0, %rax			# Put false in %rax
+	jmp logical_end_33		# Skip to the end
+logical_true_33:
+	movq $1, %rax			# Put true in %rax
+logical_end_33:
+	popq %rbx			# Pop right side into %rbx
+	movq $0, %rdx			# Put FALSE in %rdx
+	cmp %rax, %rdx			# Check if the left side is false
+	jne logical_true_34		# Skip to the true
+	cmp %rbx, %rdx			# Check if the right side is false
+	jne logical_true_34		# Skip to the true
+	movq $0, %rax			# Put false in %rax
+	jmp logical_end_34		# Skip to the end
+logical_true_34:
+	movq $1, %rax			# Put true in %rax
+logical_end_34:
+	cmp $0, %rax			# Check the condition
+	je else_part_39			# Skip to the else if the condition is false
+	movq %rbp, %rax			# Prepare static link
+	pushq %rax			# Push static link
+	subq $16, %rsp			# Add dummy spaces
+	pushq %rbp			# Save base pointer
+	movq %rsp, %rbp			# Make stack pointer new base pointer
+	subq $0, %rsp			# Allocate space for local variables on the stack
+	movq $1, %rax			# Put a number in %rax
+	negq %rax			# Negate value
+			# Start print statement
+	leaq form(%rip), %rdi		# Passing string address (1. argument)
+	movq %rax, %rsi			# Passing %rax (2. argument)
+	movq $0, %rax			# No floating point registers used
+	testq $15, %rsp			# Test for 16 byte alignment
+	jz print_align_66		# Jump if aligned
+	addq $-8, %rsp			# 16 byte aligning
+	callq printf@plt		# Call printf
+	addq $8, %rsp			# Reverting alignment
+	jmp end_print_66
+print_align_66:
+	callq printf@plt		# Call printf
+end_print_66:
+			# End print statement
+end_then_39:			# Clean up then block stack frame
+	addq $0, %rsp			# Deallocate space for local variables on the stack
+	popq %rbp			# Restore base pointer
+	addq $16, %rsp			# Remove dummy spaces
+	addq $8, %rsp			# Deallocate space on stack for static link
+	jmp end_39			# Skip the else
+else_part_39:
+	movq %rbp, %rax			# Prepare static link
+	pushq %rax			# Push static link
+	subq $16, %rsp			# Add dummy spaces
+	pushq %rbp			# Save base pointer
+	movq %rsp, %rbp			# Make stack pointer new base pointer
+	subq $0, %rsp			# Allocate space for local variables on the stack
+	movq $48, %rax			# Put a number in %rax
+			# Start print statement
+	leaq form(%rip), %rdi		# Passing string address (1. argument)
+	movq %rax, %rsi			# Passing %rax (2. argument)
+	movq $0, %rax			# No floating point registers used
+	testq $15, %rsp			# Test for 16 byte alignment
+	jz print_align_67		# Jump if aligned
+	addq $-8, %rsp			# 16 byte aligning
+	callq printf@plt		# Call printf
+	addq $8, %rsp			# Reverting alignment
+	jmp end_print_67
+print_align_67:
+	callq printf@plt		# Call printf
+end_print_67:
+			# End print statement
+end_else_39:
+	addq $0, %rsp			# Deallocate space for local variables on the stack
+	popq %rbp			# Restore base pointer
+	addq $16, %rsp			# Remove dummy spaces
+	addq $8, %rsp			# Deallocate space on stack for static link
+end_39:
+	movq $5, %rax			# Put a number in %rax
+	movq %rax, %rdx			# Move right side of assignment into %rdx
+	movq %rbp, %rax			# Prepare to access variable from another scope
+	movq -184(%rax), %rax		# Move value into %rax
+	movq %rbp, %rax			# Prepare to access variable from another scope
+	movq %rdx, -184(%rax)		# Move right side into location of left side of assign
+	movq $0, %rax			# Put false in %rax
+	movq %rax, %rdx			# Move right side of assignment into %rdx
+	movq %rbp, %rax			# Prepare to access variable from another scope
+	movq -192(%rax), %rax		# Move value into %rax
+	movq %rbp, %rax			# Prepare to access variable from another scope
+	movq %rdx, -192(%rax)		# Move right side into location of left side of assign
+	movq %rbp, %rax			# Prepare to access variable from another scope
+	movq -192(%rax), %rax		# Move value into %rax
+	pushq %rax			# Push right side to stack
+	movq %rbp, %rax			# Prepare to access variable from another scope
+	movq -184(%rax), %rax		# Move value into %rax
+	popq %rbx			# Pop right side into %rbx
+	movq $0, %rdx			# Put FALSE in %rdx
+	cmp %rax, %rdx			# Check if the left side is false
+	jne logical_true_35		# Skip to the true
+	cmp %rbx, %rdx			# Check if the right side is false
+	jne logical_true_35		# Skip to the true
+	movq $0, %rax			# Put false in %rax
+	jmp logical_end_35		# Skip to the end
+logical_true_35:
+	movq $1, %rax			# Put true in %rax
+logical_end_35:
+	cmp $0, %rax			# Check the condition
+	je else_part_40			# Skip to the else if the condition is false
+	movq %rbp, %rax			# Prepare static link
+	pushq %rax			# Push static link
+	subq $16, %rsp			# Add dummy spaces
+	pushq %rbp			# Save base pointer
+	movq %rsp, %rbp			# Make stack pointer new base pointer
+	subq $0, %rsp			# Allocate space for local variables on the stack
+	movq $49, %rax			# Put a number in %rax
+			# Start print statement
+	leaq form(%rip), %rdi		# Passing string address (1. argument)
+	movq %rax, %rsi			# Passing %rax (2. argument)
+	movq $0, %rax			# No floating point registers used
+	testq $15, %rsp			# Test for 16 byte alignment
+	jz print_align_68		# Jump if aligned
+	addq $-8, %rsp			# 16 byte aligning
+	callq printf@plt		# Call printf
+	addq $8, %rsp			# Reverting alignment
+	jmp end_print_68
+print_align_68:
+	callq printf@plt		# Call printf
+end_print_68:
+			# End print statement
+end_then_40:			# Clean up then block stack frame
+	addq $0, %rsp			# Deallocate space for local variables on the stack
+	popq %rbp			# Restore base pointer
+	addq $16, %rsp			# Remove dummy spaces
+	addq $8, %rsp			# Deallocate space on stack for static link
+	jmp end_40			# Skip the else
+else_part_40:
+	movq %rbp, %rax			# Prepare static link
+	pushq %rax			# Push static link
+	subq $16, %rsp			# Add dummy spaces
+	pushq %rbp			# Save base pointer
+	movq %rsp, %rbp			# Make stack pointer new base pointer
+	subq $0, %rsp			# Allocate space for local variables on the stack
+	movq $1, %rax			# Put a number in %rax
+	negq %rax			# Negate value
+			# Start print statement
+	leaq form(%rip), %rdi		# Passing string address (1. argument)
+	movq %rax, %rsi			# Passing %rax (2. argument)
+	movq $0, %rax			# No floating point registers used
+	testq $15, %rsp			# Test for 16 byte alignment
+	jz print_align_69		# Jump if aligned
+	addq $-8, %rsp			# 16 byte aligning
+	callq printf@plt		# Call printf
+	addq $8, %rsp			# Reverting alignment
+	jmp end_print_69
+print_align_69:
+	callq printf@plt		# Call printf
+end_print_69:
+			# End print statement
+end_else_40:
+	addq $0, %rsp			# Deallocate space for local variables on the stack
+	popq %rbp			# Restore base pointer
+	addq $16, %rsp			# Remove dummy spaces
+	addq $8, %rsp			# Deallocate space on stack for static link
+end_40:
+	movq %rbp, %rax			# Prepare to access variable from another scope
+	movq -216(%rax), %rax		# Move value into %rax
+	pushq %rax			# Push right side to stack
+	movq %rbp, %rax			# Prepare to access variable from another scope
+	movq -208(%rax), %rax		# Move value into %rax
+	popq %rbx			# Pop right side into %rbx
+	movq $0, %rdx			# Put FALSE in %rdx
+	cmp %rax, %rdx			# Check if the left side is false
+	je logical_false_36		# Skip to the false
+	cmp %rbx, %rdx			# Check if the right side is false
+	je logical_false_36		# Skip to the false
+	movq $1, %rax			# Put true in %rax
+	jmp logical_end_36		# Skip to the end
+logical_false_36:
+	movq $0, %rax			# Put false in %rax
+logical_end_36:
+	cmp $0, %rax			# Check the condition
+	je else_part_41			# Skip to the else if the condition is false
+	movq %rbp, %rax			# Prepare static link
+	pushq %rax			# Push static link
+	subq $16, %rsp			# Add dummy spaces
+	pushq %rbp			# Save base pointer
+	movq %rsp, %rbp			# Make stack pointer new base pointer
+	subq $0, %rsp			# Allocate space for local variables on the stack
+	movq $1000, %rax			# Put a number in %rax
+	negq %rax			# Negate value
+			# Start print statement
+	leaq form(%rip), %rdi		# Passing string address (1. argument)
+	movq %rax, %rsi			# Passing %rax (2. argument)
+	movq $0, %rax			# No floating point registers used
+	testq $15, %rsp			# Test for 16 byte alignment
+	jz print_align_70		# Jump if aligned
+	addq $-8, %rsp			# 16 byte aligning
+	callq printf@plt		# Call printf
+	addq $8, %rsp			# Reverting alignment
+	jmp end_print_70
+print_align_70:
+	callq printf@plt		# Call printf
+end_print_70:
+			# End print statement
+end_then_41:			# Clean up then block stack frame
+	addq $0, %rsp			# Deallocate space for local variables on the stack
+	popq %rbp			# Restore base pointer
+	addq $16, %rsp			# Remove dummy spaces
+	addq $8, %rsp			# Deallocate space on stack for static link
+	jmp end_41			# Skip the else
+else_part_41:
+	movq %rbp, %rax			# Prepare static link
+	pushq %rax			# Push static link
+	subq $16, %rsp			# Add dummy spaces
+	pushq %rbp			# Save base pointer
+	movq %rsp, %rbp			# Make stack pointer new base pointer
+	subq $0, %rsp			# Allocate space for local variables on the stack
+	movq $1, %rax			# Put a number in %rax
+	negq %rax			# Negate value
+			# Start print statement
+	leaq form(%rip), %rdi		# Passing string address (1. argument)
+	movq %rax, %rsi			# Passing %rax (2. argument)
+	movq $0, %rax			# No floating point registers used
+	testq $15, %rsp			# Test for 16 byte alignment
+	jz print_align_71		# Jump if aligned
+	addq $-8, %rsp			# 16 byte aligning
+	callq printf@plt		# Call printf
+	addq $8, %rsp			# Reverting alignment
+	jmp end_print_71
+print_align_71:
+	callq printf@plt		# Call printf
+end_print_71:
+			# End print statement
+end_else_41:
+	addq $0, %rsp			# Deallocate space for local variables on the stack
+	popq %rbp			# Restore base pointer
+	addq $16, %rsp			# Remove dummy spaces
+	addq $8, %rsp			# Deallocate space on stack for static link
+end_41:
+	addq $216, %rsp			# Deallocate space for local variables on the stack
 	popq %rbp			# Restore base pointer
 	movq $0, %rax			# End with error code 0
 	ret			# Return from main
