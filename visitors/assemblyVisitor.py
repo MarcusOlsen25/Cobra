@@ -54,9 +54,9 @@ class AssemblyVisitor(Visitor):
     
     def visitBinaryExpression(self, expr: BinaryExpression):
         expr.right.accept(self)
-        self.generateCode("pushq", "%rax", None, 3, "# Push right side to stack")
+        self.generateCode("pushq", "%rax", None, 3, "\t# Push right side to stack")
         expr.left.accept(self)
-        self.generateCode("popq", "%rbx", None, 3, "# Pop right side into %rbx")
+        self.generateCode("popq", "%rbx", None, 3, "\t# Pop right side into %rbx")
 
         match expr.operator:
             case "+":
@@ -193,7 +193,7 @@ class AssemblyVisitor(Visitor):
     def visitUnaryExpression(self, expr: UnaryExpression):
         expr.value.accept(self)
         if expr.operator == "-":
-            self.generateCode("negq", "%rax", None, 3, "# Negate value")
+            self.generateCode("negq", "%rax", None, 3, "\t# Negate value")
         else:
             self.generateCode("cmpq", "$0", "%rax", 3, "# Invert flag")
             self.generateCode("sete", "%al", None, 3, "# Invert flag")
@@ -255,7 +255,7 @@ class AssemblyVisitor(Visitor):
         self.addLabel(f"end_{functionName}", 3, "# End function")
         self.endScope()
 
-        self.generateCode("ret", None, None, 4, "# Return from the function")
+        self.generateCode("ret", None, None, 4, "\t\t# Return from the function")
 
         self.table = self.table.parent
         self.functionStack.pop()
@@ -263,16 +263,16 @@ class AssemblyVisitor(Visitor):
     def visitCallExpression(self, expr: CallExpression):
         entry = expr.var.accept(self)
 
-        for i in range(len(expr.arguments)-1, -1, -1):
+        for i in range(len(expr.arguments)):
             expr.arguments[i].accept(self)
             self.generateCode("pushq", "%rax", None, 2, f"# Push argument number {i+1} to stack")
 
         self.setStaticLink(self.table.level - entry.level)
-        self.generateCode("subq", "$8", "%rsp", 3, "# Add dummy space") # Why did we need a dummy space?
+        self.generateCode("subq", "$8", "%rsp", 3, "# Add dummy space") # Instead of a heap pointer
 
         self.generateCode("call", f"{entry.functionName}", None, 3, f"# Call the {entry.functionName} function")
 
-        self.generateCode("addq", "$8", "%rsp", 3, "# Remove dummy space")  # Why did we need a dummy space?
+        self.generateCode("addq", "$8", "%rsp", 3, "# Remove dummy space")  
         self.generateCode("addq", "$8", "%rsp", 3, "# Deallocate space on stack for static link")
         self.popArgs(len(expr.arguments))
         
@@ -293,16 +293,16 @@ class AssemblyVisitor(Visitor):
         self.generateCode("movq", "%rbp", "%rax", 3, "# Prepare static link")
         for i in range(levelDifference):
             self.generateCode("movq", "24(%rax)", "%rax", 2, "# Traverse static link once")
-        self.generateCode("pushq", "%rax", None, 3, "# Push static link")
+        self.generateCode("pushq", "%rax", None, 3, "\t# Push static link")
 
     def startScope(self):
-        self.generateCode("pushq", "%rbp", None, 3, "# Save base pointer")
+        self.generateCode("pushq", "%rbp", None, 3, "\t# Save base pointer")
         self.generateCode("movq", "%rsp", "%rbp", 3, "# Make stack pointer new base pointer")
         self.generateCode("subq", f"${abs(self.table.varCounter)}", "%rsp", 3, "# Allocate space for local variables on the stack")
 
     def endScope(self):
         self.generateCode("addq", f"${abs(self.table.varCounter)}", "%rsp", 3, "# Deallocate space for local variables on the stack")
-        self.generateCode("popq", "%rbp", None, 3, "# Restore base pointer")
+        self.generateCode("popq", "%rbp", None, 3, "\t# Restore base pointer")
 
     def popArgs(self, args: int):
         argsToPop = 8 * args
@@ -313,6 +313,8 @@ class AssemblyVisitor(Visitor):
         label = self.ifLabelCounter
         self.ifLabelCounter += 1
         
+        self.addComment(0, f"# Start if statement {label}")
+        
         # For now 0 is false and everything else is true
         stmt.condition.accept(self)
         self.generateCode("cmp", "$0", "%rax", 3, "# Check the condition")
@@ -320,24 +322,24 @@ class AssemblyVisitor(Visitor):
         if stmt.elseStatement:
             self.generateCode("je", f"else_part_{label}", None, 3, "# Skip to the else if the condition is false")
         else:
-            self.generateCode("je", f"end_{label}", None, 3, "# Skip if the condition is false")
+            self.generateCode("je", f"end_{label}", None, 3, "\t# Skip if the condition is false")
         
         self.table = stmt.thenTable
 
         #Prologue for then block
         self.setStaticLink(0)
-        self.generateCode("subq", "$16", "%rsp", 3, "# Add dummy spaces")
+        self.generateCode("subq", "$16", "%rsp", 3, "# Add dummy spaces") # Instead of heap pointer and return address
         self.startScope()
 
         for s in stmt.thenStatement:
             s.accept(self)
 
         #Epilogue for then block
-        self.addLabel(f"end_then_{label}", 3, "# Clean up then block stack frame")
+        self.addLabel(f"end_then_{label}", 3, "\t\t# Clean up then block stack frame")
         self.endScope()
         self.generateCode("addq", "$16", "%rsp", 3, "# Remove dummy spaces")
         self.generateCode("addq", "$8", "%rsp", 3, "# Deallocate space on stack for static link")
-        self.generateCode("jmp", f"end_{label}", None, 3, "# Skip the else")
+        self.generateCode("jmp", f"end_{label}", None, 3, "\t# Skip the else")
 
         if stmt.elseStatement:
             self.addLabel(f"else_part_{label}", None, None)
@@ -346,7 +348,7 @@ class AssemblyVisitor(Visitor):
 
             #Prologue for else block
             self.setStaticLink(0)
-            self.generateCode("subq", "$16", "%rsp", 3, "# Add dummy spaces")
+            self.generateCode("subq", "$16", "%rsp", 3, "# Add dummy spaces") # Instead of heap pointer and return address
             self.startScope()
 
             for s in stmt.elseStatement:
@@ -361,12 +363,13 @@ class AssemblyVisitor(Visitor):
         self.addLabel(f"end_{label}", None, None)
 
         self.table = self.table.parent
-    
         
     def visitWhileStatement(self, stmt: WhileStatement):
         # Save label counter and update it
         label = self.whileLabelCounter
         self.whileLabelCounter += 1
+        
+        self.addComment(0, f"# Start while statement {label}")
         
         # Enter a new scope
         self.table = stmt.table
@@ -401,16 +404,16 @@ class AssemblyVisitor(Visitor):
         stmt.value.accept(self)
         self.addComment(3, "# Start print statement")
         self.generateCode("leaq", "form(%rip)", "%rdi", 2, "# Passing string address (1. argument)")
-        self.generateCode("movq", "%rax", "%rsi", 3, "# Passing %rax (2. argument)")
-        self.generateCode("movq", "$0", "%rax", 3, "# No floating point registers used")
-        self.generateCode("testq", "$15", "%rsp", 3, "# Test for 16 byte alignment")
-        self.generateCode("jz", f"print_align_{label}", None, 2, "# Jump if aligned")
-        self.generateCode("addq", "$-8", "%rsp", 3, "# 16 byte aligning")
-        self.generateCode("callq", "printf@plt", None, 2, "# Call printf")
-        self.generateCode("addq", "$8", "%rsp", 3, "# Reverting alignment")
+        self.generateCode("movq", "%rax", "%rsi", 3, "\t# Passing %rax (2. argument)")
+        self.generateCode("movq", "$0", "%rax", 3, "\t# No floating point registers used")
+        self.generateCode("testq", "$15", "%rsp", 3, "\t# Test for 16 byte alignment")
+        self.generateCode("jz", f"print_align_{label}", None, 2, "\t# Jump if aligned")
+        self.generateCode("addq", "$-8", "%rsp", 3, "\t# 16 byte aligning")
+        self.generateCode("callq", "printf@plt", None, 2, "\t# Call printf")
+        self.generateCode("addq", "$8", "%rsp", 3, "\t# Reverting alignment")
         self.generateCode("jmp", f"end_print_{label}", None, None, None)
         self.addLabel(f"print_align_{label}", None, None)
-        self.generateCode("callq", "printf@plt", None, 2, "# Call printf")
+        self.generateCode("callq", "printf@plt", None, 2, "\t# Call printf")
         self.addLabel(f"end_print_{label}", None, None)
         self.addComment(3, "# End print statement")
 
@@ -433,18 +436,18 @@ class AssemblyVisitor(Visitor):
 
         entry = self.table.lookup(stmt.var)
         
-        self.generateCode("pushq", "%rbp", None, 3, "# Save base pointer")
+        self.generateCode("pushq", "%rbp", None, 3, "\t# Save base pointer")
         self.generateCode("movq", "%rsp", "%rbp", 3, "# Make stack pointer new base pointer")
         self.generateCode("movq", "16(%rbp)", "%rcx", 3, "# Push heap pointer")
-        self.generateCode("pushq", "%rcx", None, 3, "# Push heap pointer")
+        self.generateCode("pushq", "%rcx", None, 3, "\t# Push heap pointer")
 
         
         if stmt.super:
             superEntry = self.table.lookup(stmt.super)
             self.setStaticLink(self.table.level - superEntry.level)
-            self.generateCode("pushq", "%rcx", None, 3, "# Push heap pointer")
+            self.generateCode("pushq", "%rcx", None, 3, "\t# Push heap pointer")
 
-            self.generateCode("call", f"{superEntry.name}", None, 3, f"# Call {entry.name} constructor")
+            self.generateCode("call", f"{superEntry.name}", None, 3, f"\t\t# Call {entry.name} constructor")
 
             self.generateCode("addq", "$8", "%rsp", 3, "# Deallocate space on stack for heap pointer")
             self.generateCode("addq", "$8", "%rsp", 3, "# Deallocate space on stack for static link")
@@ -471,9 +474,9 @@ class AssemblyVisitor(Visitor):
         for entry in self.table.getMethods():
             self.init.append(Instruction(None, None, None, None, None, f"\t.quad {entry.name}"))
 
-        self.generateCode("popq", "%rax", None, 3, "# Pop current heap pointer into %rax")
-        self.generateCode("popq", "%rbp", None, 3, "# Restore base pointer")
-        self.generateCode("ret", None, None, 4, "# End class")
+        self.generateCode("popq", "%rax", None, 3, "\t# Pop current heap pointer into %rax")
+        self.generateCode("popq", "%rbp", None, 3, "\t# Restore base pointer")
+        self.generateCode("ret", None, None, 4, "\t\t# End class")
 
         self.table = self.table.parent
         self.functionStack.pop()
@@ -487,7 +490,7 @@ class AssemblyVisitor(Visitor):
         self.generateCode("movq", "%rax", "(%rcx)", 3, "# Move class descriptor into object")
 
         self.setStaticLink(self.table.level - entry.level)
-        self.generateCode("pushq", "%rcx", None, 3, "# Push heap pointer")
+        self.generateCode("pushq", "%rcx", None, 3, "\t# Push heap pointer")
 
         self.generateCode("call", f"{entry.name}", None, 3, f"# Call {entry.name} constructor")
         self.generateCode("movq", "16(%rbp)", "%rcx", 3, "# Move potential heap pointer into %rcx")
@@ -504,7 +507,7 @@ class AssemblyVisitor(Visitor):
             propertyEntry = classEntry.table.lookupLocal(expr.var)
 
         if expr.isMethod:
-            self.generateCode("pushq", "%rax", None, 3, "# Push heap pointer to be used as argument")
+            self.generateCode("pushq", "%rax", None, 3, "\t# Push heap pointer to be used as argument")
             self.generateCode("movq", "(%rax)", "%rax", 2, "# Move value into %rax")
 
         if not expr.isAssign and not expr.isMethod:
@@ -526,7 +529,7 @@ class AssemblyVisitor(Visitor):
 
         self.generateCode("subq", "$8", "%rsp", 3, "# Add dummy space")
         self.generateCode("movq", "%r9", "%rax", 3, "# Move heap pointer into r9")
-        self.generateCode("call", "*%rax", None, 2, "# Call method")
+        self.generateCode("call", "*%rax", None, 2, "\t\t# Call method")
 
         self.generateCode("addq", "$8", "%rsp", 3, "# Remove dummy space")
         self.generateCode("addq", "$8", "%rsp", 3, "# Deallocate space on stack for static link")
@@ -549,7 +552,7 @@ class AssemblyVisitor(Visitor):
         self.addLabel(f"end_{entry.name}", None, None)
         self.endScope()
 
-        self.generateCode("ret", None, None, 4, "# Return from the method")
+        self.generateCode("ret", None, None, 4, "\t\t# Return from the method")
 
         self.table = self.table.parent
         self.functionStack.pop()

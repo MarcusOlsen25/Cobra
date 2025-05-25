@@ -31,8 +31,9 @@ class ScopeVisitor(Visitor):
             lookup = self.table.lookup(expr.var)
             if not lookup:
                 self.addScopeError(f"Undeclared variable {expr.var} in line {expr.lineno}.", expr.lineno)
-            elif not isinstance(lookup, SymbolTable.VariableValue) and not isinstance(lookup, SymbolTable.FieldValue):
-                self.addScopeError(f"The ID {expr.var} in line {expr.lineno} is neither a variable nor a field.", expr.lineno)
+            elif not (isinstance(lookup, SymbolTable.VariableValue) or isinstance(lookup, SymbolTable.FieldValue) 
+                      or isinstance(lookup, SymbolTable.ClassValue)):
+                self.addScopeError(f"visitVarExpr: The ID {expr.var} in line {expr.lineno} is neither a variable nor a field.", expr.lineno)
             else:
                 return lookup
         except ScopeException:
@@ -61,7 +62,8 @@ class ScopeVisitor(Visitor):
                     if not classEntry:
                         self.addScopeError(f"The class {stmt.type} referenced in line {stmt.lineno} is not defined.", stmt.lineno)
                 self.table.insertVar(stmt)
-                # stmt.initializer.accept(self)     # This line fucks everything up. Why?!
+                if stmt.initializer:
+                    stmt.initializer.accept(self)     # This line fucks everything up. Why?!
         except ScopeException:
             return
     
@@ -96,8 +98,8 @@ class ScopeVisitor(Visitor):
             elif not isinstance(lookup, SymbolTable.FunctionValue):
                 self.addScopeError(f"The ID {expr.var.var} in line {expr.lineno} is not a function.", expr.lineno)
             else:
-                for arg in expr.arguments:
-                    arg.accept(self)
+                for i in range(len(expr.arguments) - 1, -1, -1):
+                    expr.arguments[i].accept(self)
         except ScopeException:
             return
 

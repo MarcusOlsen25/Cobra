@@ -9,10 +9,14 @@ from errorTester import *
 
 # The line numbers match the error messages + 10.  
 data = '''
-int x = 3;
-x;
-x = 2;
-print x;
+
+class tiger {
+    int x = 5;
+}
+
+tiger tigger = new tiger();
+
+print tigger.x;
 
 '''
     
