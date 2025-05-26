@@ -186,7 +186,7 @@ class ScopeVisitor(Visitor):
             return
     
     def visitConstructorExpression(self, expr: ConstructorExpression):
-        expr.var.accept(self)
+        return expr.var.accept(self)
         
     def visitPropertyAccessExpression(self, expr: PropertyAccessExpression):
         try:
@@ -194,10 +194,14 @@ class ScopeVisitor(Visitor):
             varEntry = expr.property.accept(self)
             if not varEntry:
                 self.addScopeError(f"Error accessing a property in line {expr.lineno}.", expr.lineno) 
-            elif not (isinstance(varEntry, SymbolTable.VariableValue) or isinstance(varEntry, SymbolTable.FieldValue)):
+            elif not (isinstance(varEntry, SymbolTable.VariableValue) or isinstance(varEntry, SymbolTable.FieldValue) or isinstance(varEntry, SymbolTable.ClassValue)):
                 self.addScopeError(f"Error: {expr.property.var} in line {expr.lineno} has no properties, since it is neither a variable nor a field.", expr.lineno)
             else:
-                classEntry = self.table.lookup(varEntry.type)
+                if not isinstance(varEntry, SymbolTable.ClassValue):
+                    classEntry = self.table.lookup(varEntry.type)
+                else:
+                    classEntry = varEntry
+                    
                 if not classEntry:
                     self.addScopeError(f"Couldn't find class {varEntry.type} in line {expr.lineno}\n", expr.lineno)
                 else:

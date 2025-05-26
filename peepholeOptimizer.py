@@ -20,8 +20,10 @@ class PeepholeOptimizer:
             # Examine each instruction
             for i in range(len(self.instructions)):
                 self.optimiseNoLocalVariables(i)
+                self.optimiseAdditionsToRSP(i)
                         
-            # Remove the instructions marked as garbage using list comprehension (safe)            
+            # Remove the instructions marked as garbage     
+            # Reverse iteration prevents index problems     
             for i in reversed(range(len(self.instructions))):
                 if i in self.indexesToRemove:
                     del self.instructions[i]
@@ -44,4 +46,39 @@ class PeepholeOptimizer:
             if instruction.operand1 == "$0":
                 if instruction.operand2 == "%rsp":
                     self.indexesToRemove.append(index)
+    
+    
+    
+    # Deallocates multiple things at once
+    def optimiseAdditionsToRSP(self, index: int):
+        
+        # New instructions
+        heapAndStatic = Instruction("addq", "$16", "%rsp", None, 3, "# Deallocate heap pointer and static link")
+        oneDummyAndStatic = Instruction("addq", "$16", "%rsp", None, 3, "# Deallocate dummy space and static link")
+        twoDummyAndStatic = Instruction("addq", "$24", "%rsp", None, 3, "# Deallocate dummy spaces and static link")
+        
+        # In case we are at the last instruction
+        if index >= len(self.instructions) - 1:
+            return
+        else:
+            
+            current = self.instructions[index]
+            next = self.instructions[index+1]
+            
+            if current.upcode == "addq" and (current.operand1 == "$8" or current.operand1 == "$16") and current.operand2 == "%rsp":
+                if next.upcode == "addq" and next.operand1 == "$8" and next.operand2 == "%rsp":
                     
+                    if next.comment == "# Deallocate space on stack for static link":
+                        
+                        if current.comment == "# Deallocate space on stack for heap pointer":
+                            self.indexesToRemove.append(index)
+                            self.instructions[index+1] = heapAndStatic
+                        elif current.comment == "# Remove dummy space":
+                            self.indexesToRemove.append(index)
+                            self.instructions[index+1] = oneDummyAndStatic
+                        elif current.comment == "# Remove dummy spaces":
+                            self.indexesToRemove.append(index)
+                            self.instructions[index+1] = twoDummyAndStatic
+            
+            
+    

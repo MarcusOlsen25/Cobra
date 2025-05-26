@@ -389,3 +389,12 @@ class theCompilerWorks {
 theCompilerWorks hurrah = new theCompilerWorks();
 
 hurrah.celebrate();
+
+
+class ExtraTest {
+    int doubleYay = 51;
+}
+
+int hurrahhurrah = new ExtraTest().doubleYay;
+
+print hurrahhurrah;

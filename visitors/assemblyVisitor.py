@@ -496,11 +496,18 @@ class AssemblyVisitor(Visitor):
         self.generateCode("movq", "16(%rbp)", "%rcx", 3, "# Move potential heap pointer into %rcx")
         self.generateCode("addq", "$8", "%rsp", 3, "# Deallocate space on stack for heap pointer")
         self.generateCode("addq", "$8", "%rsp", 3, "# Deallocate space on stack for static link")
+        
+        return entry
 
     def visitPropertyAccessExpression(self, expr: PropertyAccessExpression):
         # Traverse each property call until you come to the end
         varEntry = expr.property.accept(self)
-        classEntry = self.table.lookup(varEntry.type)
+        
+        if not isinstance(varEntry, SymbolTable.ClassValue):
+            classEntry = self.table.lookup(varEntry.type)
+        else:
+            classEntry = varEntry        
+        
         propertyEntry = classEntry.table.lookupLocal(expr.var)
         while not propertyEntry and classEntry.super:
             classEntry = self.table.lookup(classEntry.super)

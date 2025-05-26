@@ -264,13 +264,17 @@ class TypeVisitor(Visitor):
         self.table = self.table.parent
     
     def visitConstructorExpression(self, expr: ConstructorExpression):
-        expr.var.accept(self)
+        return expr.var.accept(self)
         
     def visitPropertyAccessExpression(self, expr: PropertyAccessExpression):
         # Traverse each property call until you come to the end
         varEntry = expr.property.accept(self)
     
-        classEntry = self.table.lookup(varEntry.type)
+        if not isinstance(varEntry, SymbolTable.ClassValue):
+            classEntry = self.table.lookup(varEntry.type)
+        else:
+            classEntry = varEntry
+            
         propertyEntry = classEntry.table.lookupLocal(expr.var)
         while not propertyEntry and classEntry.super:
             classEntry = self.table.lookup(classEntry.super)
