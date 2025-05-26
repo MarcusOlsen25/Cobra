@@ -33,7 +33,7 @@ class ScopeVisitor(Visitor):
                 self.addScopeError(f"Undeclared variable {expr.var} in line {expr.lineno}.", expr.lineno)
             elif not (isinstance(lookup, SymbolTable.VariableValue) or isinstance(lookup, SymbolTable.FieldValue) 
                       or isinstance(lookup, SymbolTable.ClassValue)):
-                self.addScopeError(f"visitVarExpr: The ID {expr.var} in line {expr.lineno} is neither a variable nor a field.", expr.lineno)
+                self.addScopeError(f"The ID {expr.var} in line {expr.lineno} is neither a variable nor a field.", expr.lineno)
             else:
                 return lookup
         except ScopeException:
@@ -63,7 +63,7 @@ class ScopeVisitor(Visitor):
                         self.addScopeError(f"The class {stmt.type} referenced in line {stmt.lineno} is not defined.", stmt.lineno)
                 self.table.insertVar(stmt)
                 if stmt.initializer:
-                    stmt.initializer.accept(self)     # This line fucks everything up. Why?!
+                    stmt.initializer.accept(self)     
         except ScopeException:
             return
     

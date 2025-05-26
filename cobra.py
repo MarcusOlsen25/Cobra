@@ -6,17 +6,15 @@ from visitors.scopeVisitor import ScopeVisitor
 from scope.SymbolTable import *
 from visitors.instruction import *
 from errorTester import *
-
+from peepholeOptimizer import *
 # The line numbers match the error messages + 10.  
 data = '''
 
-class tiger {
-    int x = 5;
+func one() int {
+    return 3;
 }
 
-tiger tigger = new tiger();
-
-print tigger.x;
+one();
 
 '''
     
@@ -25,7 +23,7 @@ with open("test.co", "r") as file:
     test = file.read()
 
 # Change this line from 'test' to 'data' and vice versa
-cobraCode = test
+cobraCode = data
 
 # Runs the main program
 def compileCobra(cobraCode: str):
@@ -97,6 +95,11 @@ def compileCobra(cobraCode: str):
                         program.extend(function)
 
                     program += assemblyVisitor.main
+                    
+                    # Optimise the program
+                    peepholeOptimizer = PeepholeOptimizer(program)
+                    peepholeOptimizer.optimise()
+                    program = peepholeOptimizer.instructions
                     
                     print("Program compiled successfully into test.s")
 
