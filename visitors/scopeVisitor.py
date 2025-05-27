@@ -54,7 +54,9 @@ class ScopeVisitor(Visitor):
                     
     def visitVarDeclaration(self, stmt: VarDeclaration):
         try:
-            if self.table.lookupLocal(stmt.var):
+            if isinstance(self.table.lookup(stmt.var), SymbolTable.ClassValue):
+                self.addScopeError(f"Error: {stmt.var} in line {stmt.lineno} cannot be used as a variable name, since it is a class.", stmt.lineno)
+            elif self.table.lookupLocal(stmt.var):
                 self.addScopeError(f"The variable {stmt.var} in line {stmt.lineno} is already defined in this scope.", stmt.lineno)
             else:
                 if stmt.type != "int" and stmt.type != "bool":
