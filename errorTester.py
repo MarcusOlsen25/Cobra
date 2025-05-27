@@ -238,7 +238,9 @@ def testScopeErrors():
         "The property b from line 50 could not be found.",
         "Undeclared variable fup in line 68.",
         "The ID a in line 81 is not a method.",
-        "The property b from line 82 could not be found."
+        "The property b from line 82 could not be found.",
+        "The method b from line 82 is not defined.",
+        "Error: banan in line 84 cannot be used as a variable name, since it is a class."
     ]
     
     with open("testScopeErrors.co", "r") as file:
@@ -255,6 +257,9 @@ def testScopeErrors():
         statement.accept(scopeVisitor)
     
     success = True
+    
+    print(len(scopeVisitor.scopeErrors))
+    print(len(expectedErrorMessages))
 
     if len(scopeVisitor.scopeErrors) == len(expectedErrorMessages):
         i = 0

@@ -398,3 +398,21 @@ class ExtraTest {
 int hurrahhurrah = new ExtraTest().doubleYay;
 
 print hurrahhurrah;
+
+class anotherTest {
+    int x = 52;
+}
+
+class otherTest {
+    func one() anotherTest {
+        return new anotherTest();
+    }
+}
+
+print new otherTest().one().x;
+
+func funnyFunc() anotherTest {
+    return new anotherTest();
+}
+
+print funnyFunc().x + 1;

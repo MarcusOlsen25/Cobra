@@ -80,3 +80,5 @@ tiger tigger = new tiger();
 tigger.one();
 tigger.a();
 tigger.b();
+
+banan banan = new banan();

@@ -203,6 +203,9 @@ class TypeVisitor(Visitor):
                     self.addFunctionError(f"The arguments given in line {expr.lineno} do not match the types of the parameters for {entry.functionName}.", expr.lineno)
                 expr.arguments[i].accept(self)
                 i += 1
+                
+            returnType = self.table.lookup(entry.returnType)
+            return returnType
             
         except FunctionException:
             return
@@ -301,7 +304,8 @@ class TypeVisitor(Visitor):
                 expr.arguments[i].accept(self)
                 i += 1
 
-            return methodEntry
+            returnType = self.table.lookup(methodEntry.returnType)
+            return returnType
         except FunctionException:
             return
     

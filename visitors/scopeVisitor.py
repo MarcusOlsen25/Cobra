@@ -102,6 +102,9 @@ class ScopeVisitor(Visitor):
             else:
                 for i in range(len(expr.arguments) - 1, -1, -1):
                     expr.arguments[i].accept(self)
+                    
+            returnType = self.table.lookup(lookup.returnType)
+            return returnType
         except ScopeException:
             return
 
@@ -196,7 +199,8 @@ class ScopeVisitor(Visitor):
             varEntry = expr.property.accept(self)
             if not varEntry:
                 self.addScopeError(f"Error accessing a property in line {expr.lineno}.", expr.lineno) 
-            elif not (isinstance(varEntry, SymbolTable.VariableValue) or isinstance(varEntry, SymbolTable.FieldValue) or isinstance(varEntry, SymbolTable.ClassValue)):
+            elif not (isinstance(varEntry, SymbolTable.VariableValue) or isinstance(varEntry, SymbolTable.FieldValue) or 
+                      isinstance(varEntry, SymbolTable.ClassValue) or isinstance(varEntry, SymbolTable.FunctionValue)):
                 self.addScopeError(f"Error: {expr.property.var} in line {expr.lineno} has no properties, since it is neither a variable nor a field.", expr.lineno)
             else:
                 if not isinstance(varEntry, SymbolTable.ClassValue):
@@ -222,14 +226,14 @@ class ScopeVisitor(Visitor):
         try:
             methodEntry = expr.property.accept(self)
             if not methodEntry:
-                pass
-                # self.addScopeError(f"The method {expr.property.var} from line {expr.lineno} is not defined.", expr.lineno)
+                self.addScopeError(f"The method {expr.property.var} from line {expr.lineno} is not defined.", expr.lineno)
             elif not isinstance(methodEntry, SymbolTable.MethodValue):
                 self.addScopeError(f"The ID {methodEntry.name} in line {expr.lineno} is not a method.", expr.lineno)
             else:
                 for arg in expr.arguments:
                     arg.accept(self)
-            return methodEntry
+            returnType = self.table.lookup(methodEntry.returnType)
+            return returnType
 
         except ScopeException:
             return
