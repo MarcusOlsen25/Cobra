@@ -47,7 +47,6 @@ class Parser:
         else:
             p[0] = None
 
-
     def p_classDeclarationList_multiple(self, p):
         '''classDeclarationList : classDeclarationList classDeclaration'''
         p[0] = p[1] + [p[2]]

@@ -110,8 +110,7 @@ sko:			# Class
 	popq %rbp				# Restore base pointer
 	ret						# End class
 test33:			# Function
-	pushq %rbp				# Save base pointer
-	movq %rsp, %rbp			# Make stack pointer new base pointer
+	subq $8, %rsp			# Add dummy base pointer
 # Start if statement 27
 	movq $20, %rax			# Put a number in %rax
 	pushq %rax				# Push right side to stack
@@ -128,28 +127,26 @@ comp_end_21:
 	je else_part_27			# Skip to the else if the condition is false
 	pushq %rbp				# Push simple static link
 	subq $16, %rsp			# Add dummy spaces
-	pushq %rbp				# Save base pointer
-	movq %rsp, %rbp			# Make stack pointer new base pointer
+	subq $8, %rsp			# Add dummy base pointer
 	movq $1, %rax			# Put a number in %rax
 	negq %rax				# Negate value
 	call print				# Call the print procedure
 end_then_27:				# Clean up then block stack frame
-	popq %rbp				# Restore base pointer
+	addq $8, %rsp			# Remove dummy base pointer
 	addq $24, %rsp			# Deallocate dummy spaces and static link
 	jmp end_27				# Skip the else
 else_part_27:
 	pushq %rbp				# Push simple static link
 	subq $16, %rsp			# Add dummy spaces
-	pushq %rbp				# Save base pointer
-	movq %rsp, %rbp			# Make stack pointer new base pointer
+	subq $8, %rsp			# Add dummy base pointer
 	movq $33, %rax			# Put a number in %rax
 	call print				# Call the print procedure
 end_else_27:
-	popq %rbp				# Restore base pointer
+	addq $8, %rsp			# Remove dummy base pointer
 	addq $24, %rsp			# Deallocate dummy spaces and static link
 end_27:
 end_test33:			# End function
-	popq %rbp				# Restore base pointer
+	addq $8, %rsp			# Remove dummy base pointer
 	ret						# Return from the function
 test34:			# Function
 	pushq %rbp				# Save base pointer
@@ -161,24 +158,22 @@ test34:			# Function
 	je else_part_28			# Skip to the else if the condition is false
 	pushq %rbp				# Push simple static link
 	subq $16, %rsp			# Add dummy spaces
-	pushq %rbp				# Save base pointer
-	movq %rsp, %rbp			# Make stack pointer new base pointer
+	subq $8, %rsp			# Add dummy base pointer
 	movq $34, %rax			# Put a number in %rax
 	call print				# Call the print procedure
 end_then_28:				# Clean up then block stack frame
-	popq %rbp				# Restore base pointer
+	addq $8, %rsp			# Remove dummy base pointer
 	addq $24, %rsp			# Deallocate dummy spaces and static link
 	jmp end_28				# Skip the else
 else_part_28:
 	pushq %rbp				# Push simple static link
 	subq $16, %rsp			# Add dummy spaces
-	pushq %rbp				# Save base pointer
-	movq %rsp, %rbp			# Make stack pointer new base pointer
+	subq $8, %rsp			# Add dummy base pointer
 	movq $1, %rax			# Put a number in %rax
 	negq %rax				# Negate value
 	call print				# Call the print procedure
 end_else_28:
-	popq %rbp				# Restore base pointer
+	addq $8, %rsp			# Remove dummy base pointer
 	addq $24, %rsp			# Deallocate dummy spaces and static link
 end_28:
 end_test34:			# End function
@@ -194,24 +189,22 @@ test35:			# Function
 	je else_part_29			# Skip to the else if the condition is false
 	pushq %rbp				# Push simple static link
 	subq $16, %rsp			# Add dummy spaces
-	pushq %rbp				# Save base pointer
-	movq %rsp, %rbp			# Make stack pointer new base pointer
+	subq $8, %rsp			# Add dummy base pointer
 	movq $1, %rax			# Put a number in %rax
 	negq %rax				# Negate value
 	call print				# Call the print procedure
 end_then_29:				# Clean up then block stack frame
-	popq %rbp				# Restore base pointer
+	addq $8, %rsp			# Remove dummy base pointer
 	addq $24, %rsp			# Deallocate dummy spaces and static link
 	jmp end_29				# Skip the else
 else_part_29:
 	pushq %rbp				# Push simple static link
 	subq $16, %rsp			# Add dummy spaces
-	pushq %rbp				# Save base pointer
-	movq %rsp, %rbp			# Make stack pointer new base pointer
+	subq $8, %rsp			# Add dummy base pointer
 	movq $35, %rax			# Put a number in %rax
 	call print				# Call the print procedure
 end_else_29:
-	popq %rbp				# Restore base pointer
+	addq $8, %rsp			# Remove dummy base pointer
 	addq $24, %rsp			# Deallocate dummy spaces and static link
 end_29:
 end_test35:			# End function
@@ -234,7 +227,7 @@ test36one:			# Function
 	pushq %rbp				# Push simple static link
 	subq $8, %rsp			# Add dummy space
 	call test36one_test36two			# Call the test36one_test36two function
-	addq $16, %rsp			# Deallocate dummy space and static link
+	addq $16, %rsp			# Deallocate dummy space, static link and arguments
 end_test36one:			# End function
 	popq %rbp				# Restore base pointer
 	ret						# Return from the function
@@ -247,7 +240,7 @@ test36one_test36two:			# Function
 	pushq %rax				# Push static link
 	subq $8, %rsp			# Add dummy space
 	call test36three			# Call the test36three function
-	addq $16, %rsp			# Deallocate dummy space and static link
+	addq $16, %rsp			# Deallocate dummy space, static link and arguments
 end_test36one_test36two:			# End function
 	popq %rbp				# Restore base pointer
 	ret						# Return from the function
@@ -272,7 +265,7 @@ f2:			# Function
 	pushq %rax				# Push static link
 	subq $8, %rsp			# Add dummy space
 	call f1			# Call the f1 function
-	addq $16, %rsp			# Deallocate dummy space and static link
+	addq $16, %rsp			# Deallocate dummy space, static link and arguments
 end_f2:			# End function
 	addq $8, %rsp			# Deallocate space for local variables on the stack
 	popq %rbp				# Restore base pointer
@@ -410,13 +403,13 @@ runIncrements:			# Function
 	pushq %rax				# Push static link
 	subq $8, %rsp			# Add dummy space
 	call increment			# Call the increment function
-	addq $16, %rsp			# Deallocate dummy space and static link
+	addq $16, %rsp			# Deallocate dummy space, static link and arguments
 	movq %rbp, %rax			# Prepare static link
 	movq 24(%rax), %rax		# Traverse static link once
 	pushq %rax				# Push static link
 	subq $8, %rsp			# Add dummy space
 	call increment			# Call the increment function
-	addq $16, %rsp			# Deallocate dummy space and static link
+	addq $16, %rsp			# Deallocate dummy space, static link and arguments
 end_runIncrements:			# End function
 	popq %rbp				# Restore base pointer
 	ret						# Return from the function
@@ -464,8 +457,7 @@ doubleAdd_Calculator:			# Method
 	subq $8, %rsp			# Add dummy space
 	movq %r9, %rax			# Move heap pointer into r9
 	call *%rax				# Call method
-	addq $16, %rsp			# Deallocate dummy space and static link
-	addq $8, %rsp			# Pop the arguments pushed to the stack
+	addq $24, %rsp			# Deallocate dummy space, static link and arguments
 	popq %rbx				# Pop right side into %rbx
 	imulq %rbx, %rax		# Perform multiplication
 end_doubleAdd_Calculator:
@@ -751,12 +743,11 @@ comp_end_0:
 	je end_0				# Skip if the condition is false
 	pushq %rbp				# Push simple static link
 	subq $16, %rsp			# Add dummy spaces
-	pushq %rbp				# Save base pointer
-	movq %rsp, %rbp			# Make stack pointer new base pointer
+	subq $8, %rsp			# Add dummy base pointer
 	movq $5, %rax			# Put a number in %rax
 	call print				# Call the print procedure
 end_then_0:				# Clean up then block stack frame
-	popq %rbp				# Restore base pointer
+	addq $8, %rsp			# Remove dummy base pointer
 	addq $24, %rsp			# Deallocate dummy spaces and static link
 	jmp end_0				# Skip the else
 end_0:
@@ -766,13 +757,12 @@ end_0:
 	je end_1				# Skip if the condition is false
 	pushq %rbp				# Push simple static link
 	subq $16, %rsp			# Add dummy spaces
-	pushq %rbp				# Save base pointer
-	movq %rsp, %rbp			# Make stack pointer new base pointer
+	subq $8, %rsp			# Add dummy base pointer
 	movq $1, %rax			# Put a number in %rax
 	negq %rax				# Negate value
 	call print				# Call the print procedure
 end_then_1:				# Clean up then block stack frame
-	popq %rbp				# Restore base pointer
+	addq $8, %rsp			# Remove dummy base pointer
 	addq $24, %rsp			# Deallocate dummy spaces and static link
 	jmp end_1				# Skip the else
 end_1:
@@ -782,12 +772,11 @@ end_1:
 	je end_2				# Skip if the condition is false
 	pushq %rbp				# Push simple static link
 	subq $16, %rsp			# Add dummy spaces
-	pushq %rbp				# Save base pointer
-	movq %rsp, %rbp			# Make stack pointer new base pointer
+	subq $8, %rsp			# Add dummy base pointer
 	movq $6, %rax			# Put a number in %rax
 	call print				# Call the print procedure
 end_then_2:				# Clean up then block stack frame
-	popq %rbp				# Restore base pointer
+	addq $8, %rsp			# Remove dummy base pointer
 	addq $24, %rsp			# Deallocate dummy spaces and static link
 	jmp end_2				# Skip the else
 end_2:
@@ -802,13 +791,12 @@ end_2:
 	je end_3				# Skip if the condition is false
 	pushq %rbp				# Push simple static link
 	subq $16, %rsp			# Add dummy spaces
-	pushq %rbp				# Save base pointer
-	movq %rsp, %rbp			# Make stack pointer new base pointer
+	subq $8, %rsp			# Add dummy base pointer
 	movq $1, %rax			# Put a number in %rax
 	negq %rax				# Negate value
 	call print				# Call the print procedure
 end_then_3:				# Clean up then block stack frame
-	popq %rbp				# Restore base pointer
+	addq $8, %rsp			# Remove dummy base pointer
 	addq $24, %rsp			# Deallocate dummy spaces and static link
 	jmp end_3				# Skip the else
 end_3:
@@ -819,12 +807,11 @@ end_3:
 	je end_4				# Skip if the condition is false
 	pushq %rbp				# Push simple static link
 	subq $16, %rsp			# Add dummy spaces
-	pushq %rbp				# Save base pointer
-	movq %rsp, %rbp			# Make stack pointer new base pointer
+	subq $8, %rsp			# Add dummy base pointer
 	movq $7, %rax			# Put a number in %rax
 	call print				# Call the print procedure
 end_then_4:				# Clean up then block stack frame
-	popq %rbp				# Restore base pointer
+	addq $8, %rsp			# Remove dummy base pointer
 	addq $24, %rsp			# Deallocate dummy spaces and static link
 	jmp end_4				# Skip the else
 end_4:
@@ -835,24 +822,22 @@ end_4:
 	je else_part_5			# Skip to the else if the condition is false
 	pushq %rbp				# Push simple static link
 	subq $16, %rsp			# Add dummy spaces
-	pushq %rbp				# Save base pointer
-	movq %rsp, %rbp			# Make stack pointer new base pointer
+	subq $8, %rsp			# Add dummy base pointer
 	movq $1, %rax			# Put a number in %rax
 	negq %rax				# Negate value
 	call print				# Call the print procedure
 end_then_5:				# Clean up then block stack frame
-	popq %rbp				# Restore base pointer
+	addq $8, %rsp			# Remove dummy base pointer
 	addq $24, %rsp			# Deallocate dummy spaces and static link
 	jmp end_5				# Skip the else
 else_part_5:
 	pushq %rbp				# Push simple static link
 	subq $16, %rsp			# Add dummy spaces
-	pushq %rbp				# Save base pointer
-	movq %rsp, %rbp			# Make stack pointer new base pointer
+	subq $8, %rsp			# Add dummy base pointer
 	movq $8, %rax			# Put a number in %rax
 	call print				# Call the print procedure
 end_else_5:
-	popq %rbp				# Restore base pointer
+	addq $8, %rsp			# Remove dummy base pointer
 	addq $24, %rsp			# Deallocate dummy spaces and static link
 end_5:
 # Start if statement 6
@@ -862,24 +847,22 @@ end_5:
 	je else_part_6			# Skip to the else if the condition is false
 	pushq %rbp				# Push simple static link
 	subq $16, %rsp			# Add dummy spaces
-	pushq %rbp				# Save base pointer
-	movq %rsp, %rbp			# Make stack pointer new base pointer
+	subq $8, %rsp			# Add dummy base pointer
 	movq $9, %rax			# Put a number in %rax
 	call print				# Call the print procedure
 end_then_6:				# Clean up then block stack frame
-	popq %rbp				# Restore base pointer
+	addq $8, %rsp			# Remove dummy base pointer
 	addq $24, %rsp			# Deallocate dummy spaces and static link
 	jmp end_6				# Skip the else
 else_part_6:
 	pushq %rbp				# Push simple static link
 	subq $16, %rsp			# Add dummy spaces
-	pushq %rbp				# Save base pointer
-	movq %rsp, %rbp			# Make stack pointer new base pointer
+	subq $8, %rsp			# Add dummy base pointer
 	movq $1, %rax			# Put a number in %rax
 	negq %rax				# Negate value
 	call print				# Call the print procedure
 end_else_6:
-	popq %rbp				# Restore base pointer
+	addq $8, %rsp			# Remove dummy base pointer
 	addq $24, %rsp			# Deallocate dummy spaces and static link
 end_6:
 # Start if statement 7
@@ -972,13 +955,12 @@ comp_end_1:
 	je end_9				# Skip if the condition is false
 	pushq %rbp				# Push simple static link
 	subq $16, %rsp			# Add dummy spaces
-	pushq %rbp				# Save base pointer
-	movq %rsp, %rbp			# Make stack pointer new base pointer
+	subq $8, %rsp			# Add dummy base pointer
 	movq $1, %rax			# Put a number in %rax
 	negq %rax				# Negate value
 	call print				# Call the print procedure
 end_then_9:				# Clean up then block stack frame
-	popq %rbp				# Restore base pointer
+	addq $8, %rsp			# Remove dummy base pointer
 	addq $24, %rsp			# Deallocate dummy spaces and static link
 	jmp end_9				# Skip the else
 end_9:
@@ -998,12 +980,11 @@ comp_end_2:
 	je end_10				# Skip if the condition is false
 	pushq %rbp				# Push simple static link
 	subq $16, %rsp			# Add dummy spaces
-	pushq %rbp				# Save base pointer
-	movq %rsp, %rbp			# Make stack pointer new base pointer
+	subq $8, %rsp			# Add dummy base pointer
 	movq $12, %rax			# Put a number in %rax
 	call print				# Call the print procedure
 end_then_10:				# Clean up then block stack frame
-	popq %rbp				# Restore base pointer
+	addq $8, %rsp			# Remove dummy base pointer
 	addq $24, %rsp			# Deallocate dummy spaces and static link
 	jmp end_10				# Skip the else
 end_10:
@@ -1023,12 +1004,11 @@ comp_end_3:
 	je end_11				# Skip if the condition is false
 	pushq %rbp				# Push simple static link
 	subq $16, %rsp			# Add dummy spaces
-	pushq %rbp				# Save base pointer
-	movq %rsp, %rbp			# Make stack pointer new base pointer
+	subq $8, %rsp			# Add dummy base pointer
 	movq $13, %rax			# Put a number in %rax
 	call print				# Call the print procedure
 end_then_11:				# Clean up then block stack frame
-	popq %rbp				# Restore base pointer
+	addq $8, %rsp			# Remove dummy base pointer
 	addq $24, %rsp			# Deallocate dummy spaces and static link
 	jmp end_11				# Skip the else
 end_11:
@@ -1048,13 +1028,12 @@ comp_end_4:
 	je end_12				# Skip if the condition is false
 	pushq %rbp				# Push simple static link
 	subq $16, %rsp			# Add dummy spaces
-	pushq %rbp				# Save base pointer
-	movq %rsp, %rbp			# Make stack pointer new base pointer
+	subq $8, %rsp			# Add dummy base pointer
 	movq $1, %rax			# Put a number in %rax
 	negq %rax				# Negate value
 	call print				# Call the print procedure
 end_then_12:				# Clean up then block stack frame
-	popq %rbp				# Restore base pointer
+	addq $8, %rsp			# Remove dummy base pointer
 	addq $24, %rsp			# Deallocate dummy spaces and static link
 	jmp end_12				# Skip the else
 end_12:
@@ -1074,13 +1053,12 @@ comp_end_5:
 	je end_13				# Skip if the condition is false
 	pushq %rbp				# Push simple static link
 	subq $16, %rsp			# Add dummy spaces
-	pushq %rbp				# Save base pointer
-	movq %rsp, %rbp			# Make stack pointer new base pointer
+	subq $8, %rsp			# Add dummy base pointer
 	movq $1, %rax			# Put a number in %rax
 	negq %rax				# Negate value
 	call print				# Call the print procedure
 end_then_13:				# Clean up then block stack frame
-	popq %rbp				# Restore base pointer
+	addq $8, %rsp			# Remove dummy base pointer
 	addq $24, %rsp			# Deallocate dummy spaces and static link
 	jmp end_13				# Skip the else
 end_13:
@@ -1100,12 +1078,11 @@ comp_end_6:
 	je end_14				# Skip if the condition is false
 	pushq %rbp				# Push simple static link
 	subq $16, %rsp			# Add dummy spaces
-	pushq %rbp				# Save base pointer
-	movq %rsp, %rbp			# Make stack pointer new base pointer
+	subq $8, %rsp			# Add dummy base pointer
 	movq $14, %rax			# Put a number in %rax
 	call print				# Call the print procedure
 end_then_14:				# Clean up then block stack frame
-	popq %rbp				# Restore base pointer
+	addq $8, %rsp			# Remove dummy base pointer
 	addq $24, %rsp			# Deallocate dummy spaces and static link
 	jmp end_14				# Skip the else
 end_14:
@@ -1125,12 +1102,11 @@ comp_end_7:
 	je end_15				# Skip if the condition is false
 	pushq %rbp				# Push simple static link
 	subq $16, %rsp			# Add dummy spaces
-	pushq %rbp				# Save base pointer
-	movq %rsp, %rbp			# Make stack pointer new base pointer
+	subq $8, %rsp			# Add dummy base pointer
 	movq $15, %rax			# Put a number in %rax
 	call print				# Call the print procedure
 end_then_15:				# Clean up then block stack frame
-	popq %rbp				# Restore base pointer
+	addq $8, %rsp			# Remove dummy base pointer
 	addq $24, %rsp			# Deallocate dummy spaces and static link
 	jmp end_15				# Skip the else
 end_15:
@@ -1150,13 +1126,12 @@ comp_end_8:
 	je end_16				# Skip if the condition is false
 	pushq %rbp				# Push simple static link
 	subq $16, %rsp			# Add dummy spaces
-	pushq %rbp				# Save base pointer
-	movq %rsp, %rbp			# Make stack pointer new base pointer
+	subq $8, %rsp			# Add dummy base pointer
 	movq $1, %rax			# Put a number in %rax
 	negq %rax				# Negate value
 	call print				# Call the print procedure
 end_then_16:				# Clean up then block stack frame
-	popq %rbp				# Restore base pointer
+	addq $8, %rsp			# Remove dummy base pointer
 	addq $24, %rsp			# Deallocate dummy spaces and static link
 	jmp end_16				# Skip the else
 end_16:
@@ -1176,12 +1151,11 @@ comp_end_9:
 	je end_17				# Skip if the condition is false
 	pushq %rbp				# Push simple static link
 	subq $16, %rsp			# Add dummy spaces
-	pushq %rbp				# Save base pointer
-	movq %rsp, %rbp			# Make stack pointer new base pointer
+	subq $8, %rsp			# Add dummy base pointer
 	movq $16, %rax			# Put a number in %rax
 	call print				# Call the print procedure
 end_then_17:				# Clean up then block stack frame
-	popq %rbp				# Restore base pointer
+	addq $8, %rsp			# Remove dummy base pointer
 	addq $24, %rsp			# Deallocate dummy spaces and static link
 	jmp end_17				# Skip the else
 end_17:
@@ -1201,12 +1175,11 @@ comp_end_10:
 	je end_18				# Skip if the condition is false
 	pushq %rbp				# Push simple static link
 	subq $16, %rsp			# Add dummy spaces
-	pushq %rbp				# Save base pointer
-	movq %rsp, %rbp			# Make stack pointer new base pointer
+	subq $8, %rsp			# Add dummy base pointer
 	movq $17, %rax			# Put a number in %rax
 	call print				# Call the print procedure
 end_then_18:				# Clean up then block stack frame
-	popq %rbp				# Restore base pointer
+	addq $8, %rsp			# Remove dummy base pointer
 	addq $24, %rsp			# Deallocate dummy spaces and static link
 	jmp end_18				# Skip the else
 end_18:
@@ -1226,12 +1199,11 @@ comp_end_11:
 	je end_19				# Skip if the condition is false
 	pushq %rbp				# Push simple static link
 	subq $16, %rsp			# Add dummy spaces
-	pushq %rbp				# Save base pointer
-	movq %rsp, %rbp			# Make stack pointer new base pointer
+	subq $8, %rsp			# Add dummy base pointer
 	movq $18, %rax			# Put a number in %rax
 	call print				# Call the print procedure
 end_then_19:				# Clean up then block stack frame
-	popq %rbp				# Restore base pointer
+	addq $8, %rsp			# Remove dummy base pointer
 	addq $24, %rsp			# Deallocate dummy spaces and static link
 	jmp end_19				# Skip the else
 end_19:
@@ -1251,13 +1223,12 @@ comp_end_12:
 	je end_20				# Skip if the condition is false
 	pushq %rbp				# Push simple static link
 	subq $16, %rsp			# Add dummy spaces
-	pushq %rbp				# Save base pointer
-	movq %rsp, %rbp			# Make stack pointer new base pointer
+	subq $8, %rsp			# Add dummy base pointer
 	movq $1, %rax			# Put a number in %rax
 	negq %rax				# Negate value
 	call print				# Call the print procedure
 end_then_20:				# Clean up then block stack frame
-	popq %rbp				# Restore base pointer
+	addq $8, %rsp			# Remove dummy base pointer
 	addq $24, %rsp			# Deallocate dummy spaces and static link
 	jmp end_20				# Skip the else
 end_20:
@@ -1277,12 +1248,11 @@ comp_end_13:
 	je end_21				# Skip if the condition is false
 	pushq %rbp				# Push simple static link
 	subq $16, %rsp			# Add dummy spaces
-	pushq %rbp				# Save base pointer
-	movq %rsp, %rbp			# Make stack pointer new base pointer
+	subq $8, %rsp			# Add dummy base pointer
 	movq $19, %rax			# Put a number in %rax
 	call print				# Call the print procedure
 end_then_21:				# Clean up then block stack frame
-	popq %rbp				# Restore base pointer
+	addq $8, %rsp			# Remove dummy base pointer
 	addq $24, %rsp			# Deallocate dummy spaces and static link
 	jmp end_21				# Skip the else
 end_21:
@@ -1302,13 +1272,12 @@ comp_end_14:
 	je end_22				# Skip if the condition is false
 	pushq %rbp				# Push simple static link
 	subq $16, %rsp			# Add dummy spaces
-	pushq %rbp				# Save base pointer
-	movq %rsp, %rbp			# Make stack pointer new base pointer
+	subq $8, %rsp			# Add dummy base pointer
 	movq $1, %rax			# Put a number in %rax
 	negq %rax				# Negate value
 	call print				# Call the print procedure
 end_then_22:				# Clean up then block stack frame
-	popq %rbp				# Restore base pointer
+	addq $8, %rsp			# Remove dummy base pointer
 	addq $24, %rsp			# Deallocate dummy spaces and static link
 	jmp end_22				# Skip the else
 end_22:
@@ -1444,13 +1413,12 @@ comp_end_17:
 	je else_part_23			# Skip to the else if the condition is false
 	pushq %rbp				# Push simple static link
 	subq $16, %rsp			# Add dummy spaces
-	pushq %rbp				# Save base pointer
-	movq %rsp, %rbp			# Make stack pointer new base pointer
+	subq $8, %rsp			# Add dummy base pointer
 	movq $1, %rax			# Put a number in %rax
 	negq %rax				# Negate value
 	call print				# Call the print procedure
 end_then_23:				# Clean up then block stack frame
-	popq %rbp				# Restore base pointer
+	addq $8, %rsp			# Remove dummy base pointer
 	addq $24, %rsp			# Deallocate dummy spaces and static link
 	jmp end_23				# Skip the else
 else_part_23:
@@ -1509,24 +1477,22 @@ comp_end_18:
 	je else_part_24			# Skip to the else if the condition is false
 	pushq %rbp				# Push simple static link
 	subq $16, %rsp			# Add dummy spaces
-	pushq %rbp				# Save base pointer
-	movq %rsp, %rbp			# Make stack pointer new base pointer
+	subq $8, %rsp			# Add dummy base pointer
 	movq $1, %rax			# Put a number in %rax
 	negq %rax				# Negate value
 	call print				# Call the print procedure
 end_then_24:				# Clean up then block stack frame
-	popq %rbp				# Restore base pointer
+	addq $8, %rsp			# Remove dummy base pointer
 	addq $24, %rsp			# Deallocate dummy spaces and static link
 	jmp end_24				# Skip the else
 else_part_24:
 	pushq %rbp				# Push simple static link
 	subq $16, %rsp			# Add dummy spaces
-	pushq %rbp				# Save base pointer
-	movq %rsp, %rbp			# Make stack pointer new base pointer
+	subq $8, %rsp			# Add dummy base pointer
 	movq $30, %rax			# Put a number in %rax
 	call print				# Call the print procedure
 end_else_24:
-	popq %rbp				# Restore base pointer
+	addq $8, %rsp			# Remove dummy base pointer
 	addq $24, %rsp			# Deallocate dummy spaces and static link
 end_24:
 	movq heap_pointer(%rip), %rcx			# Move heap pointer into %rcx
@@ -1565,24 +1531,22 @@ comp_end_19:
 	je else_part_25			# Skip to the else if the condition is false
 	pushq %rbp				# Push simple static link
 	subq $16, %rsp			# Add dummy spaces
-	pushq %rbp				# Save base pointer
-	movq %rsp, %rbp			# Make stack pointer new base pointer
+	subq $8, %rsp			# Add dummy base pointer
 	movq $1, %rax			# Put a number in %rax
 	negq %rax				# Negate value
 	call print				# Call the print procedure
 end_then_25:				# Clean up then block stack frame
-	popq %rbp				# Restore base pointer
+	addq $8, %rsp			# Remove dummy base pointer
 	addq $24, %rsp			# Deallocate dummy spaces and static link
 	jmp end_25				# Skip the else
 else_part_25:
 	pushq %rbp				# Push simple static link
 	subq $16, %rsp			# Add dummy spaces
-	pushq %rbp				# Save base pointer
-	movq %rsp, %rbp			# Make stack pointer new base pointer
+	subq $8, %rsp			# Add dummy base pointer
 	movq $31, %rax			# Put a number in %rax
 	call print				# Call the print procedure
 end_else_25:
-	popq %rbp				# Restore base pointer
+	addq $8, %rsp			# Remove dummy base pointer
 	addq $24, %rsp			# Deallocate dummy spaces and static link
 end_25:
 	movq $13, %rax			# Put a number in %rax
@@ -1623,44 +1587,40 @@ comp_end_20:
 	je else_part_26			# Skip to the else if the condition is false
 	pushq %rbp				# Push simple static link
 	subq $16, %rsp			# Add dummy spaces
-	pushq %rbp				# Save base pointer
-	movq %rsp, %rbp			# Make stack pointer new base pointer
+	subq $8, %rsp			# Add dummy base pointer
 	movq $1, %rax			# Put a number in %rax
 	negq %rax				# Negate value
 	call print				# Call the print procedure
 end_then_26:				# Clean up then block stack frame
-	popq %rbp				# Restore base pointer
+	addq $8, %rsp			# Remove dummy base pointer
 	addq $24, %rsp			# Deallocate dummy spaces and static link
 	jmp end_26				# Skip the else
 else_part_26:
 	pushq %rbp				# Push simple static link
 	subq $16, %rsp			# Add dummy spaces
-	pushq %rbp				# Save base pointer
-	movq %rsp, %rbp			# Make stack pointer new base pointer
+	subq $8, %rsp			# Add dummy base pointer
 	movq $32, %rax			# Put a number in %rax
 	call print				# Call the print procedure
 end_else_26:
-	popq %rbp				# Restore base pointer
+	addq $8, %rsp			# Remove dummy base pointer
 	addq $24, %rsp			# Deallocate dummy spaces and static link
 end_26:
 	pushq %rbp				# Push simple static link
 	subq $8, %rsp			# Add dummy space
 	call test33			# Call the test33 function
-	addq $16, %rsp			# Deallocate dummy space and static link
+	addq $16, %rsp			# Deallocate dummy space, static link and arguments
 	movq $1, %rax			# Put a number in %rax
 	pushq %rax		# Push argument number 1 to stack
 	pushq %rbp				# Push simple static link
 	subq $8, %rsp			# Add dummy space
 	call test34			# Call the test34 function
-	addq $16, %rsp			# Deallocate dummy space and static link
-	addq $8, %rsp			# Pop the arguments pushed to the stack
+	addq $24, %rsp			# Deallocate dummy space, static link and arguments
 	movq $0, %rax			# Put a number in %rax
 	pushq %rax		# Push argument number 1 to stack
 	pushq %rbp				# Push simple static link
 	subq $8, %rsp			# Add dummy space
 	call test35			# Call the test35 function
-	addq $16, %rsp			# Deallocate dummy space and static link
-	addq $8, %rsp			# Pop the arguments pushed to the stack
+	addq $24, %rsp			# Deallocate dummy space, static link and arguments
 	movq $36, %rax			# Put a number in %rax
 	movq %rax, -104(%rbp)		# Move initialized value into space on stack
 # Start if statement 30
@@ -1675,7 +1635,7 @@ end_26:
 	pushq %rbp				# Push simple static link
 	subq $8, %rsp			# Add dummy space
 	call test36one			# Call the test36one function
-	addq $16, %rsp			# Deallocate dummy space and static link
+	addq $16, %rsp			# Deallocate dummy space, static link and arguments
 end_then_30:				# Clean up then block stack frame
 	popq %rbp				# Restore base pointer
 	addq $24, %rsp			# Deallocate dummy spaces and static link
@@ -1686,7 +1646,7 @@ end_30:
 	pushq %rbp				# Push simple static link
 	subq $8, %rsp			# Add dummy space
 	call f2			# Call the f2 function
-	addq $16, %rsp			# Deallocate dummy space and static link
+	addq $16, %rsp			# Deallocate dummy space, static link and arguments
 	call print				# Call the print procedure
 	movq heap_pointer(%rip), %rcx			# Move heap pointer into %rcx
 	addq $40, heap_pointer(%rip)	# Add size of object to heap pointer
@@ -1708,8 +1668,7 @@ end_30:
 	subq $8, %rsp			# Add dummy space
 	movq %r9, %rax			# Move heap pointer into r9
 	call *%rax				# Call method
-	addq $16, %rsp			# Deallocate dummy space and static link
-	addq $8, %rsp			# Pop the arguments pushed to the stack
+	addq $24, %rsp			# Deallocate dummy space, static link and arguments
 	call print				# Call the print procedure
 	movq %rbp, %rax			# Prepare to access variable from another scope
 	movq -120(%rax), %rax		# Move value into %rax
@@ -1721,8 +1680,7 @@ end_30:
 	subq $8, %rsp			# Add dummy space
 	movq %r9, %rax			# Move heap pointer into r9
 	call *%rax				# Call method
-	addq $16, %rsp			# Deallocate dummy space and static link
-	addq $8, %rsp			# Pop the arguments pushed to the stack
+	addq $24, %rsp			# Deallocate dummy space, static link and arguments
 	call print				# Call the print procedure
 	movq %rbp, %rax			# Prepare to access variable from another scope
 	movq -120(%rax), %rax		# Move value into %rax
@@ -1734,15 +1692,14 @@ end_30:
 	subq $8, %rsp			# Add dummy space
 	movq %r9, %rax			# Move heap pointer into r9
 	call *%rax				# Call method
-	addq $16, %rsp			# Deallocate dummy space and static link
-	addq $8, %rsp			# Pop the arguments pushed to the stack
+	addq $24, %rsp			# Deallocate dummy space, static link and arguments
 	call print				# Call the print procedure
 	movq $39, %rax			# Put a number in %rax
 	movq %rax, -128(%rbp)		# Move initialized value into space on stack
 	pushq %rbp				# Push simple static link
 	subq $8, %rsp			# Add dummy space
 	call runIncrements			# Call the runIncrements function
-	addq $16, %rsp			# Deallocate dummy space and static link
+	addq $16, %rsp			# Deallocate dummy space, static link and arguments
 	movq %rbp, %rax			# Prepare to access variable from another scope
 	movq -128(%rax), %rax		# Move value into %rax
 	call print				# Call the print procedure
@@ -1766,8 +1723,7 @@ end_30:
 	subq $8, %rsp			# Add dummy space
 	movq %r9, %rax			# Move heap pointer into r9
 	call *%rax				# Call method
-	addq $16, %rsp			# Deallocate dummy space and static link
-	addq $8, %rsp			# Pop the arguments pushed to the stack
+	addq $24, %rsp			# Deallocate dummy space, static link and arguments
 	call print				# Call the print procedure
 	movq heap_pointer(%rip), %rcx			# Move heap pointer into %rcx
 	addq $16, heap_pointer(%rip)	# Add size of object to heap pointer
@@ -1791,8 +1747,7 @@ end_30:
 	subq $8, %rsp			# Add dummy space
 	movq %r9, %rax			# Move heap pointer into r9
 	call *%rax				# Call method
-	addq $16, %rsp			# Deallocate dummy space and static link
-	addq $16, %rsp			# Pop the arguments pushed to the stack
+	addq $32, %rsp			# Deallocate dummy space, static link and arguments
 	movq %rbp, %rax			# Prepare to access variable from another scope
 	movq -144(%rax), %rax		# Move value into %rax
 	pushq %rax				# Push heap pointer to be used as argument
@@ -1803,8 +1758,7 @@ end_30:
 	subq $8, %rsp			# Add dummy space
 	movq %r9, %rax			# Move heap pointer into r9
 	call *%rax				# Call method
-	addq $16, %rsp			# Deallocate dummy space and static link
-	addq $8, %rsp			# Pop the arguments pushed to the stack
+	addq $24, %rsp			# Deallocate dummy space, static link and arguments
 	call print				# Call the print procedure
 	movq heap_pointer(%rip), %rcx			# Move heap pointer into %rcx
 	addq $16, heap_pointer(%rip)	# Add size of object to heap pointer
@@ -1826,8 +1780,7 @@ end_30:
 	subq $8, %rsp			# Add dummy space
 	movq %r9, %rax			# Move heap pointer into r9
 	call *%rax				# Call method
-	addq $16, %rsp			# Deallocate dummy space and static link
-	addq $8, %rsp			# Pop the arguments pushed to the stack
+	addq $24, %rsp			# Deallocate dummy space, static link and arguments
 	call print				# Call the print procedure
 	movq heap_pointer(%rip), %rcx			# Move heap pointer into %rcx
 	addq $16, heap_pointer(%rip)	# Add size of object to heap pointer
@@ -1851,8 +1804,7 @@ end_30:
 	subq $8, %rsp			# Add dummy space
 	movq %r9, %rax			# Move heap pointer into r9
 	call *%rax				# Call method
-	addq $16, %rsp			# Deallocate dummy space and static link
-	addq $16, %rsp			# Pop the arguments pushed to the stack
+	addq $32, %rsp			# Deallocate dummy space, static link and arguments
 	movq %rbp, %rax			# Prepare to access variable from another scope
 	movq -160(%rax), %rax		# Move value into %rax
 	pushq %rax				# Push heap pointer to be used as argument
@@ -1865,8 +1817,7 @@ end_30:
 	subq $8, %rsp			# Add dummy space
 	movq %r9, %rax			# Move heap pointer into r9
 	call *%rax				# Call method
-	addq $16, %rsp			# Deallocate dummy space and static link
-	addq $16, %rsp			# Pop the arguments pushed to the stack
+	addq $32, %rsp			# Deallocate dummy space, static link and arguments
 	movq %rbp, %rax			# Prepare to access variable from another scope
 	movq -160(%rax), %rax		# Move value into %rax
 	pushq %rax				# Push heap pointer to be used as argument
@@ -1877,8 +1828,7 @@ end_30:
 	subq $8, %rsp			# Add dummy space
 	movq %r9, %rax			# Move heap pointer into r9
 	call *%rax				# Call method
-	addq $16, %rsp			# Deallocate dummy space and static link
-	addq $8, %rsp			# Pop the arguments pushed to the stack
+	addq $24, %rsp			# Deallocate dummy space, static link and arguments
 	call print				# Call the print procedure
 	movq $1, %rax			# Put true in %rax
 	movq %rax, -168(%rbp)		# Move initialized value into space on stack
@@ -1905,13 +1855,12 @@ logical_end_22:
 	je end_31				# Skip if the condition is false
 	pushq %rbp				# Push simple static link
 	subq $16, %rsp			# Add dummy spaces
-	pushq %rbp				# Save base pointer
-	movq %rsp, %rbp			# Make stack pointer new base pointer
+	subq $8, %rsp			# Add dummy base pointer
 	movq $1, %rax			# Put a number in %rax
 	negq %rax				# Negate value
 	call print				# Call the print procedure
 end_then_31:				# Clean up then block stack frame
-	popq %rbp				# Restore base pointer
+	addq $8, %rsp			# Remove dummy base pointer
 	addq $24, %rsp			# Deallocate dummy spaces and static link
 	jmp end_31				# Skip the else
 end_31:
@@ -1936,13 +1885,12 @@ logical_end_23:
 	je end_32				# Skip if the condition is false
 	pushq %rbp				# Push simple static link
 	subq $16, %rsp			# Add dummy spaces
-	pushq %rbp				# Save base pointer
-	movq %rsp, %rbp			# Make stack pointer new base pointer
+	subq $8, %rsp			# Add dummy base pointer
 	movq $1, %rax			# Put a number in %rax
 	negq %rax				# Negate value
 	call print				# Call the print procedure
 end_then_32:				# Clean up then block stack frame
-	popq %rbp				# Restore base pointer
+	addq $8, %rsp			# Remove dummy base pointer
 	addq $24, %rsp			# Deallocate dummy spaces and static link
 	jmp end_32				# Skip the else
 end_32:
@@ -1967,13 +1915,12 @@ logical_end_24:
 	je end_33				# Skip if the condition is false
 	pushq %rbp				# Push simple static link
 	subq $16, %rsp			# Add dummy spaces
-	pushq %rbp				# Save base pointer
-	movq %rsp, %rbp			# Make stack pointer new base pointer
+	subq $8, %rsp			# Add dummy base pointer
 	movq $1, %rax			# Put a number in %rax
 	negq %rax				# Negate value
 	call print				# Call the print procedure
 end_then_33:				# Clean up then block stack frame
-	popq %rbp				# Restore base pointer
+	addq $8, %rsp			# Remove dummy base pointer
 	addq $24, %rsp			# Deallocate dummy spaces and static link
 	jmp end_33				# Skip the else
 end_33:
@@ -2001,13 +1948,12 @@ logical_end_25:
 	je end_34				# Skip if the condition is false
 	pushq %rbp				# Push simple static link
 	subq $16, %rsp			# Add dummy spaces
-	pushq %rbp				# Save base pointer
-	movq %rsp, %rbp			# Make stack pointer new base pointer
+	subq $8, %rsp			# Add dummy base pointer
 	movq $1, %rax			# Put a number in %rax
 	negq %rax				# Negate value
 	call print				# Call the print procedure
 end_then_34:				# Clean up then block stack frame
-	popq %rbp				# Restore base pointer
+	addq $8, %rsp			# Remove dummy base pointer
 	addq $24, %rsp			# Deallocate dummy spaces and static link
 	jmp end_34				# Skip the else
 end_34:
@@ -2035,13 +1981,12 @@ logical_end_26:
 	je end_35				# Skip if the condition is false
 	pushq %rbp				# Push simple static link
 	subq $16, %rsp			# Add dummy spaces
-	pushq %rbp				# Save base pointer
-	movq %rsp, %rbp			# Make stack pointer new base pointer
+	subq $8, %rsp			# Add dummy base pointer
 	movq $1, %rax			# Put a number in %rax
 	negq %rax				# Negate value
 	call print				# Call the print procedure
 end_then_35:				# Clean up then block stack frame
-	popq %rbp				# Restore base pointer
+	addq $8, %rsp			# Remove dummy base pointer
 	addq $24, %rsp			# Deallocate dummy spaces and static link
 	jmp end_35				# Skip the else
 end_35:
@@ -2069,13 +2014,12 @@ logical_end_27:
 	je end_36				# Skip if the condition is false
 	pushq %rbp				# Push simple static link
 	subq $16, %rsp			# Add dummy spaces
-	pushq %rbp				# Save base pointer
-	movq %rsp, %rbp			# Make stack pointer new base pointer
+	subq $8, %rsp			# Add dummy base pointer
 	movq $1, %rax			# Put a number in %rax
 	negq %rax				# Negate value
 	call print				# Call the print procedure
 end_then_36:				# Clean up then block stack frame
-	popq %rbp				# Restore base pointer
+	addq $8, %rsp			# Remove dummy base pointer
 	addq $24, %rsp			# Deallocate dummy spaces and static link
 	jmp end_36				# Skip the else
 end_36:
@@ -2156,12 +2100,11 @@ logical_end_32:
 	je end_37				# Skip if the condition is false
 	pushq %rbp				# Push simple static link
 	subq $16, %rsp			# Add dummy spaces
-	pushq %rbp				# Save base pointer
-	movq %rsp, %rbp			# Make stack pointer new base pointer
+	subq $8, %rsp			# Add dummy base pointer
 	movq $46, %rax			# Put a number in %rax
 	call print				# Call the print procedure
 end_then_37:				# Clean up then block stack frame
-	popq %rbp				# Restore base pointer
+	addq $8, %rsp			# Remove dummy base pointer
 	addq $24, %rsp			# Deallocate dummy spaces and static link
 	jmp end_37				# Skip the else
 end_37:
@@ -2172,24 +2115,22 @@ end_37:
 	je else_part_38			# Skip to the else if the condition is false
 	pushq %rbp				# Push simple static link
 	subq $16, %rsp			# Add dummy spaces
-	pushq %rbp				# Save base pointer
-	movq %rsp, %rbp			# Make stack pointer new base pointer
+	subq $8, %rsp			# Add dummy base pointer
 	movq $47, %rax			# Put a number in %rax
 	call print				# Call the print procedure
 end_then_38:				# Clean up then block stack frame
-	popq %rbp				# Restore base pointer
+	addq $8, %rsp			# Remove dummy base pointer
 	addq $24, %rsp			# Deallocate dummy spaces and static link
 	jmp end_38				# Skip the else
 else_part_38:
 	pushq %rbp				# Push simple static link
 	subq $16, %rsp			# Add dummy spaces
-	pushq %rbp				# Save base pointer
-	movq %rsp, %rbp			# Make stack pointer new base pointer
+	subq $8, %rsp			# Add dummy base pointer
 	movq $1, %rax			# Put a number in %rax
 	negq %rax				# Negate value
 	call print				# Call the print procedure
 end_else_38:
-	popq %rbp				# Restore base pointer
+	addq $8, %rsp			# Remove dummy base pointer
 	addq $24, %rsp			# Deallocate dummy spaces and static link
 end_38:
 	movq $0, %rax			# Put a number in %rax
@@ -2245,24 +2186,22 @@ logical_end_34:
 	je else_part_39			# Skip to the else if the condition is false
 	pushq %rbp				# Push simple static link
 	subq $16, %rsp			# Add dummy spaces
-	pushq %rbp				# Save base pointer
-	movq %rsp, %rbp			# Make stack pointer new base pointer
+	subq $8, %rsp			# Add dummy base pointer
 	movq $1, %rax			# Put a number in %rax
 	negq %rax				# Negate value
 	call print				# Call the print procedure
 end_then_39:				# Clean up then block stack frame
-	popq %rbp				# Restore base pointer
+	addq $8, %rsp			# Remove dummy base pointer
 	addq $24, %rsp			# Deallocate dummy spaces and static link
 	jmp end_39				# Skip the else
 else_part_39:
 	pushq %rbp				# Push simple static link
 	subq $16, %rsp			# Add dummy spaces
-	pushq %rbp				# Save base pointer
-	movq %rsp, %rbp			# Make stack pointer new base pointer
+	subq $8, %rsp			# Add dummy base pointer
 	movq $48, %rax			# Put a number in %rax
 	call print				# Call the print procedure
 end_else_39:
-	popq %rbp				# Restore base pointer
+	addq $8, %rsp			# Remove dummy base pointer
 	addq $24, %rsp			# Deallocate dummy spaces and static link
 end_39:
 	movq $5, %rax			# Put a number in %rax
@@ -2298,24 +2237,22 @@ logical_end_35:
 	je else_part_40			# Skip to the else if the condition is false
 	pushq %rbp				# Push simple static link
 	subq $16, %rsp			# Add dummy spaces
-	pushq %rbp				# Save base pointer
-	movq %rsp, %rbp			# Make stack pointer new base pointer
+	subq $8, %rsp			# Add dummy base pointer
 	movq $49, %rax			# Put a number in %rax
 	call print				# Call the print procedure
 end_then_40:				# Clean up then block stack frame
-	popq %rbp				# Restore base pointer
+	addq $8, %rsp			# Remove dummy base pointer
 	addq $24, %rsp			# Deallocate dummy spaces and static link
 	jmp end_40				# Skip the else
 else_part_40:
 	pushq %rbp				# Push simple static link
 	subq $16, %rsp			# Add dummy spaces
-	pushq %rbp				# Save base pointer
-	movq %rsp, %rbp			# Make stack pointer new base pointer
+	subq $8, %rsp			# Add dummy base pointer
 	movq $1, %rax			# Put a number in %rax
 	negq %rax				# Negate value
 	call print				# Call the print procedure
 end_else_40:
-	popq %rbp				# Restore base pointer
+	addq $8, %rsp			# Remove dummy base pointer
 	addq $24, %rsp			# Deallocate dummy spaces and static link
 end_40:
 	movq heap_pointer(%rip), %rcx			# Move heap pointer into %rcx
@@ -2338,8 +2275,7 @@ end_40:
 	subq $8, %rsp			# Add dummy space
 	movq %r9, %rax			# Move heap pointer into r9
 	call *%rax				# Call method
-	addq $16, %rsp			# Deallocate dummy space and static link
-	addq $8, %rsp			# Pop the arguments pushed to the stack
+	addq $24, %rsp			# Deallocate dummy space, static link and arguments
 	movq heap_pointer(%rip), %rcx			# Move heap pointer into %rcx
 	addq $16, heap_pointer(%rip)	# Add size of object to heap pointer
 	leaq ExtraTest_descriptor(%rip), %rax	# Move class descriptor into %rax
@@ -2371,8 +2307,7 @@ end_40:
 	subq $8, %rsp			# Add dummy space
 	movq %r9, %rax			# Move heap pointer into r9
 	call *%rax				# Call method
-	addq $16, %rsp			# Deallocate dummy space and static link
-	addq $8, %rsp			# Pop the arguments pushed to the stack
+	addq $24, %rsp			# Deallocate dummy space, static link and arguments
 	movq 8(%rax), %rax		# Move value into %rax
 	call print				# Call the print procedure
 	movq $1, %rax			# Put a number in %rax
@@ -2380,7 +2315,7 @@ end_40:
 	pushq %rbp				# Push simple static link
 	subq $8, %rsp			# Add dummy space
 	call funnyFunc			# Call the funnyFunc function
-	addq $16, %rsp			# Deallocate dummy space and static link
+	addq $16, %rsp			# Deallocate dummy space, static link and arguments
 	movq 8(%rax), %rax		# Move value into %rax
 	popq %rbx				# Pop right side into %rbx
 	addq %rbx, %rax			# Perform addition

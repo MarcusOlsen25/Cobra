@@ -1,14 +1,32 @@
-Removed lines:
 
-We start with the index 24
-We start with the index 37
-36
-37
-48
-We start with the index 52
-We start with the index 83
-82
-83
-94
-We start with the index 24
-We start with the index 49
+
+
+
+melon:			# Class
+	pushq %rbp				# Save base pointer
+	movq %rsp, %rbp			# Make stack pointer new base pointer
+	movq 16(%rbp), %rcx			# Push heap pointer
+	pushq %rcx				# Push heap pointer
+	movq $14, %rax			# Put a number in %rax
+	pushq %rax				# Push right side to stack
+	movq %rbp, %rax			# Prepare to access variable from another scope
+	movq 24(%rax), %rax		# Traverse static link once
+	movq -72(%rax), %rax		# Move value into %rax
+	popq %rbx				# Pop right side into %rbx
+	addq %rbx, %rax			# Perform addition
+	movq %rax, 8(%rcx)		# Move initialized value into space on heap
+	movq heap_pointer(%rip), %rcx			# Move heap pointer into %rcx
+	addq $24, heap_pointer(%rip)	# Add size of object to heap pointer
+	leaq gulerod_descriptor(%rip), %rax	# Move class descriptor into %rax
+	movq %rax, (%rcx)			# Move class descriptor into object
+	movq %rbp, %rax			# Prepare static link
+	movq 24(%rax), %rax		# Traverse static link once
+	pushq %rax				# Push static link
+	pushq %rcx				# Push heap pointer
+	call gulerod			# Call gulerod constructor
+	movq 16(%rbp), %rcx			# Move potential heap pointer into %rcx
+	addq $16, %rsp			# Deallocate heap pointer and static link
+	movq %rax, 16(%rcx)		# Move initialized value into space on heap
+	popq %rax				# Pop current heap pointer into %rax
+	popq %rbp				# Restore base pointer
+	ret						# End class

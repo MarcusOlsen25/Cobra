@@ -9,19 +9,31 @@ from errorTester import *
 from peepholeOptimizer import *
 # The line numbers match the error messages + 10.  
 data = '''
-int thirtysix = 36;
-if thirtysix then {
-    func test36three() void {
-        print thirtysix;
-    }
-    func test36one() void {
-        func test36two() void {
-            test36three();
-        }
-        test36two();
-    }
-    test36one();
+class c4 {
+    int a = 3;
 }
+class c1 {
+    int x = 38;
+    func m1() int {
+        return this.x;
+    }
+}
+class c2 extends c1 {
+    int x = 39;
+    func m2() int {
+        return this.x;
+    }
+}
+class c3 extends c2 {
+    int y = 17;
+    c4 c = new c4();
+    func m3() int {
+        this.x = 20;
+        return this.y + this.x + this.c.a;
+    }
+}
+c3 cc3 = new c3();
+print cc3.m1();
 '''
     
 

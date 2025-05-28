@@ -22,8 +22,10 @@ class PeepholeOptimizer:
                 self.optimiseNoLocalVariables(i)
                 self.optimiseAdditionsToRSP(i)
                 self.optimisePushSimpleSL(i)
+                self.optimiseSaveBasePointer(i)
+
                 # self.optimiseDirectInitialization(i)
-                # self.optimiseSaveBasePointer(i)
+                hwllo = 9
                         
             # Remove the instructions marked as garbage     
             # Reverse iteration prevents index problems     
@@ -42,19 +44,31 @@ class PeepholeOptimizer:
         lengthAfter = self.terminatingFunction()
         print(f"Optimised {lengthBefore - lengthAfter} lines. :)")
     
+    
+    
     # Finds and removes allocation and deallocation of nothing at all
     def optimiseNoLocalVariables(self, index: int):
-        instruction = self.instructions[index]
-        if (instruction.upcode == "addq" or instruction.upcode == "subq"):
-            if instruction.operand1 == "$0":
-                if instruction.operand2 == "%rsp":
-                    self.indexesToRemove.append(index)
+        '''
+        Remove both:
+        addq $0, %rsp   # Allocate space for local variables on the stack
+        subq $0, %rsp   # Deallocate space for local variables on the stack
+        '''
+        one = self.instructions[index]
+        if ((one.upcode == "addq" or one.upcode == "subq") and one.operand1 == "$0" 
+            and one.operand2 == "%rsp"):
+            self.indexesToRemove.append(index)
     
     
     
     # Deallocates multiple things at once
     def optimiseAdditionsToRSP(self, index: int):
-        
+        '''
+        addq $8, %rsp   # Deallocate space on stack for (heap pointer / dummy space)
+        addq $8, %rsp   # Deallocate space on stack for static link
+        addq $8, %rsp   # Pop the arguments pushed to the stack
+        ->
+        addq $24, %rsp  # Deallocate dummy space, static link and arguments
+        '''
         # New instructions
         heapAndStatic = Instruction("addq", "$16", "%rsp", None, 3, "# Deallocate heap pointer and static link")
         oneDummyAndStatic = Instruction("addq", "$16", "%rsp", None, 3, "# Deallocate dummy space and static link")
@@ -65,27 +79,43 @@ class PeepholeOptimizer:
             return
         else:
             
-            current = self.instructions[index]
-            next = self.instructions[index+1]
+            one = self.instructions[index]
+            two = self.instructions[index+1]
             
-            if (next.upcode == "addq" and next.operand1 == "$8" and next.operand2 == "%rsp" 
-                and next.comment == "# Deallocate space on stack for static link"):
+            if (two.upcode == "addq" and two.operand1 == "$8" and two.operand2 == "%rsp" 
+                and two.comment == "# Deallocate space on stack for static link"):
                 
-                if current.upcode == "addq" and current.operand1 == "$8" and current.operand2 == "%rsp":
-                        if current.comment == "# Deallocate space on stack for heap pointer":
+                if one.upcode == "addq" and one.operand1 == "$8" and one.operand2 == "%rsp":
+                        if one.comment == "# Deallocate space on stack for heap pointer":
                             self.indexesToRemove.append(index)
                             self.instructions[index+1] = heapAndStatic
-                        elif current.comment == "# Remove dummy space":
+                        elif one.comment == "# Remove dummy space":
                             self.indexesToRemove.append(index)
                             self.instructions[index+1] = oneDummyAndStatic
                             
-                elif (current.upcode == "addq" and current.operand1 == "$16" and current.operand2 == "%rsp" 
-                      and current.comment == "# Remove dummy spaces"):
+                elif (one.upcode == "addq" and one.operand1 == "$16" and one.operand2 == "%rsp" 
+                      and one.comment == "# Remove dummy spaces"):
                         self.indexesToRemove.append(index)
                         self.instructions[index+1] = twoDummyAndStatic
+            
+            # In a second round optimise deallocation of arguments after a call
+            elif (one.upcode == "addq" and one.operand1 == "$16" and one.operand2 == "%rsp" 
+                  and one.comment == "# Deallocate dummy space and static link"):
+                if (two.upcode == "addq" and two.operand2 == "%rsp" and two.comment == "# Pop the arguments pushed to the stack"):
+                    newValue = int(two.operand1.lstrip("$")) + 16
+                    one.operand1 = f"${newValue}"
+                    one.comment = "# Deallocate dummy space, static link and arguments"
+                    self.indexesToRemove.append(index+1)
+                    
                             
     # The static link doesn't always need to be prepared
     def optimisePushSimpleSL(self, index: int):
+        '''
+        movq %rbp, %rax     # Prepare static link
+        pushq %rax          # Push static link
+        ->
+        pushq %rbp          # Push simple static link
+        '''
         one = self.instructions[index]
         if (one.upcode == "movq" and one.operand1 == "%rbp" and one.operand2 == "%rax" and one.comment == "# Prepare static link"):
             
@@ -98,9 +128,73 @@ class PeepholeOptimizer:
                 self.instructions[index+1] = simpleSL
                 
     
+    # Can the heap pointer be pushed in one go? 
+    # Once put in %rcx it is used in many places...
+    def optimisePushHP(self, index: int):
+        one = self.instructions[index]
+                
+                
+    
+
+    # Avoids saving base pointer pointlessly                    
+    def optimiseSaveBasePointer(self, index: int):
+        '''
+        We need to maintain the stack frame structure
+        pushq %rbp          # Save base pointer
+        movq %rsp, %rbp		# Make stack pointer new base pointer
+        ...                 (No use of the base pointer)
+        popq %rbp			# Restore base pointer
+        ->
+        subq $8, %rsp       # Add dummy base pointer
+        ...
+        addq $8, %rsp       # Remove dummy base pointer
+        '''
+        
+        one = self.instructions[index]
+        
+        if (one.upcode == "pushq" and one.operand1 == "%rbp" and one.comment == "# Save base pointer"
+            and self.instructions[index-1].label != "main"):
+            
+            addDummy = Instruction("subq", "$8", "%rsp", None, 3, "# Add dummy base pointer")
+            remDummy = Instruction("addq", "$8", "%rsp", None, 3, "# Remove dummy base pointer")
+                        
+            done = False
+            i = index + 1
+            while not done and i < len(self.instructions):
+                two = self.instructions[i]
+                
+                # Saving the base pointer again, accessing another scope, 
+                # traversing the static link, pushing the heap pointer, or calling anything other than print
+                if (two.comment == "# Save base pointer" or two.comment == "# Prepare to access variable from another scope" 
+                    or two.comment == "# Traverse static link once" or (two.upcode == "call" and two.operand1 != "print")
+                    or two.comment == "# Push heap pointer"):
+                    done = True
+                
+                # Restoring it again while in this loop means it is pointless
+                elif (two.upcode == "popq" and two.operand1 == "%rbp" and two.comment == "# Restore base pointer"):
+                    self.indexesToRemove.append(index)
+                    self.instructions[index+1] = addDummy
+                    self.instructions[i] = remDummy
+                    
+                    done = True
+                
+                i += 1
+                    
+                    
+    
+    
+    
+    
+    
     # Error: operand type mismatch for `movq'    (Damn it! It was a good idea...)
     # Some initialized values can be put directly where they belong
     def optimiseDirectInitialization(self, index: int):
+        '''
+        movq $3, %rax           # Put a number in %rax
+        movq %rax, -8(%rbp)     # Move initialized value into space on stack
+        ->
+        movq $3, -8(%rbp)       # Move initialized value directly into space on stack
+        '''
         two = self.instructions[index]
         
         if (two.upcode == "movq" and two.operand1 == "%rax" and 
@@ -113,41 +207,4 @@ class PeepholeOptimizer:
                 self.indexesToRemove.append(index-1)
                 two.operand2 = one.operand1
                 two.comment = "# Move initialized value directly into space on stack"
-                
-    
-    # This function is not ready yet... It proved to be more complex than I thought.
-    # Avoids saving base pointer pointlessly                    
-    def optimiseSaveBasePointer(self, index: int):
-        
-        one = self.instructions[index]
-        
-        if (one.upcode == "pushq" and one.operand1 == "%rbp" and one.comment == "# Save base pointer"
-            and self.instructions[index-1].label != "main"):
-            
-            # print(f"We start with the index {index+1}")
-            
-            done = False
-            i = index + 1
-            while not done and i < len(self.instructions):
-                two = self.instructions[i]
-                
-                # Saving the base pointer again or accessing, traversing the static link, or calling anything other than print
-                if ((two.upcode == "pushq" and two.operand1 == "%rbp" and two.comment == "# Save base pointer")
-                   or (two.upcode == "movq" and two.operand1 == "24(%rax)" and two.operand2 == "%rax" 
-                   and two.comment == "# Traverse static link once") 
-                   or (two.upcode == "call" and two.operand1 != "print")):
-                    done = True
-                
-                # Restoring it again while in this loop means it is pointless
-                elif (two.upcode == "popq" and two.operand1 == "%rbp" and two.comment == "# Restore base pointer"):
-                    self.indexesToRemove.append(index)
-                    self.indexesToRemove.append(index+1)
-                    self.indexesToRemove.append(i)
-                    done = True
-                    print(index)
-                    # print(index+1)
-                    # print(i)
-                
-                i += 1
-                    
             
