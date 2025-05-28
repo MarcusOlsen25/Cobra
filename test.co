@@ -416,3 +416,12 @@ func funnyFunc() anotherTest {
 }
 
 print funnyFunc().x + 1;
+
+func factorial(int n) int {
+    if n == 0 or n == 1 then {
+        return 1;
+    }
+    return n * factorial( n - 1 );
+}
+
+print factorial(4) + 30;

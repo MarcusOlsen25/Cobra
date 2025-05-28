@@ -340,19 +340,9 @@ class AssemblyVisitor(Visitor):
         
         self.table = stmt.thenTable
 
-        #Prologue for then block
-        self.setStaticLink(0)
-        self.generateCode("subq", "$16", "%rsp", 3, "# Add dummy spaces") # Instead of heap pointer and return address
-        self.startScope()
-
         for s in stmt.thenStatement:
             s.accept(self)
 
-        #Epilogue for then block
-        self.addLabel(f"end_then_{label}", 4, "# Clean up then block stack frame")
-        self.endScope()
-        self.generateCode("addq", "$16", "%rsp", 3, "# Remove dummy spaces")
-        self.generateCode("addq", "$8", "%rsp", 3, "# Deallocate space on stack for static link")
         self.generateCode("jmp", f"end_{label}", None, 4, "# Skip the else")
 
         if stmt.elseStatement:
@@ -360,19 +350,8 @@ class AssemblyVisitor(Visitor):
 
             self.table = stmt.elseTable
 
-            #Prologue for else block
-            self.setStaticLink(0)
-            self.generateCode("subq", "$16", "%rsp", 3, "# Add dummy spaces") # Instead of heap pointer and return address
-            self.startScope()
-
             for s in stmt.elseStatement:
                 s.accept(self)
-            
-            #Epilogue for else block
-            self.addLabel(f"end_else_{label}", None, None)
-            self.endScope()
-            self.generateCode("addq", "$16", "%rsp", 3, "# Remove dummy spaces")
-            self.generateCode("addq", "$8", "%rsp", 3, "# Deallocate space on stack for static link")
 
         self.addLabel(f"end_{label}", None, None)
 
@@ -387,9 +366,6 @@ class AssemblyVisitor(Visitor):
         
         # Enter a new scope
         self.table = stmt.table
-        self.setStaticLink(0)
-        self.generateCode("subq", "$16", "%rsp", 3, "# Add dummy spaces")
-        self.startScope()
 
         self.addLabel(f"while_loop_{label}", None, None)
         
@@ -404,10 +380,6 @@ class AssemblyVisitor(Visitor):
         self.generateCode("jmp", f"while_loop_{label}", None, 2, "# Restart the loop")
         self.addLabel(f"end_while_{label}", None, None)
 
-        # Exit the scope
-        self.endScope()
-        self.generateCode("addq", "$16", "%rsp", 3, "# Remove dummy spaces")
-        self.generateCode("addq", "$8", "%rsp", 3, "# Deallocate space on stack for static link")
         self.table = self.table.parent
 
     def visitPrintStatement(self, stmt: PrintStatement):
@@ -416,16 +388,7 @@ class AssemblyVisitor(Visitor):
         
     def visitReturnStatement(self, stmt: ReturnStatement):
         stmt.value.accept(self)
-
-        match self.table.scopeType:
-            case "If":
-                self.generateCode("jmp", f"end_{self.ifLabelCounter}", None, None, None)
-            case "Else":
-                self.generateCode("jmp", f"end_else_{self.ifLabelCounter}", None, None, None)
-            case "While":
-                self.generateCode("jmp", f"end_while_{self.whileLabelCounter}", None, None, None)
-            case "Function":
-                self.generateCode("jmp", f"end_{self.functionStack[-1]}", None, None, None)
+        self.generateCode("jmp", f"end_{self.functionStack[-1]}", None, None, None)
 
     def visitClassDeclaration(self, stmt: ClassDeclaration):
         self.functionStack.append(stmt.var)

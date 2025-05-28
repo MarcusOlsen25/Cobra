@@ -13,7 +13,9 @@ class SymbolTable:
         self.methodCounter = -8
         self._tab = {}
         self.parent = parent
-        if parent != None:
+        if scopeType == "If" or scopeType == "Else" or scopeType == "While":
+            self.level = parent.level
+        elif parent:
             self.level = parent.level + 1
         else:
             self.level = 0

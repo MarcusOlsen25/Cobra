@@ -10,7 +10,9 @@ from peepholeOptimizer import *
 # The line numbers match the error messages + 10.  
 data = '''
 
-print -null;
+if 3 then {
+    return 2;
+}
 '''
     
 
@@ -18,7 +20,7 @@ with open("test.co", "r") as file:
     test = file.read()
 
 # Change this line from 'test' to 'data' and vice versa
-cobraCode = test
+cobraCode = data
 
 # Runs the main program
 def compileCobra(cobraCode: str):

@@ -125,20 +125,12 @@ comp_skip_21:
 comp_end_21:
 	cmp $0, %rax			# Check the condition
 	je else_part_27			# Skip to the else if the condition is false
-	pushq %rbp				# Push simple static link
-	subq $24, %rsp			# Add many dummy spaces
 	movq $-1, %rax			# Put a number in %rax
 	call print				# Call the print procedure
-end_then_27:				# Clean up then block stack frame
-	addq $32, %rsp			# Deallocate many dummy spaces and static link
 	jmp end_27				# Skip the else
 else_part_27:
-	pushq %rbp				# Push simple static link
-	subq $24, %rsp			# Add many dummy spaces
 	movq $33, %rax			# Put a number in %rax
 	call print				# Call the print procedure
-end_else_27:
-	addq $32, %rsp			# Deallocate many dummy spaces and static link
 end_27:
 end_test33:			# End function
 	addq $8, %rsp			# Remove dummy base pointer
@@ -151,20 +143,12 @@ test34:			# Function
 	movq 32(%rax), %rax		# Move value into %rax
 	cmp $0, %rax			# Check the condition
 	je else_part_28			# Skip to the else if the condition is false
-	pushq %rbp				# Push simple static link
-	subq $24, %rsp			# Add many dummy spaces
 	movq $34, %rax			# Put a number in %rax
 	call print				# Call the print procedure
-end_then_28:				# Clean up then block stack frame
-	addq $32, %rsp			# Deallocate many dummy spaces and static link
 	jmp end_28				# Skip the else
 else_part_28:
-	pushq %rbp				# Push simple static link
-	subq $24, %rsp			# Add many dummy spaces
 	movq $-1, %rax			# Put a number in %rax
 	call print				# Call the print procedure
-end_else_28:
-	addq $32, %rsp			# Deallocate many dummy spaces and static link
 end_28:
 end_test34:			# End function
 	popq %rbp				# Restore base pointer
@@ -177,20 +161,12 @@ test35:			# Function
 	movq 32(%rax), %rax		# Move value into %rax
 	cmp $0, %rax			# Check the condition
 	je else_part_29			# Skip to the else if the condition is false
-	pushq %rbp				# Push simple static link
-	subq $24, %rsp			# Add many dummy spaces
 	movq $-1, %rax			# Put a number in %rax
 	call print				# Call the print procedure
-end_then_29:				# Clean up then block stack frame
-	addq $32, %rsp			# Deallocate many dummy spaces and static link
 	jmp end_29				# Skip the else
 else_part_29:
-	pushq %rbp				# Push simple static link
-	subq $24, %rsp			# Add many dummy spaces
 	movq $35, %rax			# Put a number in %rax
 	call print				# Call the print procedure
-end_else_29:
-	addq $32, %rsp			# Deallocate many dummy spaces and static link
 end_29:
 end_test35:			# End function
 	popq %rbp				# Restore base pointer
@@ -199,7 +175,6 @@ test36three:			# Function
 	pushq %rbp				# Save base pointer
 	movq %rsp, %rbp			# Make stack pointer new base pointer
 	movq %rbp, %rax			# Prepare to access variable from another scope
-	movq 24(%rax), %rax		# Traverse static link once
 	movq 24(%rax), %rax		# Traverse static link once
 	movq -104(%rax), %rax		# Move value into %rax
 	call print				# Call the print procedure
@@ -281,6 +256,7 @@ m1_c1:			# Method
 	movq %rbp, %rax			# Prepare to access variable from another scope
 	movq 32(%rax), %rax		# Move value into %rax
 	movq 8(%rax), %rax		# Move value into %rax
+	jmp end_m1_c1
 end_m1_c1:
 	popq %rbp				# Restore base pointer
 	ret						# Return from the method
@@ -304,6 +280,7 @@ m2_c2:			# Method
 	movq %rbp, %rax			# Prepare to access variable from another scope
 	movq 32(%rax), %rax		# Move value into %rax
 	movq 16(%rax), %rax		# Move value into %rax
+	jmp end_m2_c2
 end_m2_c2:
 	popq %rbp				# Restore base pointer
 	ret						# Return from the method
@@ -357,6 +334,7 @@ m3_c3:			# Method
 	addq %rbx, %rax			# Perform addition
 	popq %rbx				# Pop right side into %rbx
 	addq %rbx, %rax			# Perform addition
+	jmp end_m3_c3
 end_m3_c3:
 	popq %rbp				# Restore base pointer
 	ret						# Return from the method
@@ -422,6 +400,7 @@ add_Calculator:			# Method
 	movq 8(%rax), %rax		# Move value into %rax
 	popq %rbx				# Pop right side into %rbx
 	addq %rbx, %rax			# Perform addition
+	jmp end_add_Calculator
 end_add_Calculator:
 	popq %rbp				# Restore base pointer
 	ret						# Return from the method
@@ -445,6 +424,7 @@ doubleAdd_Calculator:			# Method
 	addq $24, %rsp			# Deallocate dummy space, static link and arguments
 	popq %rbx				# Pop right side into %rbx
 	imulq %rbx, %rax		# Perform multiplication
+	jmp end_doubleAdd_Calculator
 end_doubleAdd_Calculator:
 	popq %rbp				# Restore base pointer
 	ret						# Return from the method
@@ -476,6 +456,7 @@ get_Box:			# Method
 	movq %rbp, %rax			# Prepare to access variable from another scope
 	movq 32(%rax), %rax		# Move value into %rax
 	movq 8(%rax), %rax		# Move value into %rax
+	jmp end_get_Box
 end_get_Box:
 	popq %rbp				# Restore base pointer
 	ret						# Return from the method
@@ -516,6 +497,7 @@ getZ_Outer:			# Method
 	movq 32(%rax), %rax		# Move value into %rax
 	movq 8(%rax), %rax		# Move value into %rax
 	movq 8(%rax), %rax		# Move value into %rax
+	jmp end_getZ_Outer
 end_getZ_Outer:
 	popq %rbp				# Restore base pointer
 	ret						# Return from the method
@@ -553,6 +535,7 @@ getTotal_Accumulator:			# Method
 	movq %rbp, %rax			# Prepare to access variable from another scope
 	movq 32(%rax), %rax		# Move value into %rax
 	movq 8(%rax), %rax		# Move value into %rax
+	jmp end_getTotal_Accumulator
 end_getTotal_Accumulator:
 	popq %rbp				# Restore base pointer
 	ret						# Return from the method
@@ -619,6 +602,7 @@ one_otherTest:			# Method
 	call anotherTest			# Call anotherTest constructor
 	movq 16(%rbp), %rcx			# Move potential heap pointer into %rcx
 	addq $16, %rsp			# Deallocate heap pointer and static link
+	jmp end_one_otherTest
 end_one_otherTest:
 	popq %rbp				# Restore base pointer
 	ret						# Return from the method
@@ -638,6 +622,74 @@ funnyFunc:			# Function
 	addq $16, %rsp			# Deallocate heap pointer and static link
 	jmp end_funnyFunc
 end_funnyFunc:			# End function
+	popq %rbp				# Restore base pointer
+	ret						# Return from the function
+factorial:			# Function
+	pushq %rbp				# Save base pointer
+	movq %rsp, %rbp			# Make stack pointer new base pointer
+# Start if statement 41
+	movq $1, %rax			# Put a number in %rax
+	pushq %rax				# Push right side to stack
+	movq %rbp, %rax			# Prepare to access variable from another scope
+	movq 32(%rax), %rax		# Move value into %rax
+	popq %rbx				# Pop right side into %rbx
+	cmp %rax, %rbx			# Compare both sides
+	jne comp_skip_36			# Skip if they are not equal
+	movq $1, %rax			# Put true in %rax
+	jmp comp_end_36			# Skip the alternative branch
+comp_skip_36:
+	movq $0, %rax			# Put false in %rax
+comp_end_36:
+	pushq %rax				# Push right side to stack
+	movq $0, %rax			# Put a number in %rax
+	pushq %rax				# Push right side to stack
+	movq %rbp, %rax			# Prepare to access variable from another scope
+	movq 32(%rax), %rax		# Move value into %rax
+	popq %rbx				# Pop right side into %rbx
+	cmp %rax, %rbx			# Compare both sides
+	jne comp_skip_37			# Skip if they are not equal
+	movq $1, %rax			# Put true in %rax
+	jmp comp_end_37			# Skip the alternative branch
+comp_skip_37:
+	movq $0, %rax			# Put false in %rax
+comp_end_37:
+	popq %rbx				# Pop right side into %rbx
+	movq $0, %rdx			# Put FALSE in %rdx
+	cmp %rax, %rdx			# Check if the left side is false
+	jne logical_true_38		# Skip to the true
+	cmp %rbx, %rdx			# Check if the right side is false
+	jne logical_true_38		# Skip to the true
+	movq $0, %rax			# Put false in %rax
+	jmp logical_end_38		# Skip to the end
+logical_true_38:
+	movq $1, %rax			# Put true in %rax
+logical_end_38:
+	cmp $0, %rax			# Check the condition
+	je end_41				# Skip if the condition is false
+	movq $1, %rax			# Put a number in %rax
+	jmp end_factorial
+	jmp end_41				# Skip the else
+end_41:
+	movq $1, %rax			# Put a number in %rax
+	pushq %rax				# Push right side to stack
+	movq %rbp, %rax			# Prepare to access variable from another scope
+	movq 32(%rax), %rax		# Move value into %rax
+	popq %rbx				# Pop right side into %rbx
+	subq %rbx, %rax			# Perform subtraction
+	pushq %rax		# Push argument number 1 to stack
+	movq %rbp, %rax			# Prepare static link
+	movq 24(%rax), %rax		# Traverse static link once
+	pushq %rax				# Push static link
+	subq $8, %rsp			# Add dummy space
+	call factorial			# Call the factorial function
+	addq $24, %rsp			# Deallocate dummy space, static link and arguments
+	pushq %rax				# Push right side to stack
+	movq %rbp, %rax			# Prepare to access variable from another scope
+	movq 32(%rax), %rax		# Move value into %rax
+	popq %rbx				# Pop right side into %rbx
+	imulq %rbx, %rax		# Perform multiplication
+	jmp end_factorial
+end_factorial:			# End function
 	popq %rbp				# Restore base pointer
 	ret						# Return from the function
 .globl main
@@ -725,36 +777,24 @@ comp_skip_0:
 comp_end_0:
 	cmp $0, %rax			# Check the condition
 	je end_0				# Skip if the condition is false
-	pushq %rbp				# Push simple static link
-	subq $24, %rsp			# Add many dummy spaces
 	movq $5, %rax			# Put a number in %rax
 	call print				# Call the print procedure
-end_then_0:				# Clean up then block stack frame
-	addq $32, %rsp			# Deallocate many dummy spaces and static link
 	jmp end_0				# Skip the else
 end_0:
 # Start if statement 1
 	movq $0, %rax			# Put a number in %rax
 	cmp $0, %rax			# Check the condition
 	je end_1				# Skip if the condition is false
-	pushq %rbp				# Push simple static link
-	subq $24, %rsp			# Add many dummy spaces
 	movq $-1, %rax			# Put a number in %rax
 	call print				# Call the print procedure
-end_then_1:				# Clean up then block stack frame
-	addq $32, %rsp			# Deallocate many dummy spaces and static link
 	jmp end_1				# Skip the else
 end_1:
 # Start if statement 2
 	movq $1, %rax			# Put a number in %rax
 	cmp $0, %rax			# Check the condition
 	je end_2				# Skip if the condition is false
-	pushq %rbp				# Push simple static link
-	subq $24, %rsp			# Add many dummy spaces
 	movq $6, %rax			# Put a number in %rax
 	call print				# Call the print procedure
-end_then_2:				# Clean up then block stack frame
-	addq $32, %rsp			# Deallocate many dummy spaces and static link
 	jmp end_2				# Skip the else
 end_2:
 	movq $0, %rax			# Put a number in %rax
@@ -766,12 +806,8 @@ end_2:
 	movq -40(%rax), %rax		# Move value into %rax
 	cmp $0, %rax			# Check the condition
 	je end_3				# Skip if the condition is false
-	pushq %rbp				# Push simple static link
-	subq $24, %rsp			# Add many dummy spaces
 	movq $-1, %rax			# Put a number in %rax
 	call print				# Call the print procedure
-end_then_3:				# Clean up then block stack frame
-	addq $32, %rsp			# Deallocate many dummy spaces and static link
 	jmp end_3				# Skip the else
 end_3:
 # Start if statement 4
@@ -779,12 +815,8 @@ end_3:
 	movq -48(%rax), %rax		# Move value into %rax
 	cmp $0, %rax			# Check the condition
 	je end_4				# Skip if the condition is false
-	pushq %rbp				# Push simple static link
-	subq $24, %rsp			# Add many dummy spaces
 	movq $7, %rax			# Put a number in %rax
 	call print				# Call the print procedure
-end_then_4:				# Clean up then block stack frame
-	addq $32, %rsp			# Deallocate many dummy spaces and static link
 	jmp end_4				# Skip the else
 end_4:
 # Start if statement 5
@@ -792,50 +824,29 @@ end_4:
 	movq -40(%rax), %rax		# Move value into %rax
 	cmp $0, %rax			# Check the condition
 	je else_part_5			# Skip to the else if the condition is false
-	pushq %rbp				# Push simple static link
-	subq $24, %rsp			# Add many dummy spaces
 	movq $-1, %rax			# Put a number in %rax
 	call print				# Call the print procedure
-end_then_5:				# Clean up then block stack frame
-	addq $32, %rsp			# Deallocate many dummy spaces and static link
 	jmp end_5				# Skip the else
 else_part_5:
-	pushq %rbp				# Push simple static link
-	subq $24, %rsp			# Add many dummy spaces
 	movq $8, %rax			# Put a number in %rax
 	call print				# Call the print procedure
-end_else_5:
-	addq $32, %rsp			# Deallocate many dummy spaces and static link
 end_5:
 # Start if statement 6
 	movq %rbp, %rax			# Prepare to access variable from another scope
 	movq -48(%rax), %rax		# Move value into %rax
 	cmp $0, %rax			# Check the condition
 	je else_part_6			# Skip to the else if the condition is false
-	pushq %rbp				# Push simple static link
-	subq $24, %rsp			# Add many dummy spaces
 	movq $9, %rax			# Put a number in %rax
 	call print				# Call the print procedure
-end_then_6:				# Clean up then block stack frame
-	addq $32, %rsp			# Deallocate many dummy spaces and static link
 	jmp end_6				# Skip the else
 else_part_6:
-	pushq %rbp				# Push simple static link
-	subq $24, %rsp			# Add many dummy spaces
 	movq $-1, %rax			# Put a number in %rax
 	call print				# Call the print procedure
-end_else_6:
-	addq $32, %rsp			# Deallocate many dummy spaces and static link
 end_6:
 # Start if statement 7
 	movq $1, %rax			# Put a number in %rax
 	cmp $0, %rax			# Check the condition
 	je else_part_7			# Skip to the else if the condition is false
-	pushq %rbp				# Push simple static link
-	subq $16, %rsp			# Add dummy spaces
-	pushq %rbp				# Save base pointer
-	movq %rsp, %rbp			# Make stack pointer new base pointer
-	subq $16, %rsp			# Allocate space for local variables on the stack
 	movq $9, %rax			# Put a number in %rax
 	movq %rax, -8(%rbp)		# Move initialized value into space on stack
 	movq $10, %rax			# Put a number in %rax
@@ -843,36 +854,18 @@ end_6:
 	movq %rbp, %rax			# Prepare to access variable from another scope
 	movq -16(%rax), %rax		# Move value into %rax
 	call print				# Call the print procedure
-end_then_7:				# Clean up then block stack frame
-	addq $16, %rsp			# Deallocate space for local variables on the stack
-	popq %rbp				# Restore base pointer
-	addq $24, %rsp			# Deallocate dummy spaces and static link
 	jmp end_7				# Skip the else
 else_part_7:
-	pushq %rbp				# Push simple static link
-	subq $16, %rsp			# Add dummy spaces
-	pushq %rbp				# Save base pointer
-	movq %rsp, %rbp			# Make stack pointer new base pointer
-	subq $8, %rsp			# Allocate space for local variables on the stack
 	movq $78, %rax			# Put a number in %rax
 	movq %rax, -8(%rbp)		# Move initialized value into space on stack
 	movq %rbp, %rax			# Prepare to access variable from another scope
 	movq -8(%rax), %rax		# Move value into %rax
 	call print				# Call the print procedure
-end_else_7:
-	addq $8, %rsp			# Deallocate space for local variables on the stack
-	popq %rbp				# Restore base pointer
-	addq $24, %rsp			# Deallocate dummy spaces and static link
 end_7:
 # Start if statement 8
 	movq $0, %rax			# Put a number in %rax
 	cmp $0, %rax			# Check the condition
 	je else_part_8			# Skip to the else if the condition is false
-	pushq %rbp				# Push simple static link
-	subq $16, %rsp			# Add dummy spaces
-	pushq %rbp				# Save base pointer
-	movq %rsp, %rbp			# Make stack pointer new base pointer
-	subq $16, %rsp			# Allocate space for local variables on the stack
 	movq $6, %rax			# Put a number in %rax
 	movq %rax, -8(%rbp)		# Move initialized value into space on stack
 	movq $0, %rax			# Put a number in %rax
@@ -880,26 +873,13 @@ end_7:
 	movq %rbp, %rax			# Prepare to access variable from another scope
 	movq -8(%rax), %rax		# Move value into %rax
 	call print				# Call the print procedure
-end_then_8:				# Clean up then block stack frame
-	addq $16, %rsp			# Deallocate space for local variables on the stack
-	popq %rbp				# Restore base pointer
-	addq $24, %rsp			# Deallocate dummy spaces and static link
 	jmp end_8				# Skip the else
 else_part_8:
-	pushq %rbp				# Push simple static link
-	subq $16, %rsp			# Add dummy spaces
-	pushq %rbp				# Save base pointer
-	movq %rsp, %rbp			# Make stack pointer new base pointer
-	subq $8, %rsp			# Allocate space for local variables on the stack
 	movq $11, %rax			# Put a number in %rax
 	movq %rax, -8(%rbp)		# Move initialized value into space on stack
 	movq %rbp, %rax			# Prepare to access variable from another scope
 	movq -8(%rax), %rax		# Move value into %rax
 	call print				# Call the print procedure
-end_else_8:
-	addq $8, %rsp			# Deallocate space for local variables on the stack
-	popq %rbp				# Restore base pointer
-	addq $24, %rsp			# Deallocate dummy spaces and static link
 end_8:
 # Start if statement 9
 	movq $3, %rax			# Put a number in %rax
@@ -915,12 +895,8 @@ comp_skip_1:
 comp_end_1:
 	cmp $0, %rax			# Check the condition
 	je end_9				# Skip if the condition is false
-	pushq %rbp				# Push simple static link
-	subq $24, %rsp			# Add many dummy spaces
 	movq $-1, %rax			# Put a number in %rax
 	call print				# Call the print procedure
-end_then_9:				# Clean up then block stack frame
-	addq $32, %rsp			# Deallocate many dummy spaces and static link
 	jmp end_9				# Skip the else
 end_9:
 # Start if statement 10
@@ -937,12 +913,8 @@ comp_skip_2:
 comp_end_2:
 	cmp $0, %rax			# Check the condition
 	je end_10				# Skip if the condition is false
-	pushq %rbp				# Push simple static link
-	subq $24, %rsp			# Add many dummy spaces
 	movq $12, %rax			# Put a number in %rax
 	call print				# Call the print procedure
-end_then_10:				# Clean up then block stack frame
-	addq $32, %rsp			# Deallocate many dummy spaces and static link
 	jmp end_10				# Skip the else
 end_10:
 # Start if statement 11
@@ -959,12 +931,8 @@ comp_skip_3:
 comp_end_3:
 	cmp $0, %rax			# Check the condition
 	je end_11				# Skip if the condition is false
-	pushq %rbp				# Push simple static link
-	subq $24, %rsp			# Add many dummy spaces
 	movq $13, %rax			# Put a number in %rax
 	call print				# Call the print procedure
-end_then_11:				# Clean up then block stack frame
-	addq $32, %rsp			# Deallocate many dummy spaces and static link
 	jmp end_11				# Skip the else
 end_11:
 # Start if statement 12
@@ -981,12 +949,8 @@ comp_skip_4:
 comp_end_4:
 	cmp $0, %rax			# Check the condition
 	je end_12				# Skip if the condition is false
-	pushq %rbp				# Push simple static link
-	subq $24, %rsp			# Add many dummy spaces
 	movq $-1, %rax			# Put a number in %rax
 	call print				# Call the print procedure
-end_then_12:				# Clean up then block stack frame
-	addq $32, %rsp			# Deallocate many dummy spaces and static link
 	jmp end_12				# Skip the else
 end_12:
 # Start if statement 13
@@ -1003,12 +967,8 @@ comp_skip_5:
 comp_end_5:
 	cmp $0, %rax			# Check the condition
 	je end_13				# Skip if the condition is false
-	pushq %rbp				# Push simple static link
-	subq $24, %rsp			# Add many dummy spaces
 	movq $-1, %rax			# Put a number in %rax
 	call print				# Call the print procedure
-end_then_13:				# Clean up then block stack frame
-	addq $32, %rsp			# Deallocate many dummy spaces and static link
 	jmp end_13				# Skip the else
 end_13:
 # Start if statement 14
@@ -1025,12 +985,8 @@ comp_skip_6:
 comp_end_6:
 	cmp $0, %rax			# Check the condition
 	je end_14				# Skip if the condition is false
-	pushq %rbp				# Push simple static link
-	subq $24, %rsp			# Add many dummy spaces
 	movq $14, %rax			# Put a number in %rax
 	call print				# Call the print procedure
-end_then_14:				# Clean up then block stack frame
-	addq $32, %rsp			# Deallocate many dummy spaces and static link
 	jmp end_14				# Skip the else
 end_14:
 # Start if statement 15
@@ -1047,12 +1003,8 @@ comp_skip_7:
 comp_end_7:
 	cmp $0, %rax			# Check the condition
 	je end_15				# Skip if the condition is false
-	pushq %rbp				# Push simple static link
-	subq $24, %rsp			# Add many dummy spaces
 	movq $15, %rax			# Put a number in %rax
 	call print				# Call the print procedure
-end_then_15:				# Clean up then block stack frame
-	addq $32, %rsp			# Deallocate many dummy spaces and static link
 	jmp end_15				# Skip the else
 end_15:
 # Start if statement 16
@@ -1069,12 +1021,8 @@ comp_skip_8:
 comp_end_8:
 	cmp $0, %rax			# Check the condition
 	je end_16				# Skip if the condition is false
-	pushq %rbp				# Push simple static link
-	subq $24, %rsp			# Add many dummy spaces
 	movq $-1, %rax			# Put a number in %rax
 	call print				# Call the print procedure
-end_then_16:				# Clean up then block stack frame
-	addq $32, %rsp			# Deallocate many dummy spaces and static link
 	jmp end_16				# Skip the else
 end_16:
 # Start if statement 17
@@ -1091,12 +1039,8 @@ comp_skip_9:
 comp_end_9:
 	cmp $0, %rax			# Check the condition
 	je end_17				# Skip if the condition is false
-	pushq %rbp				# Push simple static link
-	subq $24, %rsp			# Add many dummy spaces
 	movq $16, %rax			# Put a number in %rax
 	call print				# Call the print procedure
-end_then_17:				# Clean up then block stack frame
-	addq $32, %rsp			# Deallocate many dummy spaces and static link
 	jmp end_17				# Skip the else
 end_17:
 # Start if statement 18
@@ -1113,12 +1057,8 @@ comp_skip_10:
 comp_end_10:
 	cmp $0, %rax			# Check the condition
 	je end_18				# Skip if the condition is false
-	pushq %rbp				# Push simple static link
-	subq $24, %rsp			# Add many dummy spaces
 	movq $17, %rax			# Put a number in %rax
 	call print				# Call the print procedure
-end_then_18:				# Clean up then block stack frame
-	addq $32, %rsp			# Deallocate many dummy spaces and static link
 	jmp end_18				# Skip the else
 end_18:
 # Start if statement 19
@@ -1135,12 +1075,8 @@ comp_skip_11:
 comp_end_11:
 	cmp $0, %rax			# Check the condition
 	je end_19				# Skip if the condition is false
-	pushq %rbp				# Push simple static link
-	subq $24, %rsp			# Add many dummy spaces
 	movq $18, %rax			# Put a number in %rax
 	call print				# Call the print procedure
-end_then_19:				# Clean up then block stack frame
-	addq $32, %rsp			# Deallocate many dummy spaces and static link
 	jmp end_19				# Skip the else
 end_19:
 # Start if statement 20
@@ -1157,12 +1093,8 @@ comp_skip_12:
 comp_end_12:
 	cmp $0, %rax			# Check the condition
 	je end_20				# Skip if the condition is false
-	pushq %rbp				# Push simple static link
-	subq $24, %rsp			# Add many dummy spaces
 	movq $-1, %rax			# Put a number in %rax
 	call print				# Call the print procedure
-end_then_20:				# Clean up then block stack frame
-	addq $32, %rsp			# Deallocate many dummy spaces and static link
 	jmp end_20				# Skip the else
 end_20:
 # Start if statement 21
@@ -1179,12 +1111,8 @@ comp_skip_13:
 comp_end_13:
 	cmp $0, %rax			# Check the condition
 	je end_21				# Skip if the condition is false
-	pushq %rbp				# Push simple static link
-	subq $24, %rsp			# Add many dummy spaces
 	movq $19, %rax			# Put a number in %rax
 	call print				# Call the print procedure
-end_then_21:				# Clean up then block stack frame
-	addq $32, %rsp			# Deallocate many dummy spaces and static link
 	jmp end_21				# Skip the else
 end_21:
 # Start if statement 22
@@ -1201,26 +1129,17 @@ comp_skip_14:
 comp_end_14:
 	cmp $0, %rax			# Check the condition
 	je end_22				# Skip if the condition is false
-	pushq %rbp				# Push simple static link
-	subq $24, %rsp			# Add many dummy spaces
 	movq $-1, %rax			# Put a number in %rax
 	call print				# Call the print procedure
-end_then_22:				# Clean up then block stack frame
-	addq $32, %rsp			# Deallocate many dummy spaces and static link
 	jmp end_22				# Skip the else
 end_22:
 	movq $20, %rax			# Put a number in %rax
 	movq %rax, -56(%rbp)		# Move initialized value into space on stack
 # Start while statement 0
-	pushq %rbp				# Push simple static link
-	subq $16, %rsp			# Add dummy spaces
-	pushq %rbp				# Save base pointer
-	movq %rsp, %rbp			# Make stack pointer new base pointer
 while_loop_0:
 	movq $25, %rax			# Put a number in %rax
 	pushq %rax				# Push right side to stack
 	movq %rbp, %rax			# Prepare to access variable from another scope
-	movq 24(%rax), %rax		# Traverse static link once
 	movq -56(%rax), %rax		# Move value into %rax
 	popq %rbx				# Pop right side into %rbx
 	cmp %rax, %rbx			# Compare both sides
@@ -1233,43 +1152,31 @@ comp_end_15:
 	cmp $0, %rax			# Check the condition
 	je end_while_0			# Skip if the condition is false
 	movq %rbp, %rax			# Prepare to access variable from another scope
-	movq 24(%rax), %rax		# Traverse static link once
 	movq -56(%rax), %rax		# Move value into %rax
 	call print				# Call the print procedure
 	movq $1, %rax			# Put a number in %rax
 	pushq %rax				# Push right side to stack
 	movq %rbp, %rax			# Prepare to access variable from another scope
-	movq 24(%rax), %rax		# Traverse static link once
 	movq -56(%rax), %rax		# Move value into %rax
 	popq %rbx				# Pop right side into %rbx
 	addq %rbx, %rax			# Perform addition
 	movq %rax, %rdx			# Move right side of assignment into %rdx
 	movq %rbp, %rax			# Prepare to access variable from another scope
-	movq 24(%rax), %rax		# Traverse static link once
 	movq -56(%rax), %rax		# Move value into %rax
 	movq %rbp, %rax			# Prepare to access variable from another scope
-	movq 24(%rax), %rax		# Traverse static link once
 	movq %rdx, -56(%rax)		# Move right side into location of left side of assign
 	jmp while_loop_0		# Restart the loop
 end_while_0:
-	popq %rbp				# Restore base pointer
-	addq $24, %rsp			# Deallocate dummy spaces and static link
 	movq $26, %rax			# Put a number in %rax
 	movq %rax, -64(%rbp)		# Move initialized value into space on stack
 # Start while statement 1
-	pushq %rbp				# Push simple static link
-	subq $16, %rsp			# Add dummy spaces
-	pushq %rbp				# Save base pointer
-	movq %rsp, %rbp			# Make stack pointer new base pointer
 while_loop_1:
 	movq $55, %rax			# Put a number in %rax
 	pushq %rax				# Push right side to stack
 	movq %rbp, %rax			# Prepare to access variable from another scope
-	movq 24(%rax), %rax		# Traverse static link once
 	movq -56(%rax), %rax		# Move value into %rax
 	pushq %rax				# Push right side to stack
 	movq %rbp, %rax			# Prepare to access variable from another scope
-	movq 24(%rax), %rax		# Traverse static link once
 	movq -64(%rax), %rax		# Move value into %rax
 	popq %rbx				# Pop right side into %rbx
 	addq %rbx, %rax			# Perform addition
@@ -1284,27 +1191,21 @@ comp_end_16:
 	cmp $0, %rax			# Check the condition
 	je end_while_1			# Skip if the condition is false
 	movq %rbp, %rax			# Prepare to access variable from another scope
-	movq 24(%rax), %rax		# Traverse static link once
 	movq -64(%rax), %rax		# Move value into %rax
 	call print				# Call the print procedure
 	movq $1, %rax			# Put a number in %rax
 	pushq %rax				# Push right side to stack
 	movq %rbp, %rax			# Prepare to access variable from another scope
-	movq 24(%rax), %rax		# Traverse static link once
 	movq -64(%rax), %rax		# Move value into %rax
 	popq %rbx				# Pop right side into %rbx
 	addq %rbx, %rax			# Perform addition
 	movq %rax, %rdx			# Move right side of assignment into %rdx
 	movq %rbp, %rax			# Prepare to access variable from another scope
-	movq 24(%rax), %rax		# Traverse static link once
 	movq -64(%rax), %rax		# Move value into %rax
 	movq %rbp, %rax			# Prepare to access variable from another scope
-	movq 24(%rax), %rax		# Traverse static link once
 	movq %rdx, -64(%rax)		# Move right side into location of left side of assign
 	jmp while_loop_1		# Restart the loop
 end_while_1:
-	popq %rbp				# Restore base pointer
-	addq $24, %rsp			# Deallocate dummy spaces and static link
 	movq $12, %rax			# Put a number in %rax
 	movq %rax, -72(%rbp)		# Move initialized value into space on stack
 	movq heap_pointer(%rip), %rcx			# Move heap pointer into %rcx
@@ -1339,33 +1240,20 @@ comp_skip_17:
 comp_end_17:
 	cmp $0, %rax			# Check the condition
 	je else_part_23			# Skip to the else if the condition is false
-	pushq %rbp				# Push simple static link
-	subq $24, %rsp			# Add many dummy spaces
 	movq $-1, %rax			# Put a number in %rax
 	call print				# Call the print procedure
-end_then_23:				# Clean up then block stack frame
-	addq $32, %rsp			# Deallocate many dummy spaces and static link
 	jmp end_23				# Skip the else
 else_part_23:
-	pushq %rbp				# Push simple static link
-	subq $16, %rsp			# Add dummy spaces
-	pushq %rbp				# Save base pointer
-	movq %rsp, %rbp			# Make stack pointer new base pointer
 	movq %rbp, %rax			# Prepare to access variable from another scope
-	movq 24(%rax), %rax		# Traverse static link once
 	movq -80(%rax), %rax		# Move value into %rax
 	movq 16(%rax), %rax		# Move value into %rax
 	pushq %rax				# Push right side to stack
 	movq %rbp, %rax			# Prepare to access variable from another scope
-	movq 24(%rax), %rax		# Traverse static link once
 	movq -80(%rax), %rax		# Move value into %rax
 	movq 8(%rax), %rax		# Move value into %rax
 	popq %rbx				# Pop right side into %rbx
 	addq %rbx, %rax			# Perform addition
 	call print				# Call the print procedure
-end_else_23:
-	popq %rbp				# Restore base pointer
-	addq $24, %rsp			# Deallocate dummy spaces and static link
 end_23:
 	movq heap_pointer(%rip), %rcx			# Move heap pointer into %rcx
 	addq $24, heap_pointer(%rip)	# Add size of object to heap pointer
@@ -1400,20 +1288,12 @@ comp_skip_18:
 comp_end_18:
 	cmp $0, %rax			# Check the condition
 	je else_part_24			# Skip to the else if the condition is false
-	pushq %rbp				# Push simple static link
-	subq $24, %rsp			# Add many dummy spaces
 	movq $-1, %rax			# Put a number in %rax
 	call print				# Call the print procedure
-end_then_24:				# Clean up then block stack frame
-	addq $32, %rsp			# Deallocate many dummy spaces and static link
 	jmp end_24				# Skip the else
 else_part_24:
-	pushq %rbp				# Push simple static link
-	subq $24, %rsp			# Add many dummy spaces
 	movq $30, %rax			# Put a number in %rax
 	call print				# Call the print procedure
-end_else_24:
-	addq $32, %rsp			# Deallocate many dummy spaces and static link
 end_24:
 	movq heap_pointer(%rip), %rcx			# Move heap pointer into %rcx
 	addq $24, heap_pointer(%rip)	# Add size of object to heap pointer
@@ -1449,20 +1329,12 @@ comp_skip_19:
 comp_end_19:
 	cmp $0, %rax			# Check the condition
 	je else_part_25			# Skip to the else if the condition is false
-	pushq %rbp				# Push simple static link
-	subq $24, %rsp			# Add many dummy spaces
 	movq $-1, %rax			# Put a number in %rax
 	call print				# Call the print procedure
-end_then_25:				# Clean up then block stack frame
-	addq $32, %rsp			# Deallocate many dummy spaces and static link
 	jmp end_25				# Skip the else
 else_part_25:
-	pushq %rbp				# Push simple static link
-	subq $24, %rsp			# Add many dummy spaces
 	movq $31, %rax			# Put a number in %rax
 	call print				# Call the print procedure
-end_else_25:
-	addq $32, %rsp			# Deallocate many dummy spaces and static link
 end_25:
 	movq $13, %rax			# Put a number in %rax
 	movq %rax, %rdx			# Move right side of assignment into %rdx
@@ -1500,20 +1372,12 @@ comp_skip_20:
 comp_end_20:
 	cmp $0, %rax			# Check the condition
 	je else_part_26			# Skip to the else if the condition is false
-	pushq %rbp				# Push simple static link
-	subq $24, %rsp			# Add many dummy spaces
 	movq $-1, %rax			# Put a number in %rax
 	call print				# Call the print procedure
-end_then_26:				# Clean up then block stack frame
-	addq $32, %rsp			# Deallocate many dummy spaces and static link
 	jmp end_26				# Skip the else
 else_part_26:
-	pushq %rbp				# Push simple static link
-	subq $24, %rsp			# Add many dummy spaces
 	movq $32, %rax			# Put a number in %rax
 	call print				# Call the print procedure
-end_else_26:
-	addq $32, %rsp			# Deallocate many dummy spaces and static link
 end_26:
 	pushq %rbp				# Push simple static link
 	subq $8, %rsp			# Add dummy space
@@ -1539,16 +1403,9 @@ end_26:
 	cmp $0, %rax			# Check the condition
 	je end_30				# Skip if the condition is false
 	pushq %rbp				# Push simple static link
-	subq $16, %rsp			# Add dummy spaces
-	pushq %rbp				# Save base pointer
-	movq %rsp, %rbp			# Make stack pointer new base pointer
-	pushq %rbp				# Push simple static link
 	subq $8, %rsp			# Add dummy space
 	call test36one			# Call the test36one function
 	addq $16, %rsp			# Deallocate dummy space, static link and arguments
-end_then_30:				# Clean up then block stack frame
-	popq %rbp				# Restore base pointer
-	addq $24, %rsp			# Deallocate dummy spaces and static link
 	jmp end_30				# Skip the else
 end_30:
 	movq $37, %rax			# Put a number in %rax
@@ -1763,12 +1620,8 @@ logical_false_22:
 logical_end_22:
 	cmp $0, %rax			# Check the condition
 	je end_31				# Skip if the condition is false
-	pushq %rbp				# Push simple static link
-	subq $24, %rsp			# Add many dummy spaces
 	movq $-1, %rax			# Put a number in %rax
 	call print				# Call the print procedure
-end_then_31:				# Clean up then block stack frame
-	addq $32, %rsp			# Deallocate many dummy spaces and static link
 	jmp end_31				# Skip the else
 end_31:
 # Start if statement 32
@@ -1790,12 +1643,8 @@ logical_false_23:
 logical_end_23:
 	cmp $0, %rax			# Check the condition
 	je end_32				# Skip if the condition is false
-	pushq %rbp				# Push simple static link
-	subq $24, %rsp			# Add many dummy spaces
 	movq $-1, %rax			# Put a number in %rax
 	call print				# Call the print procedure
-end_then_32:				# Clean up then block stack frame
-	addq $32, %rsp			# Deallocate many dummy spaces and static link
 	jmp end_32				# Skip the else
 end_32:
 # Start if statement 33
@@ -1817,12 +1666,8 @@ logical_true_24:
 logical_end_24:
 	cmp $0, %rax			# Check the condition
 	je end_33				# Skip if the condition is false
-	pushq %rbp				# Push simple static link
-	subq $24, %rsp			# Add many dummy spaces
 	movq $-1, %rax			# Put a number in %rax
 	call print				# Call the print procedure
-end_then_33:				# Clean up then block stack frame
-	addq $32, %rsp			# Deallocate many dummy spaces and static link
 	jmp end_33				# Skip the else
 end_33:
 # Start if statement 34
@@ -1847,12 +1692,8 @@ logical_end_25:
 	movzbl %al, %eax			# Invert flag
 	cmp $0, %rax			# Check the condition
 	je end_34				# Skip if the condition is false
-	pushq %rbp				# Push simple static link
-	subq $24, %rsp			# Add many dummy spaces
 	movq $-1, %rax			# Put a number in %rax
 	call print				# Call the print procedure
-end_then_34:				# Clean up then block stack frame
-	addq $32, %rsp			# Deallocate many dummy spaces and static link
 	jmp end_34				# Skip the else
 end_34:
 # Start if statement 35
@@ -1877,12 +1718,8 @@ logical_true_26:
 logical_end_26:
 	cmp $0, %rax			# Check the condition
 	je end_35				# Skip if the condition is false
-	pushq %rbp				# Push simple static link
-	subq $24, %rsp			# Add many dummy spaces
 	movq $-1, %rax			# Put a number in %rax
 	call print				# Call the print procedure
-end_then_35:				# Clean up then block stack frame
-	addq $32, %rsp			# Deallocate many dummy spaces and static link
 	jmp end_35				# Skip the else
 end_35:
 # Start if statement 36
@@ -1907,12 +1744,8 @@ logical_false_27:
 logical_end_27:
 	cmp $0, %rax			# Check the condition
 	je end_36				# Skip if the condition is false
-	pushq %rbp				# Push simple static link
-	subq $24, %rsp			# Add many dummy spaces
 	movq $-1, %rax			# Put a number in %rax
 	call print				# Call the print procedure
-end_then_36:				# Clean up then block stack frame
-	addq $32, %rsp			# Deallocate many dummy spaces and static link
 	jmp end_36				# Skip the else
 end_36:
 # Start if statement 37
@@ -1990,12 +1823,8 @@ logical_true_32:
 logical_end_32:
 	cmp $0, %rax			# Check the condition
 	je end_37				# Skip if the condition is false
-	pushq %rbp				# Push simple static link
-	subq $24, %rsp			# Add many dummy spaces
 	movq $46, %rax			# Put a number in %rax
 	call print				# Call the print procedure
-end_then_37:				# Clean up then block stack frame
-	addq $32, %rsp			# Deallocate many dummy spaces and static link
 	jmp end_37				# Skip the else
 end_37:
 # Start if statement 38
@@ -2003,20 +1832,12 @@ end_37:
 	movq -184(%rax), %rax		# Move value into %rax
 	cmp $0, %rax			# Check the condition
 	je else_part_38			# Skip to the else if the condition is false
-	pushq %rbp				# Push simple static link
-	subq $24, %rsp			# Add many dummy spaces
 	movq $47, %rax			# Put a number in %rax
 	call print				# Call the print procedure
-end_then_38:				# Clean up then block stack frame
-	addq $32, %rsp			# Deallocate many dummy spaces and static link
 	jmp end_38				# Skip the else
 else_part_38:
-	pushq %rbp				# Push simple static link
-	subq $24, %rsp			# Add many dummy spaces
 	movq $-1, %rax			# Put a number in %rax
 	call print				# Call the print procedure
-end_else_38:
-	addq $32, %rsp			# Deallocate many dummy spaces and static link
 end_38:
 	movq $0, %rax			# Put a number in %rax
 	movq %rax, %rdx			# Move right side of assignment into %rdx
@@ -2069,20 +1890,12 @@ logical_true_34:
 logical_end_34:
 	cmp $0, %rax			# Check the condition
 	je else_part_39			# Skip to the else if the condition is false
-	pushq %rbp				# Push simple static link
-	subq $24, %rsp			# Add many dummy spaces
 	movq $-1, %rax			# Put a number in %rax
 	call print				# Call the print procedure
-end_then_39:				# Clean up then block stack frame
-	addq $32, %rsp			# Deallocate many dummy spaces and static link
 	jmp end_39				# Skip the else
 else_part_39:
-	pushq %rbp				# Push simple static link
-	subq $24, %rsp			# Add many dummy spaces
 	movq $48, %rax			# Put a number in %rax
 	call print				# Call the print procedure
-end_else_39:
-	addq $32, %rsp			# Deallocate many dummy spaces and static link
 end_39:
 	movq $5, %rax			# Put a number in %rax
 	movq %rax, %rdx			# Move right side of assignment into %rdx
@@ -2115,20 +1928,12 @@ logical_true_35:
 logical_end_35:
 	cmp $0, %rax			# Check the condition
 	je else_part_40			# Skip to the else if the condition is false
-	pushq %rbp				# Push simple static link
-	subq $24, %rsp			# Add many dummy spaces
 	movq $49, %rax			# Put a number in %rax
 	call print				# Call the print procedure
-end_then_40:				# Clean up then block stack frame
-	addq $32, %rsp			# Deallocate many dummy spaces and static link
 	jmp end_40				# Skip the else
 else_part_40:
-	pushq %rbp				# Push simple static link
-	subq $24, %rsp			# Add many dummy spaces
 	movq $-1, %rax			# Put a number in %rax
 	call print				# Call the print procedure
-end_else_40:
-	addq $32, %rsp			# Deallocate many dummy spaces and static link
 end_40:
 	movq heap_pointer(%rip), %rcx			# Move heap pointer into %rcx
 	addq $16, heap_pointer(%rip)	# Add size of object to heap pointer
@@ -2192,6 +1997,17 @@ end_40:
 	call funnyFunc			# Call the funnyFunc function
 	addq $16, %rsp			# Deallocate dummy space, static link and arguments
 	movq 8(%rax), %rax		# Move value into %rax
+	popq %rbx				# Pop right side into %rbx
+	addq %rbx, %rax			# Perform addition
+	call print				# Call the print procedure
+	movq $30, %rax			# Put a number in %rax
+	pushq %rax				# Push right side to stack
+	movq $4, %rax			# Put a number in %rax
+	pushq %rax		# Push argument number 1 to stack
+	pushq %rbp				# Push simple static link
+	subq $8, %rsp			# Add dummy space
+	call factorial			# Call the factorial function
+	addq $24, %rsp			# Deallocate dummy space, static link and arguments
 	popq %rbx				# Pop right side into %rbx
 	addq %rbx, %rax			# Perform addition
 	call print				# Call the print procedure
