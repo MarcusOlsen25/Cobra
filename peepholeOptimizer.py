@@ -23,6 +23,8 @@ class PeepholeOptimizer:
                 self.optimiseAdditionsToRSP(i)
                 self.optimisePushSimpleSL(i)
                 self.optimiseSaveBasePointer(i)
+                self.optimiseAssembleDummies(i)
+                self.optimiseInstantNegation(i)
 
                 # self.optimiseDirectInitialization(i)
                 hwllo = 9
@@ -179,6 +181,65 @@ class PeepholeOptimizer:
                     done = True
                 
                 i += 1
+                
+                
+                
+                
+    # Add dummy spaces more efficiently
+    def optimiseAssembleDummies(self, index: int):
+        '''
+        subq $16, %rsp			# Add dummy spaces
+    	subq $8, %rsp			# Add dummy base pointer
+        ->
+        subq $24, %rsp          # Add many dummy spaces
+        
+        addq $8, %rsp			# Remove dummy base pointer
+    	addq $24, %rsp			# Deallocate dummy spaces and static link
+        ->
+        addq $32, %rsp          # Deallocate many dummy spaces and static link
+        '''
+        two = self.instructions[index]
+        
+        if two.comment == "# Add dummy base pointer":
+            one = self.instructions[index-1]
+            if one.comment == "# Add dummy spaces" and one.operand1 == "$16":
+                two.operand1 = "$24"
+                two.comment =  "# Add many dummy spaces"
+                self.indexesToRemove.append(index-1)
+        
+        elif two.comment == "# Deallocate dummy spaces and static link":
+            one = self.instructions[index-1]
+            if one.comment == "# Remove dummy base pointer":
+                two.operand1 = "$32"
+                two.comment = "# Deallocate many dummy spaces and static link"
+                self.indexesToRemove.append(index-1)
+                
+                
+                
+                
+    # Negate numbers in a single step
+    def optimiseInstantNegation(self, index: int):
+        '''
+        movq $1, %rax			# Put a number in %rax
+    	negq %rax				# Negate value
+        ->
+        movq $-1, %rax          # Put a number in %rax
+        '''
+        two = self.instructions[index]
+        if two.comment == "# Negate value":
+            one = self.instructions[index-1]
+            if one.comment == "# Put a number in %rax":
+                # Logic to negate and deal with multiple '-'s
+                number = one.operand1.lstrip("$")
+                number = "-" + number
+                minus_count = number.count('-')
+                if minus_count % 2 == 0:
+                    number = number.replace('-', '')
+                one.operand1 = "$" + number
+                self.indexesToRemove.append(index)
+
+           
+                
                     
                     
     
