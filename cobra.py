@@ -9,7 +9,8 @@ from errorTester import *
 from peepholeOptimizer import *
 # The line numbers match the error messages + 10.  
 data = '''
-print ----------6;
+
+print -null;
 '''
     
 
@@ -107,7 +108,7 @@ def compileCobra(cobraCode: str):
 compileCobra(cobraCode)  
 
 # Test programs for error handling
-# testAllErrors()
+testAllErrors()
 # testLexicalErrors()         
 # testSyntacticErrors()
 # testScopeErrors()
