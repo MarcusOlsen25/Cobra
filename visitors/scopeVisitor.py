@@ -125,7 +125,7 @@ class ScopeVisitor(Visitor):
         newTable = SymbolTable(self.table, "If")
         stmt.thenTable = newTable
 
-        stmt.thenTable.setFieldCounter(self.table.varCounter)
+        stmt.thenTable.setVarCounter(self.table.varCounter)
 
         self.table = stmt.thenTable
 
@@ -140,7 +140,7 @@ class ScopeVisitor(Visitor):
             newTable = SymbolTable(self.table, "Else")
             stmt.elseTable = newTable
 
-            stmt.elseTable.setFieldCounter(self.table.varCounter)
+            stmt.elseTable.setVarCounter(self.table.varCounter)
             self.table = stmt.elseTable
 
             for s in stmt.elseStatement:
@@ -155,7 +155,7 @@ class ScopeVisitor(Visitor):
         newTable = SymbolTable(self.table, "While")
         stmt.table = newTable
 
-        stmt.table.setFieldCounter(self.table.varCounter)
+        stmt.table.setVarCounter(self.table.varCounter)
         
         self.table = stmt.table
 
@@ -170,7 +170,7 @@ class ScopeVisitor(Visitor):
     def visitReturnStatement(self, stmt: ReturnStatement):
         try:
             if self.table.level == 0:
-                self.addScopeError("Can't return in the global scope", stmt.lineno)
+                self.addScopeError(f"Error in line {stmt.lineno}: Can't return in the global scope", stmt.lineno)
             if stmt.value:
                 stmt.value.accept(self)
         except ScopeException:

@@ -115,7 +115,7 @@ class AssemblyVisitor(Visitor):
         label = self.binaryLabelCounter
         self.binaryLabelCounter += 1
         self.generateCode("cmp", "%rax", "%rbx", 3, "# Compare both sides")
-        self.generateCode("je", f"comp_skip_{label}", None, 3, "# Skip if they are  equal")
+        self.generateCode("je", f"comp_skip_{label}", None, 3, "# Skip if they are equal")
         self.generateCode("movq", "$1", "%rax", 3, "# Put true in %rax")
         self.generateCode("jmp", f"comp_end_{label}", None, 3, "# Skip the alternative branch")
         self.addLabel(f"comp_skip_{label}", None, None)
@@ -327,7 +327,7 @@ class AssemblyVisitor(Visitor):
         label = self.ifLabelCounter
         self.ifLabelCounter += 1
         
-        self.addComment(0, f"# Start if statement {label}")
+        self.addComment(4, f"# Start if statement {label}")
         
         # For now 0 is false and everything else is true
         stmt.condition.accept(self)

@@ -19,13 +19,15 @@ class PeepholeOptimizer:
             
             # Examine each instruction
             for i in range(len(self.instructions)):
-                self.optimiseNoLocalVariables(i)
-                self.optimiseAdditionsToRSP(i)
-                self.optimisePushSimpleSL(i)
-                self.optimiseSaveBasePointer(i)
-                self.optimiseAssembleDummies(i)
-                self.optimiseInstantNegation(i)
+                # self.optimiseNoLocalVariables(i)
+                # self.optimiseAdditionsToRSP(i)
+                # self.optimisePushSimpleSL(i)
+                # self.optimiseSaveBasePointer(i)
+                # self.optimiseInstantNegation(i)
+                # self.optimiseAssembleDummies(i)     # Maybe irrelevant
+                # self.optimiseVariableAccess(i)
 
+                # Problematic
                 # self.optimiseDirectInitialization(i)
                 hwllo = 9
                         
@@ -65,40 +67,40 @@ class PeepholeOptimizer:
     # Deallocates multiple things at once
     def optimiseAdditionsToRSP(self, index: int):
         '''
-        addq $8, %rsp   # Deallocate space on stack for (heap pointer / dummy space)
+        addq $8, %rsp   # Remove dummy space
         addq $8, %rsp   # Deallocate space on stack for static link
         addq $8, %rsp   # Pop the arguments pushed to the stack
         ->
         addq $24, %rsp  # Deallocate dummy space, static link and arguments
-        '''
-        # New instructions
-        heapAndStatic = Instruction("addq", "$16", "%rsp", None, 3, "# Deallocate heap pointer and static link")
-        oneDummyAndStatic = Instruction("addq", "$16", "%rsp", None, 3, "# Deallocate dummy space and static link")
-        twoDummyAndStatic = Instruction("addq", "$24", "%rsp", None, 3, "# Deallocate dummy spaces and static link")
         
+        addq $8, %rsp   # Deallocate space on stack for heap pointer
+        addq $8, %rsp   # Deallocate space on stack for static link
+        ->
+        addq $16, %rsp  # Deallocate heap pointer and static link 
+        '''
+                
         # In case we are at the last instruction
         if index >= len(self.instructions) - 1:
             return
         else:
-            
             one = self.instructions[index]
             two = self.instructions[index+1]
             
             if (two.upcode == "addq" and two.operand1 == "$8" and two.operand2 == "%rsp" 
                 and two.comment == "# Deallocate space on stack for static link"):
-                
+                                
                 if one.upcode == "addq" and one.operand1 == "$8" and one.operand2 == "%rsp":
-                        if one.comment == "# Deallocate space on stack for heap pointer":
-                            self.indexesToRemove.append(index)
-                            self.instructions[index+1] = heapAndStatic
-                        elif one.comment == "# Remove dummy space":
-                            self.indexesToRemove.append(index)
-                            self.instructions[index+1] = oneDummyAndStatic
-                            
-                elif (one.upcode == "addq" and one.operand1 == "$16" and one.operand2 == "%rsp" 
-                      and one.comment == "# Remove dummy spaces"):
-                        self.indexesToRemove.append(index)
-                        self.instructions[index+1] = twoDummyAndStatic
+                    
+                    # New instructions
+                    heapAndStatic = Instruction("addq", "$16", "%rsp", None, 3, "# Deallocate heap pointer and static link")
+                    dummyAndStatic = Instruction("addq", "$16", "%rsp", None, 3, "# Deallocate dummy space and static link")
+                    
+                    if one.comment == "# Deallocate space on stack for heap pointer":
+                        self.indexesToRemove.append(index+1)
+                        self.instructions[index] = heapAndStatic
+                    elif one.comment == "# Remove dummy space":
+                        self.indexesToRemove.append(index+1)
+                        self.instructions[index] = dummyAndStatic
             
             # In a second round optimise deallocation of arguments after a call
             elif (one.upcode == "addq" and one.operand1 == "$16" and one.operand2 == "%rsp" 
@@ -130,11 +132,6 @@ class PeepholeOptimizer:
                 self.instructions[index+1] = simpleSL
                 
     
-    # Can the heap pointer be pushed in one go? 
-    # Once put in %rcx it is used in many places...
-    def optimisePushHP(self, index: int):
-        one = self.instructions[index]
-                
                 
     
 
@@ -151,6 +148,10 @@ class PeepholeOptimizer:
         ...
         addq $8, %rsp       # Remove dummy base pointer
         '''
+        warning = '''This pattern is tricky. You can define variables that are never used in a scope 
+        that matches this pattern. They get placed in the wrong place, overwriting the static link. 
+        The code still works, since neither the variable or the static link are used, but still. 
+        Is this alright? If we can prove that neither is used?'''
         
         one = self.instructions[index]
         
@@ -165,11 +166,12 @@ class PeepholeOptimizer:
             while not done and i < len(self.instructions):
                 two = self.instructions[i]
                 
-                # Saving the base pointer again, accessing another scope, 
+                # Saving the base pointer again, accessing a variable, declaring an initialised variable, 
                 # traversing the static link, pushing the heap pointer, or calling anything other than print
                 if (two.comment == "# Save base pointer" or two.comment == "# Prepare to access variable from another scope" 
                     or two.comment == "# Traverse static link once" or (two.upcode == "call" and two.operand1 != "print")
-                    or two.comment == "# Push heap pointer"):
+                    or two.comment == "# Push heap pointer" or two.comment == "# Access variable from another scope" 
+                    or two.comment == "# Move initialized value into space on stack"):
                     done = True
                 
                 # Restoring it again while in this loop means it is pointless
@@ -185,6 +187,56 @@ class PeepholeOptimizer:
                 
                 
                 
+                
+    # Negate numbers in a single step
+    def optimiseInstantNegation(self, index: int):
+        '''
+        movq $1, %rax			# Put a number in %rax
+    	negq %rax				# Negate value
+        ->
+        movq $-1, %rax          # Put a number in %rax
+        '''
+        two = self.instructions[index]
+        if two.comment == "# Negate value":
+            one = self.instructions[index-1]
+            if one.comment == "# Put a number in %rax":
+                # Logic to negate and deal with multiple '-'s
+                number = one.operand1.lstrip("$")
+                number = "-" + number
+                minus_count = number.count('-')
+                if minus_count % 2 == 0:
+                    number = number.replace('-', '')
+                one.operand1 = "$" + number
+                self.indexesToRemove.append(index)
+                
+    
+    
+    
+    # The static link is not always traversed, no need to prepare
+    def optimiseVariableAccess(self, index: int):
+        '''
+        movq %rbp, %rax			# Prepare to access variable from another scope
+        movq -8(%rax), %rax		# Move value into %rax
+        ->
+        movq -8(%rbp), %rax     # Access variable from another scope
+        '''
+        one = self.instructions[index]
+        if one.comment == "# Prepare to access variable from another scope":
+            two = self.instructions[index+1]
+            if (two.comment == "# Move value into %rax"):
+                offset = two.operand1.replace('(%rax)', '')
+                # print(offset)
+                two.operand1 = offset + "(%rbp)"
+                two.comment = "# Access variable from another scope"
+                self.indexesToRemove.append(index)
+                # print(index+1)
+                
+
+           
+                
+                    
+    
+    # This pattern is no longer found after if and while don't have their own scopes
     # Add dummy spaces more efficiently
     def optimiseAssembleDummies(self, index: int):
         '''
@@ -212,40 +264,14 @@ class PeepholeOptimizer:
             if one.comment == "# Remove dummy base pointer":
                 two.operand1 = "$32"
                 two.comment = "# Deallocate many dummy spaces and static link"
-                self.indexesToRemove.append(index-1)
-                
-                
-                
-                
-    # Negate numbers in a single step
-    def optimiseInstantNegation(self, index: int):
-        '''
-        movq $1, %rax			# Put a number in %rax
-    	negq %rax				# Negate value
-        ->
-        movq $-1, %rax          # Put a number in %rax
-        '''
-        two = self.instructions[index]
-        if two.comment == "# Negate value":
-            one = self.instructions[index-1]
-            if one.comment == "# Put a number in %rax":
-                # Logic to negate and deal with multiple '-'s
-                number = one.operand1.lstrip("$")
-                number = "-" + number
-                minus_count = number.count('-')
-                if minus_count % 2 == 0:
-                    number = number.replace('-', '')
-                one.operand1 = "$" + number
-                self.indexesToRemove.append(index)
-
-           
-                
-                    
-                    
+                self.indexesToRemove.append(index-1)    
     
     
     
-    
+    # Can the heap pointer be pushed in one go? 
+    # Once put in %rcx it is used in many places...
+    def optimisePushHP(self, index: int):
+        one = self.instructions[index]
     
     # Error: operand type mismatch for `movq'    (Damn it! It was a good idea...)
     # Some initialized values can be put directly where they belong

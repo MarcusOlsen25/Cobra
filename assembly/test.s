@@ -88,7 +88,8 @@ melon:			# Class
 	pushq %rcx				# Push heap pointer
 	call gulerod			# Call gulerod constructor
 	movq 16(%rbp), %rcx			# Move potential heap pointer into %rcx
-	addq $16, %rsp			# Deallocate heap pointer and static link
+	addq $8, %rsp			# Deallocate space on stack for heap pointer
+	addq $8, %rsp			# Deallocate space on stack for static link
 	movq %rax, 16(%rcx)		# Move initialized value into space on heap
 	popq %rax				# Pop current heap pointer into %rax
 	popq %rbp				# Restore base pointer
@@ -110,8 +111,10 @@ sko:			# Class
 	popq %rbp				# Restore base pointer
 	ret						# End class
 test33:			# Function
-	subq $8, %rsp			# Add dummy base pointer
-# Start if statement 27
+	pushq %rbp				# Save base pointer
+	movq %rsp, %rbp			# Make stack pointer new base pointer
+	subq $0, %rsp			# Allocate space for local variables on the stack
+				# Start if statement 27
 	movq $20, %rax			# Put a number in %rax
 	pushq %rax				# Push right side to stack
 	movq $6, %rax			# Put a number in %rax
@@ -125,7 +128,8 @@ comp_skip_21:
 comp_end_21:
 	cmp $0, %rax			# Check the condition
 	je else_part_27			# Skip to the else if the condition is false
-	movq $-1, %rax			# Put a number in %rax
+	movq $1, %rax			# Put a number in %rax
+	negq %rax				# Negate value
 	call print				# Call the print procedure
 	jmp end_27				# Skip the else
 else_part_27:
@@ -133,12 +137,14 @@ else_part_27:
 	call print				# Call the print procedure
 end_27:
 end_test33:			# End function
-	addq $8, %rsp			# Remove dummy base pointer
+	addq $0, %rsp			# Deallocate space for local variables on the stack
+	popq %rbp				# Restore base pointer
 	ret						# Return from the function
 test34:			# Function
 	pushq %rbp				# Save base pointer
 	movq %rsp, %rbp			# Make stack pointer new base pointer
-# Start if statement 28
+	subq $0, %rsp			# Allocate space for local variables on the stack
+				# Start if statement 28
 	movq %rbp, %rax			# Prepare to access variable from another scope
 	movq 32(%rax), %rax		# Move value into %rax
 	cmp $0, %rax			# Check the condition
@@ -147,21 +153,25 @@ test34:			# Function
 	call print				# Call the print procedure
 	jmp end_28				# Skip the else
 else_part_28:
-	movq $-1, %rax			# Put a number in %rax
+	movq $1, %rax			# Put a number in %rax
+	negq %rax				# Negate value
 	call print				# Call the print procedure
 end_28:
 end_test34:			# End function
+	addq $0, %rsp			# Deallocate space for local variables on the stack
 	popq %rbp				# Restore base pointer
 	ret						# Return from the function
 test35:			# Function
 	pushq %rbp				# Save base pointer
 	movq %rsp, %rbp			# Make stack pointer new base pointer
-# Start if statement 29
+	subq $0, %rsp			# Allocate space for local variables on the stack
+				# Start if statement 29
 	movq %rbp, %rax			# Prepare to access variable from another scope
 	movq 32(%rax), %rax		# Move value into %rax
 	cmp $0, %rax			# Check the condition
 	je else_part_29			# Skip to the else if the condition is false
-	movq $-1, %rax			# Put a number in %rax
+	movq $1, %rax			# Put a number in %rax
+	negq %rax				# Negate value
 	call print				# Call the print procedure
 	jmp end_29				# Skip the else
 else_part_29:
@@ -169,49 +179,63 @@ else_part_29:
 	call print				# Call the print procedure
 end_29:
 end_test35:			# End function
+	addq $0, %rsp			# Deallocate space for local variables on the stack
 	popq %rbp				# Restore base pointer
 	ret						# Return from the function
 test36three:			# Function
 	pushq %rbp				# Save base pointer
 	movq %rsp, %rbp			# Make stack pointer new base pointer
+	subq $0, %rsp			# Allocate space for local variables on the stack
 	movq %rbp, %rax			# Prepare to access variable from another scope
 	movq 24(%rax), %rax		# Traverse static link once
 	movq -104(%rax), %rax		# Move value into %rax
 	call print				# Call the print procedure
 end_test36three:			# End function
+	addq $0, %rsp			# Deallocate space for local variables on the stack
 	popq %rbp				# Restore base pointer
 	ret						# Return from the function
 test36one:			# Function
 	pushq %rbp				# Save base pointer
 	movq %rsp, %rbp			# Make stack pointer new base pointer
-	pushq %rbp				# Push simple static link
+	subq $0, %rsp			# Allocate space for local variables on the stack
+	movq %rbp, %rax			# Prepare static link
+	pushq %rax				# Push static link
 	subq $8, %rsp			# Add dummy space
 	call test36one_test36two			# Call the test36one_test36two function
-	addq $16, %rsp			# Deallocate dummy space, static link and arguments
+	addq $8, %rsp			# Remove dummy space
+	addq $8, %rsp			# Deallocate space on stack for static link
+	addq $0, %rsp			# Pop the arguments pushed to the stack
 end_test36one:			# End function
+	addq $0, %rsp			# Deallocate space for local variables on the stack
 	popq %rbp				# Restore base pointer
 	ret						# Return from the function
 test36one_test36two:			# Function
 	pushq %rbp				# Save base pointer
 	movq %rsp, %rbp			# Make stack pointer new base pointer
+	subq $0, %rsp			# Allocate space for local variables on the stack
 	movq %rbp, %rax			# Prepare static link
 	movq 24(%rax), %rax		# Traverse static link once
 	movq 24(%rax), %rax		# Traverse static link once
 	pushq %rax				# Push static link
 	subq $8, %rsp			# Add dummy space
 	call test36three			# Call the test36three function
-	addq $16, %rsp			# Deallocate dummy space, static link and arguments
+	addq $8, %rsp			# Remove dummy space
+	addq $8, %rsp			# Deallocate space on stack for static link
+	addq $0, %rsp			# Pop the arguments pushed to the stack
 end_test36one_test36two:			# End function
+	addq $0, %rsp			# Deallocate space for local variables on the stack
 	popq %rbp				# Restore base pointer
 	ret						# Return from the function
 f1:			# Function
 	pushq %rbp				# Save base pointer
 	movq %rsp, %rbp			# Make stack pointer new base pointer
+	subq $0, %rsp			# Allocate space for local variables on the stack
 	movq %rbp, %rax			# Prepare to access variable from another scope
 	movq 24(%rax), %rax		# Traverse static link once
 	movq -112(%rax), %rax		# Move value into %rax
 	jmp end_f1
 end_f1:			# End function
+	addq $0, %rsp			# Deallocate space for local variables on the stack
 	popq %rbp				# Restore base pointer
 	ret						# Return from the function
 f2:			# Function
@@ -225,7 +249,9 @@ f2:			# Function
 	pushq %rax				# Push static link
 	subq $8, %rsp			# Add dummy space
 	call f1			# Call the f1 function
-	addq $16, %rsp			# Deallocate dummy space, static link and arguments
+	addq $8, %rsp			# Remove dummy space
+	addq $8, %rsp			# Deallocate space on stack for static link
+	addq $0, %rsp			# Pop the arguments pushed to the stack
 end_f2:			# End function
 	addq $8, %rsp			# Deallocate space for local variables on the stack
 	popq %rbp				# Restore base pointer
@@ -253,11 +279,13 @@ c1:			# Class
 m1_c1:			# Method
 	pushq %rbp				# Save base pointer
 	movq %rsp, %rbp			# Make stack pointer new base pointer
+	subq $0, %rsp			# Allocate space for local variables on the stack
 	movq %rbp, %rax			# Prepare to access variable from another scope
 	movq 32(%rax), %rax		# Move value into %rax
 	movq 8(%rax), %rax		# Move value into %rax
 	jmp end_m1_c1
 end_m1_c1:
+	addq $0, %rsp			# Deallocate space for local variables on the stack
 	popq %rbp				# Restore base pointer
 	ret						# Return from the method
 c2:			# Class
@@ -265,10 +293,12 @@ c2:			# Class
 	movq %rsp, %rbp			# Make stack pointer new base pointer
 	movq 16(%rbp), %rcx			# Push heap pointer
 	pushq %rcx				# Push heap pointer
-	pushq %rbp				# Push simple static link
+	movq %rbp, %rax			# Prepare static link
+	pushq %rax				# Push static link
 	pushq %rcx				# Push heap pointer
 	call c1					# Call c2 constructor
-	addq $16, %rsp			# Deallocate heap pointer and static link
+	addq $8, %rsp			# Deallocate space on stack for heap pointer
+	addq $8, %rsp			# Deallocate space on stack for static link
 	movq $39, %rax			# Put a number in %rax
 	movq %rax, 16(%rcx)		# Move initialized value into space on heap
 	popq %rax				# Pop current heap pointer into %rax
@@ -277,11 +307,13 @@ c2:			# Class
 m2_c2:			# Method
 	pushq %rbp				# Save base pointer
 	movq %rsp, %rbp			# Make stack pointer new base pointer
+	subq $0, %rsp			# Allocate space for local variables on the stack
 	movq %rbp, %rax			# Prepare to access variable from another scope
 	movq 32(%rax), %rax		# Move value into %rax
 	movq 16(%rax), %rax		# Move value into %rax
 	jmp end_m2_c2
 end_m2_c2:
+	addq $0, %rsp			# Deallocate space for local variables on the stack
 	popq %rbp				# Restore base pointer
 	ret						# Return from the method
 c3:			# Class
@@ -289,10 +321,12 @@ c3:			# Class
 	movq %rsp, %rbp			# Make stack pointer new base pointer
 	movq 16(%rbp), %rcx			# Push heap pointer
 	pushq %rcx				# Push heap pointer
-	pushq %rbp				# Push simple static link
+	movq %rbp, %rax			# Prepare static link
+	pushq %rax				# Push static link
 	pushq %rcx				# Push heap pointer
 	call c2					# Call c3 constructor
-	addq $16, %rsp			# Deallocate heap pointer and static link
+	addq $8, %rsp			# Deallocate space on stack for heap pointer
+	addq $8, %rsp			# Deallocate space on stack for static link
 	movq $17, %rax			# Put a number in %rax
 	movq %rax, 24(%rcx)		# Move initialized value into space on heap
 	movq heap_pointer(%rip), %rcx			# Move heap pointer into %rcx
@@ -305,7 +339,8 @@ c3:			# Class
 	pushq %rcx				# Push heap pointer
 	call c4			# Call c4 constructor
 	movq 16(%rbp), %rcx			# Move potential heap pointer into %rcx
-	addq $16, %rsp			# Deallocate heap pointer and static link
+	addq $8, %rsp			# Deallocate space on stack for heap pointer
+	addq $8, %rsp			# Deallocate space on stack for static link
 	movq %rax, 32(%rcx)		# Move initialized value into space on heap
 	popq %rax				# Pop current heap pointer into %rax
 	popq %rbp				# Restore base pointer
@@ -313,6 +348,7 @@ c3:			# Class
 m3_c3:			# Method
 	pushq %rbp				# Save base pointer
 	movq %rsp, %rbp			# Make stack pointer new base pointer
+	subq $0, %rsp			# Allocate space for local variables on the stack
 	movq $20, %rax			# Put a number in %rax
 	movq %rax, %rdx			# Move right side of assignment into %rdx
 	movq %rbp, %rax			# Prepare to access variable from another scope
@@ -336,11 +372,13 @@ m3_c3:			# Method
 	addq %rbx, %rax			# Perform addition
 	jmp end_m3_c3
 end_m3_c3:
+	addq $0, %rsp			# Deallocate space for local variables on the stack
 	popq %rbp				# Restore base pointer
 	ret						# Return from the method
 increment:			# Function
 	pushq %rbp				# Save base pointer
 	movq %rsp, %rbp			# Make stack pointer new base pointer
+	subq $0, %rsp			# Allocate space for local variables on the stack
 	movq $1, %rax			# Put a number in %rax
 	pushq %rax				# Push right side to stack
 	movq %rbp, %rax			# Prepare to access variable from another scope
@@ -356,24 +394,31 @@ increment:			# Function
 	movq 24(%rax), %rax		# Traverse static link once
 	movq %rdx, -128(%rax)		# Move right side into location of left side of assign
 end_increment:			# End function
+	addq $0, %rsp			# Deallocate space for local variables on the stack
 	popq %rbp				# Restore base pointer
 	ret						# Return from the function
 runIncrements:			# Function
 	pushq %rbp				# Save base pointer
 	movq %rsp, %rbp			# Make stack pointer new base pointer
+	subq $0, %rsp			# Allocate space for local variables on the stack
 	movq %rbp, %rax			# Prepare static link
 	movq 24(%rax), %rax		# Traverse static link once
 	pushq %rax				# Push static link
 	subq $8, %rsp			# Add dummy space
 	call increment			# Call the increment function
-	addq $16, %rsp			# Deallocate dummy space, static link and arguments
+	addq $8, %rsp			# Remove dummy space
+	addq $8, %rsp			# Deallocate space on stack for static link
+	addq $0, %rsp			# Pop the arguments pushed to the stack
 	movq %rbp, %rax			# Prepare static link
 	movq 24(%rax), %rax		# Traverse static link once
 	pushq %rax				# Push static link
 	subq $8, %rsp			# Add dummy space
 	call increment			# Call the increment function
-	addq $16, %rsp			# Deallocate dummy space, static link and arguments
+	addq $8, %rsp			# Remove dummy space
+	addq $8, %rsp			# Deallocate space on stack for static link
+	addq $0, %rsp			# Pop the arguments pushed to the stack
 end_runIncrements:			# End function
+	addq $0, %rsp			# Deallocate space for local variables on the stack
 	popq %rbp				# Restore base pointer
 	ret						# Return from the function
 Calculator:			# Class
@@ -391,6 +436,7 @@ Calculator:			# Class
 add_Calculator:			# Method
 	pushq %rbp				# Save base pointer
 	movq %rsp, %rbp			# Make stack pointer new base pointer
+	subq $0, %rsp			# Allocate space for local variables on the stack
 	movq %rbp, %rax			# Prepare to access variable from another scope
 	movq 32(%rax), %rax		# Move value into %rax
 	movq 16(%rax), %rax		# Move value into %rax
@@ -402,11 +448,13 @@ add_Calculator:			# Method
 	addq %rbx, %rax			# Perform addition
 	jmp end_add_Calculator
 end_add_Calculator:
+	addq $0, %rsp			# Deallocate space for local variables on the stack
 	popq %rbp				# Restore base pointer
 	ret						# Return from the method
 doubleAdd_Calculator:			# Method
 	pushq %rbp				# Save base pointer
 	movq %rsp, %rbp			# Make stack pointer new base pointer
+	subq $0, %rsp			# Allocate space for local variables on the stack
 	movq $2, %rax			# Put a number in %rax
 	pushq %rax				# Push right side to stack
 	movq %rbp, %rax			# Prepare to access variable from another scope
@@ -421,11 +469,14 @@ doubleAdd_Calculator:			# Method
 	subq $8, %rsp			# Add dummy space
 	movq %r9, %rax			# Move heap pointer into r9
 	call *%rax				# Call method
-	addq $24, %rsp			# Deallocate dummy space, static link and arguments
+	addq $8, %rsp			# Remove dummy space
+	addq $8, %rsp			# Deallocate space on stack for static link
+	addq $8, %rsp			# Pop the arguments pushed to the stack
 	popq %rbx				# Pop right side into %rbx
 	imulq %rbx, %rax		# Perform multiplication
 	jmp end_doubleAdd_Calculator
 end_doubleAdd_Calculator:
+	addq $0, %rsp			# Deallocate space for local variables on the stack
 	popq %rbp				# Restore base pointer
 	ret						# Return from the method
 Box:			# Class
@@ -441,6 +492,7 @@ Box:			# Class
 set_Box:			# Method
 	pushq %rbp				# Save base pointer
 	movq %rsp, %rbp			# Make stack pointer new base pointer
+	subq $0, %rsp			# Allocate space for local variables on the stack
 	movq %rbp, %rax			# Prepare to access variable from another scope
 	movq 32(%rax), %rax		# Move value into %rax
 	movq %rax, %rdx			# Move right side of assignment into %rdx
@@ -448,16 +500,19 @@ set_Box:			# Method
 	movq 40(%rax), %rax		# Move value into %rax
 	movq %rdx, 8(%rax)		# Move right side into location of left side of assign
 end_set_Box:
+	addq $0, %rsp			# Deallocate space for local variables on the stack
 	popq %rbp				# Restore base pointer
 	ret						# Return from the method
 get_Box:			# Method
 	pushq %rbp				# Save base pointer
 	movq %rsp, %rbp			# Make stack pointer new base pointer
+	subq $0, %rsp			# Allocate space for local variables on the stack
 	movq %rbp, %rax			# Prepare to access variable from another scope
 	movq 32(%rax), %rax		# Move value into %rax
 	movq 8(%rax), %rax		# Move value into %rax
 	jmp end_get_Box
 end_get_Box:
+	addq $0, %rsp			# Deallocate space for local variables on the stack
 	popq %rbp				# Restore base pointer
 	ret						# Return from the method
 Inner:			# Class
@@ -485,7 +540,8 @@ Outer:			# Class
 	pushq %rcx				# Push heap pointer
 	call Inner			# Call Inner constructor
 	movq 16(%rbp), %rcx			# Move potential heap pointer into %rcx
-	addq $16, %rsp			# Deallocate heap pointer and static link
+	addq $8, %rsp			# Deallocate space on stack for heap pointer
+	addq $8, %rsp			# Deallocate space on stack for static link
 	movq %rax, 8(%rcx)		# Move initialized value into space on heap
 	popq %rax				# Pop current heap pointer into %rax
 	popq %rbp				# Restore base pointer
@@ -493,12 +549,14 @@ Outer:			# Class
 getZ_Outer:			# Method
 	pushq %rbp				# Save base pointer
 	movq %rsp, %rbp			# Make stack pointer new base pointer
+	subq $0, %rsp			# Allocate space for local variables on the stack
 	movq %rbp, %rax			# Prepare to access variable from another scope
 	movq 32(%rax), %rax		# Move value into %rax
 	movq 8(%rax), %rax		# Move value into %rax
 	movq 8(%rax), %rax		# Move value into %rax
 	jmp end_getZ_Outer
 end_getZ_Outer:
+	addq $0, %rsp			# Deallocate space for local variables on the stack
 	popq %rbp				# Restore base pointer
 	ret						# Return from the method
 Accumulator:			# Class
@@ -514,6 +572,7 @@ Accumulator:			# Class
 add_Accumulator:			# Method
 	pushq %rbp				# Save base pointer
 	movq %rsp, %rbp			# Make stack pointer new base pointer
+	subq $0, %rsp			# Allocate space for local variables on the stack
 	movq %rbp, %rax			# Prepare to access variable from another scope
 	movq 32(%rax), %rax		# Move value into %rax
 	pushq %rax				# Push right side to stack
@@ -527,16 +586,19 @@ add_Accumulator:			# Method
 	movq 40(%rax), %rax		# Move value into %rax
 	movq %rdx, 8(%rax)		# Move right side into location of left side of assign
 end_add_Accumulator:
+	addq $0, %rsp			# Deallocate space for local variables on the stack
 	popq %rbp				# Restore base pointer
 	ret						# Return from the method
 getTotal_Accumulator:			# Method
 	pushq %rbp				# Save base pointer
 	movq %rsp, %rbp			# Make stack pointer new base pointer
+	subq $0, %rsp			# Allocate space for local variables on the stack
 	movq %rbp, %rax			# Prepare to access variable from another scope
 	movq 32(%rax), %rax		# Move value into %rax
 	movq 8(%rax), %rax		# Move value into %rax
 	jmp end_getTotal_Accumulator
 end_getTotal_Accumulator:
+	addq $0, %rsp			# Deallocate space for local variables on the stack
 	popq %rbp				# Restore base pointer
 	ret						# Return from the method
 theCompilerWorks:			# Class
@@ -552,11 +614,13 @@ theCompilerWorks:			# Class
 celebrate_theCompilerWorks:			# Method
 	pushq %rbp				# Save base pointer
 	movq %rsp, %rbp			# Make stack pointer new base pointer
+	subq $0, %rsp			# Allocate space for local variables on the stack
 	movq %rbp, %rax			# Prepare to access variable from another scope
 	movq 32(%rax), %rax		# Move value into %rax
 	movq 8(%rax), %rax		# Move value into %rax
 	call print				# Call the print procedure
 end_celebrate_theCompilerWorks:
+	addq $0, %rsp			# Deallocate space for local variables on the stack
 	popq %rbp				# Restore base pointer
 	ret						# Return from the method
 ExtraTest:			# Class
@@ -590,6 +654,7 @@ otherTest:			# Class
 one_otherTest:			# Method
 	pushq %rbp				# Save base pointer
 	movq %rsp, %rbp			# Make stack pointer new base pointer
+	subq $0, %rsp			# Allocate space for local variables on the stack
 	movq heap_pointer(%rip), %rcx			# Move heap pointer into %rcx
 	addq $16, heap_pointer(%rip)	# Add size of object to heap pointer
 	leaq anotherTest_descriptor(%rip), %rax	# Move class descriptor into %rax
@@ -601,14 +666,17 @@ one_otherTest:			# Method
 	pushq %rcx				# Push heap pointer
 	call anotherTest			# Call anotherTest constructor
 	movq 16(%rbp), %rcx			# Move potential heap pointer into %rcx
-	addq $16, %rsp			# Deallocate heap pointer and static link
+	addq $8, %rsp			# Deallocate space on stack for heap pointer
+	addq $8, %rsp			# Deallocate space on stack for static link
 	jmp end_one_otherTest
 end_one_otherTest:
+	addq $0, %rsp			# Deallocate space for local variables on the stack
 	popq %rbp				# Restore base pointer
 	ret						# Return from the method
 funnyFunc:			# Function
 	pushq %rbp				# Save base pointer
 	movq %rsp, %rbp			# Make stack pointer new base pointer
+	subq $0, %rsp			# Allocate space for local variables on the stack
 	movq heap_pointer(%rip), %rcx			# Move heap pointer into %rcx
 	addq $16, heap_pointer(%rip)	# Add size of object to heap pointer
 	leaq anotherTest_descriptor(%rip), %rax	# Move class descriptor into %rax
@@ -619,15 +687,18 @@ funnyFunc:			# Function
 	pushq %rcx				# Push heap pointer
 	call anotherTest			# Call anotherTest constructor
 	movq 16(%rbp), %rcx			# Move potential heap pointer into %rcx
-	addq $16, %rsp			# Deallocate heap pointer and static link
+	addq $8, %rsp			# Deallocate space on stack for heap pointer
+	addq $8, %rsp			# Deallocate space on stack for static link
 	jmp end_funnyFunc
 end_funnyFunc:			# End function
+	addq $0, %rsp			# Deallocate space for local variables on the stack
 	popq %rbp				# Restore base pointer
 	ret						# Return from the function
 factorial:			# Function
 	pushq %rbp				# Save base pointer
 	movq %rsp, %rbp			# Make stack pointer new base pointer
-# Start if statement 41
+	subq $0, %rsp			# Allocate space for local variables on the stack
+				# Start if statement 41
 	movq $1, %rax			# Put a number in %rax
 	pushq %rax				# Push right side to stack
 	movq %rbp, %rax			# Prepare to access variable from another scope
@@ -682,7 +753,9 @@ end_41:
 	pushq %rax				# Push static link
 	subq $8, %rsp			# Add dummy space
 	call factorial			# Call the factorial function
-	addq $24, %rsp			# Deallocate dummy space, static link and arguments
+	addq $8, %rsp			# Remove dummy space
+	addq $8, %rsp			# Deallocate space on stack for static link
+	addq $8, %rsp			# Pop the arguments pushed to the stack
 	pushq %rax				# Push right side to stack
 	movq %rbp, %rax			# Prepare to access variable from another scope
 	movq 32(%rax), %rax		# Move value into %rax
@@ -690,6 +763,7 @@ end_41:
 	imulq %rbx, %rax		# Perform multiplication
 	jmp end_factorial
 end_factorial:			# End function
+	addq $0, %rsp			# Deallocate space for local variables on the stack
 	popq %rbp				# Restore base pointer
 	ret						# Return from the function
 .globl main
@@ -762,8 +836,9 @@ main:
 	popq %rbx				# Pop right side into %rbx
 	subq %rbx, %rax			# Perform subtraction
 	movq %rax, -32(%rbp)		# Move initialized value into space on stack
-# Start if statement 0
-	movq $-15, %rax			# Put a number in %rax
+				# Start if statement 0
+	movq $15, %rax			# Put a number in %rax
+	negq %rax				# Negate value
 	pushq %rax				# Push right side to stack
 	movq %rbp, %rax			# Prepare to access variable from another scope
 	movq -32(%rax), %rax		# Move value into %rax
@@ -781,15 +856,16 @@ comp_end_0:
 	call print				# Call the print procedure
 	jmp end_0				# Skip the else
 end_0:
-# Start if statement 1
+				# Start if statement 1
 	movq $0, %rax			# Put a number in %rax
 	cmp $0, %rax			# Check the condition
 	je end_1				# Skip if the condition is false
-	movq $-1, %rax			# Put a number in %rax
+	movq $1, %rax			# Put a number in %rax
+	negq %rax				# Negate value
 	call print				# Call the print procedure
 	jmp end_1				# Skip the else
 end_1:
-# Start if statement 2
+				# Start if statement 2
 	movq $1, %rax			# Put a number in %rax
 	cmp $0, %rax			# Check the condition
 	je end_2				# Skip if the condition is false
@@ -801,16 +877,17 @@ end_2:
 	movq %rax, -40(%rbp)		# Move initialized value into space on stack
 	movq $1, %rax			# Put a number in %rax
 	movq %rax, -48(%rbp)		# Move initialized value into space on stack
-# Start if statement 3
+				# Start if statement 3
 	movq %rbp, %rax			# Prepare to access variable from another scope
 	movq -40(%rax), %rax		# Move value into %rax
 	cmp $0, %rax			# Check the condition
 	je end_3				# Skip if the condition is false
-	movq $-1, %rax			# Put a number in %rax
+	movq $1, %rax			# Put a number in %rax
+	negq %rax				# Negate value
 	call print				# Call the print procedure
 	jmp end_3				# Skip the else
 end_3:
-# Start if statement 4
+				# Start if statement 4
 	movq %rbp, %rax			# Prepare to access variable from another scope
 	movq -48(%rax), %rax		# Move value into %rax
 	cmp $0, %rax			# Check the condition
@@ -819,19 +896,20 @@ end_3:
 	call print				# Call the print procedure
 	jmp end_4				# Skip the else
 end_4:
-# Start if statement 5
+				# Start if statement 5
 	movq %rbp, %rax			# Prepare to access variable from another scope
 	movq -40(%rax), %rax		# Move value into %rax
 	cmp $0, %rax			# Check the condition
 	je else_part_5			# Skip to the else if the condition is false
-	movq $-1, %rax			# Put a number in %rax
+	movq $1, %rax			# Put a number in %rax
+	negq %rax				# Negate value
 	call print				# Call the print procedure
 	jmp end_5				# Skip the else
 else_part_5:
 	movq $8, %rax			# Put a number in %rax
 	call print				# Call the print procedure
 end_5:
-# Start if statement 6
+				# Start if statement 6
 	movq %rbp, %rax			# Prepare to access variable from another scope
 	movq -48(%rax), %rax		# Move value into %rax
 	cmp $0, %rax			# Check the condition
@@ -840,48 +918,49 @@ end_5:
 	call print				# Call the print procedure
 	jmp end_6				# Skip the else
 else_part_6:
-	movq $-1, %rax			# Put a number in %rax
+	movq $1, %rax			# Put a number in %rax
+	negq %rax				# Negate value
 	call print				# Call the print procedure
 end_6:
-# Start if statement 7
+				# Start if statement 7
 	movq $1, %rax			# Put a number in %rax
 	cmp $0, %rax			# Check the condition
 	je else_part_7			# Skip to the else if the condition is false
 	movq $9, %rax			# Put a number in %rax
-	movq %rax, -8(%rbp)		# Move initialized value into space on stack
+	movq %rax, -56(%rbp)		# Move initialized value into space on stack
 	movq $10, %rax			# Put a number in %rax
-	movq %rax, -16(%rbp)		# Move initialized value into space on stack
+	movq %rax, -64(%rbp)		# Move initialized value into space on stack
 	movq %rbp, %rax			# Prepare to access variable from another scope
-	movq -16(%rax), %rax		# Move value into %rax
+	movq -64(%rax), %rax		# Move value into %rax
 	call print				# Call the print procedure
 	jmp end_7				# Skip the else
 else_part_7:
 	movq $78, %rax			# Put a number in %rax
-	movq %rax, -8(%rbp)		# Move initialized value into space on stack
+	movq %rax, -56(%rbp)		# Move initialized value into space on stack
 	movq %rbp, %rax			# Prepare to access variable from another scope
-	movq -8(%rax), %rax		# Move value into %rax
+	movq -56(%rax), %rax		# Move value into %rax
 	call print				# Call the print procedure
 end_7:
-# Start if statement 8
+				# Start if statement 8
 	movq $0, %rax			# Put a number in %rax
 	cmp $0, %rax			# Check the condition
 	je else_part_8			# Skip to the else if the condition is false
 	movq $6, %rax			# Put a number in %rax
-	movq %rax, -8(%rbp)		# Move initialized value into space on stack
+	movq %rax, -56(%rbp)		# Move initialized value into space on stack
 	movq $0, %rax			# Put a number in %rax
-	movq %rax, -16(%rbp)		# Move initialized value into space on stack
+	movq %rax, -64(%rbp)		# Move initialized value into space on stack
 	movq %rbp, %rax			# Prepare to access variable from another scope
-	movq -8(%rax), %rax		# Move value into %rax
+	movq -56(%rax), %rax		# Move value into %rax
 	call print				# Call the print procedure
 	jmp end_8				# Skip the else
 else_part_8:
 	movq $11, %rax			# Put a number in %rax
-	movq %rax, -8(%rbp)		# Move initialized value into space on stack
+	movq %rax, -56(%rbp)		# Move initialized value into space on stack
 	movq %rbp, %rax			# Prepare to access variable from another scope
-	movq -8(%rax), %rax		# Move value into %rax
+	movq -56(%rax), %rax		# Move value into %rax
 	call print				# Call the print procedure
 end_8:
-# Start if statement 9
+				# Start if statement 9
 	movq $3, %rax			# Put a number in %rax
 	pushq %rax				# Push right side to stack
 	movq $6, %rax			# Put a number in %rax
@@ -895,11 +974,12 @@ comp_skip_1:
 comp_end_1:
 	cmp $0, %rax			# Check the condition
 	je end_9				# Skip if the condition is false
-	movq $-1, %rax			# Put a number in %rax
+	movq $1, %rax			# Put a number in %rax
+	negq %rax				# Negate value
 	call print				# Call the print procedure
 	jmp end_9				# Skip the else
 end_9:
-# Start if statement 10
+				# Start if statement 10
 	movq $6, %rax			# Put a number in %rax
 	pushq %rax				# Push right side to stack
 	movq $3, %rax			# Put a number in %rax
@@ -917,7 +997,7 @@ comp_end_2:
 	call print				# Call the print procedure
 	jmp end_10				# Skip the else
 end_10:
-# Start if statement 11
+				# Start if statement 11
 	movq $3, %rax			# Put a number in %rax
 	pushq %rax				# Push right side to stack
 	movq $6, %rax			# Put a number in %rax
@@ -935,7 +1015,7 @@ comp_end_3:
 	call print				# Call the print procedure
 	jmp end_11				# Skip the else
 end_11:
-# Start if statement 12
+				# Start if statement 12
 	movq $8, %rax			# Put a number in %rax
 	pushq %rax				# Push right side to stack
 	movq $3, %rax			# Put a number in %rax
@@ -949,11 +1029,12 @@ comp_skip_4:
 comp_end_4:
 	cmp $0, %rax			# Check the condition
 	je end_12				# Skip if the condition is false
-	movq $-1, %rax			# Put a number in %rax
+	movq $1, %rax			# Put a number in %rax
+	negq %rax				# Negate value
 	call print				# Call the print procedure
 	jmp end_12				# Skip the else
 end_12:
-# Start if statement 13
+				# Start if statement 13
 	movq $9, %rax			# Put a number in %rax
 	pushq %rax				# Push right side to stack
 	movq $7, %rax			# Put a number in %rax
@@ -967,11 +1048,12 @@ comp_skip_5:
 comp_end_5:
 	cmp $0, %rax			# Check the condition
 	je end_13				# Skip if the condition is false
-	movq $-1, %rax			# Put a number in %rax
+	movq $1, %rax			# Put a number in %rax
+	negq %rax				# Negate value
 	call print				# Call the print procedure
 	jmp end_13				# Skip the else
 end_13:
-# Start if statement 14
+				# Start if statement 14
 	movq $2, %rax			# Put a number in %rax
 	pushq %rax				# Push right side to stack
 	movq $9, %rax			# Put a number in %rax
@@ -989,7 +1071,7 @@ comp_end_6:
 	call print				# Call the print procedure
 	jmp end_14				# Skip the else
 end_14:
-# Start if statement 15
+				# Start if statement 15
 	movq $6, %rax			# Put a number in %rax
 	pushq %rax				# Push right side to stack
 	movq $6, %rax			# Put a number in %rax
@@ -1007,7 +1089,7 @@ comp_end_7:
 	call print				# Call the print procedure
 	jmp end_15				# Skip the else
 end_15:
-# Start if statement 16
+				# Start if statement 16
 	movq $2, %rax			# Put a number in %rax
 	pushq %rax				# Push right side to stack
 	movq $4, %rax			# Put a number in %rax
@@ -1021,11 +1103,12 @@ comp_skip_8:
 comp_end_8:
 	cmp $0, %rax			# Check the condition
 	je end_16				# Skip if the condition is false
-	movq $-1, %rax			# Put a number in %rax
+	movq $1, %rax			# Put a number in %rax
+	negq %rax				# Negate value
 	call print				# Call the print procedure
 	jmp end_16				# Skip the else
 end_16:
-# Start if statement 17
+				# Start if statement 17
 	movq $4, %rax			# Put a number in %rax
 	pushq %rax				# Push right side to stack
 	movq $2, %rax			# Put a number in %rax
@@ -1043,7 +1126,7 @@ comp_end_9:
 	call print				# Call the print procedure
 	jmp end_17				# Skip the else
 end_17:
-# Start if statement 18
+				# Start if statement 18
 	movq $2, %rax			# Put a number in %rax
 	pushq %rax				# Push right side to stack
 	movq $2, %rax			# Put a number in %rax
@@ -1061,7 +1144,7 @@ comp_end_10:
 	call print				# Call the print procedure
 	jmp end_18				# Skip the else
 end_18:
-# Start if statement 19
+				# Start if statement 19
 	movq $8, %rax			# Put a number in %rax
 	pushq %rax				# Push right side to stack
 	movq $8, %rax			# Put a number in %rax
@@ -1079,7 +1162,7 @@ comp_end_11:
 	call print				# Call the print procedure
 	jmp end_19				# Skip the else
 end_19:
-# Start if statement 20
+				# Start if statement 20
 	movq $9, %rax			# Put a number in %rax
 	pushq %rax				# Push right side to stack
 	movq $8, %rax			# Put a number in %rax
@@ -1093,17 +1176,18 @@ comp_skip_12:
 comp_end_12:
 	cmp $0, %rax			# Check the condition
 	je end_20				# Skip if the condition is false
-	movq $-1, %rax			# Put a number in %rax
+	movq $1, %rax			# Put a number in %rax
+	negq %rax				# Negate value
 	call print				# Call the print procedure
 	jmp end_20				# Skip the else
 end_20:
-# Start if statement 21
+				# Start if statement 21
 	movq $5, %rax			# Put a number in %rax
 	pushq %rax				# Push right side to stack
 	movq $8, %rax			# Put a number in %rax
 	popq %rbx				# Pop right side into %rbx
 	cmp %rax, %rbx			# Compare both sides
-	je comp_skip_13			# Skip if they are  equal
+	je comp_skip_13			# Skip if they are equal
 	movq $1, %rax			# Put true in %rax
 	jmp comp_end_13			# Skip the alternative branch
 comp_skip_13:
@@ -1115,13 +1199,13 @@ comp_end_13:
 	call print				# Call the print procedure
 	jmp end_21				# Skip the else
 end_21:
-# Start if statement 22
+				# Start if statement 22
 	movq $8, %rax			# Put a number in %rax
 	pushq %rax				# Push right side to stack
 	movq $8, %rax			# Put a number in %rax
 	popq %rbx				# Pop right side into %rbx
 	cmp %rax, %rbx			# Compare both sides
-	je comp_skip_14			# Skip if they are  equal
+	je comp_skip_14			# Skip if they are equal
 	movq $1, %rax			# Put true in %rax
 	jmp comp_end_14			# Skip the alternative branch
 comp_skip_14:
@@ -1129,7 +1213,8 @@ comp_skip_14:
 comp_end_14:
 	cmp $0, %rax			# Check the condition
 	je end_22				# Skip if the condition is false
-	movq $-1, %rax			# Put a number in %rax
+	movq $1, %rax			# Put a number in %rax
+	negq %rax				# Negate value
 	call print				# Call the print procedure
 	jmp end_22				# Skip the else
 end_22:
@@ -1182,7 +1267,7 @@ while_loop_1:
 	addq %rbx, %rax			# Perform addition
 	popq %rbx				# Pop right side into %rbx
 	cmp %rax, %rbx			# Compare both sides
-	je comp_skip_16			# Skip if they are  equal
+	je comp_skip_16			# Skip if they are equal
 	movq $1, %rax			# Put true in %rax
 	jmp comp_end_16			# Skip the alternative branch
 comp_skip_16:
@@ -1212,13 +1297,15 @@ end_while_1:
 	addq $24, heap_pointer(%rip)	# Add size of object to heap pointer
 	leaq gulerod_descriptor(%rip), %rax	# Move class descriptor into %rax
 	movq %rax, (%rcx)			# Move class descriptor into object
-	pushq %rbp				# Push simple static link
+	movq %rbp, %rax			# Prepare static link
+	pushq %rax				# Push static link
 	pushq %rcx				# Push heap pointer
 	call gulerod			# Call gulerod constructor
 	movq 16(%rbp), %rcx			# Move potential heap pointer into %rcx
-	addq $16, %rsp			# Deallocate heap pointer and static link
+	addq $8, %rsp			# Deallocate space on stack for heap pointer
+	addq $8, %rsp			# Deallocate space on stack for static link
 	movq %rax, -80(%rbp)		# Move initialized value into space on stack
-# Start if statement 23
+				# Start if statement 23
 	movq $29, %rax			# Put a number in %rax
 	pushq %rax				# Push right side to stack
 	movq %rbp, %rax			# Prepare to access variable from another scope
@@ -1232,7 +1319,7 @@ end_while_1:
 	addq %rbx, %rax			# Perform addition
 	popq %rbx				# Pop right side into %rbx
 	cmp %rax, %rbx			# Compare both sides
-	je comp_skip_17			# Skip if they are  equal
+	je comp_skip_17			# Skip if they are equal
 	movq $1, %rax			# Put true in %rax
 	jmp comp_end_17			# Skip the alternative branch
 comp_skip_17:
@@ -1240,7 +1327,8 @@ comp_skip_17:
 comp_end_17:
 	cmp $0, %rax			# Check the condition
 	je else_part_23			# Skip to the else if the condition is false
-	movq $-1, %rax			# Put a number in %rax
+	movq $1, %rax			# Put a number in %rax
+	negq %rax				# Negate value
 	call print				# Call the print procedure
 	jmp end_23				# Skip the else
 else_part_23:
@@ -1259,13 +1347,15 @@ end_23:
 	addq $24, heap_pointer(%rip)	# Add size of object to heap pointer
 	leaq melon_descriptor(%rip), %rax	# Move class descriptor into %rax
 	movq %rax, (%rcx)			# Move class descriptor into object
-	pushq %rbp				# Push simple static link
+	movq %rbp, %rax			# Prepare static link
+	pushq %rax				# Push static link
 	pushq %rcx				# Push heap pointer
 	call melon			# Call melon constructor
 	movq 16(%rbp), %rcx			# Move potential heap pointer into %rcx
-	addq $16, %rsp			# Deallocate heap pointer and static link
+	addq $8, %rsp			# Deallocate space on stack for heap pointer
+	addq $8, %rsp			# Deallocate space on stack for static link
 	movq %rax, -88(%rbp)		# Move initialized value into space on stack
-# Start if statement 24
+				# Start if statement 24
 	movq $38, %rax			# Put a number in %rax
 	pushq %rax				# Push right side to stack
 	movq %rbp, %rax			# Prepare to access variable from another scope
@@ -1280,7 +1370,7 @@ end_23:
 	addq %rbx, %rax			# Perform addition
 	popq %rbx				# Pop right side into %rbx
 	cmp %rax, %rbx			# Compare both sides
-	je comp_skip_18			# Skip if they are  equal
+	je comp_skip_18			# Skip if they are equal
 	movq $1, %rax			# Put true in %rax
 	jmp comp_end_18			# Skip the alternative branch
 comp_skip_18:
@@ -1288,7 +1378,8 @@ comp_skip_18:
 comp_end_18:
 	cmp $0, %rax			# Check the condition
 	je else_part_24			# Skip to the else if the condition is false
-	movq $-1, %rax			# Put a number in %rax
+	movq $1, %rax			# Put a number in %rax
+	negq %rax				# Negate value
 	call print				# Call the print procedure
 	jmp end_24				# Skip the else
 else_part_24:
@@ -1299,13 +1390,15 @@ end_24:
 	addq $24, heap_pointer(%rip)	# Add size of object to heap pointer
 	leaq sko_descriptor(%rip), %rax	# Move class descriptor into %rax
 	movq %rax, (%rcx)			# Move class descriptor into object
-	pushq %rbp				# Push simple static link
+	movq %rbp, %rax			# Prepare static link
+	pushq %rax				# Push static link
 	pushq %rcx				# Push heap pointer
 	call sko			# Call sko constructor
 	movq 16(%rbp), %rcx			# Move potential heap pointer into %rcx
-	addq $16, %rsp			# Deallocate heap pointer and static link
+	addq $8, %rsp			# Deallocate space on stack for heap pointer
+	addq $8, %rsp			# Deallocate space on stack for static link
 	movq %rax, -96(%rbp)		# Move initialized value into space on stack
-# Start if statement 25
+				# Start if statement 25
 	movq $43, %rax			# Put a number in %rax
 	pushq %rax				# Push right side to stack
 	movq %rbp, %rax			# Prepare to access variable from another scope
@@ -1321,7 +1414,7 @@ end_24:
 	addq %rbx, %rax			# Perform addition
 	popq %rbx				# Pop right side into %rbx
 	cmp %rax, %rbx			# Compare both sides
-	je comp_skip_19			# Skip if they are  equal
+	je comp_skip_19			# Skip if they are equal
 	movq $1, %rax			# Put true in %rax
 	jmp comp_end_19			# Skip the alternative branch
 comp_skip_19:
@@ -1329,7 +1422,8 @@ comp_skip_19:
 comp_end_19:
 	cmp $0, %rax			# Check the condition
 	je else_part_25			# Skip to the else if the condition is false
-	movq $-1, %rax			# Put a number in %rax
+	movq $1, %rax			# Put a number in %rax
+	negq %rax				# Negate value
 	call print				# Call the print procedure
 	jmp end_25				# Skip the else
 else_part_25:
@@ -1348,7 +1442,7 @@ end_25:
 	movq -96(%rax), %rax		# Move value into %rax
 	movq 16(%rax), %rax		# Move value into %rax
 	movq %rdx, 8(%rax)		# Move right side into location of left side of assign
-# Start if statement 26
+				# Start if statement 26
 	movq $27, %rax			# Put a number in %rax
 	pushq %rax				# Push right side to stack
 	movq %rbp, %rax			# Prepare to access variable from another scope
@@ -1364,7 +1458,7 @@ end_25:
 	addq %rbx, %rax			# Perform addition
 	popq %rbx				# Pop right side into %rbx
 	cmp %rax, %rbx			# Compare both sides
-	je comp_skip_20			# Skip if they are  equal
+	je comp_skip_20			# Skip if they are equal
 	movq $1, %rax			# Put true in %rax
 	jmp comp_end_20			# Skip the alternative branch
 comp_skip_20:
@@ -1372,58 +1466,76 @@ comp_skip_20:
 comp_end_20:
 	cmp $0, %rax			# Check the condition
 	je else_part_26			# Skip to the else if the condition is false
-	movq $-1, %rax			# Put a number in %rax
+	movq $1, %rax			# Put a number in %rax
+	negq %rax				# Negate value
 	call print				# Call the print procedure
 	jmp end_26				# Skip the else
 else_part_26:
 	movq $32, %rax			# Put a number in %rax
 	call print				# Call the print procedure
 end_26:
-	pushq %rbp				# Push simple static link
+	movq %rbp, %rax			# Prepare static link
+	pushq %rax				# Push static link
 	subq $8, %rsp			# Add dummy space
 	call test33			# Call the test33 function
-	addq $16, %rsp			# Deallocate dummy space, static link and arguments
+	addq $8, %rsp			# Remove dummy space
+	addq $8, %rsp			# Deallocate space on stack for static link
+	addq $0, %rsp			# Pop the arguments pushed to the stack
 	movq $1, %rax			# Put a number in %rax
 	pushq %rax		# Push argument number 1 to stack
-	pushq %rbp				# Push simple static link
+	movq %rbp, %rax			# Prepare static link
+	pushq %rax				# Push static link
 	subq $8, %rsp			# Add dummy space
 	call test34			# Call the test34 function
-	addq $24, %rsp			# Deallocate dummy space, static link and arguments
+	addq $8, %rsp			# Remove dummy space
+	addq $8, %rsp			# Deallocate space on stack for static link
+	addq $8, %rsp			# Pop the arguments pushed to the stack
 	movq $0, %rax			# Put a number in %rax
 	pushq %rax		# Push argument number 1 to stack
-	pushq %rbp				# Push simple static link
+	movq %rbp, %rax			# Prepare static link
+	pushq %rax				# Push static link
 	subq $8, %rsp			# Add dummy space
 	call test35			# Call the test35 function
-	addq $24, %rsp			# Deallocate dummy space, static link and arguments
+	addq $8, %rsp			# Remove dummy space
+	addq $8, %rsp			# Deallocate space on stack for static link
+	addq $8, %rsp			# Pop the arguments pushed to the stack
 	movq $36, %rax			# Put a number in %rax
 	movq %rax, -104(%rbp)		# Move initialized value into space on stack
-# Start if statement 30
+				# Start if statement 30
 	movq %rbp, %rax			# Prepare to access variable from another scope
 	movq -104(%rax), %rax		# Move value into %rax
 	cmp $0, %rax			# Check the condition
 	je end_30				# Skip if the condition is false
-	pushq %rbp				# Push simple static link
+	movq %rbp, %rax			# Prepare static link
+	pushq %rax				# Push static link
 	subq $8, %rsp			# Add dummy space
 	call test36one			# Call the test36one function
-	addq $16, %rsp			# Deallocate dummy space, static link and arguments
+	addq $8, %rsp			# Remove dummy space
+	addq $8, %rsp			# Deallocate space on stack for static link
+	addq $0, %rsp			# Pop the arguments pushed to the stack
 	jmp end_30				# Skip the else
 end_30:
 	movq $37, %rax			# Put a number in %rax
 	movq %rax, -112(%rbp)		# Move initialized value into space on stack
-	pushq %rbp				# Push simple static link
+	movq %rbp, %rax			# Prepare static link
+	pushq %rax				# Push static link
 	subq $8, %rsp			# Add dummy space
 	call f2			# Call the f2 function
-	addq $16, %rsp			# Deallocate dummy space, static link and arguments
+	addq $8, %rsp			# Remove dummy space
+	addq $8, %rsp			# Deallocate space on stack for static link
+	addq $0, %rsp			# Pop the arguments pushed to the stack
 	call print				# Call the print procedure
 	movq heap_pointer(%rip), %rcx			# Move heap pointer into %rcx
 	addq $40, heap_pointer(%rip)	# Add size of object to heap pointer
 	leaq c3_descriptor(%rip), %rax	# Move class descriptor into %rax
 	movq %rax, (%rcx)			# Move class descriptor into object
-	pushq %rbp				# Push simple static link
+	movq %rbp, %rax			# Prepare static link
+	pushq %rax				# Push static link
 	pushq %rcx				# Push heap pointer
 	call c3			# Call c3 constructor
 	movq 16(%rbp), %rcx			# Move potential heap pointer into %rcx
-	addq $16, %rsp			# Deallocate heap pointer and static link
+	addq $8, %rsp			# Deallocate space on stack for heap pointer
+	addq $8, %rsp			# Deallocate space on stack for static link
 	movq %rax, -120(%rbp)		# Move initialized value into space on stack
 	movq %rbp, %rax			# Prepare to access variable from another scope
 	movq -120(%rax), %rax		# Move value into %rax
@@ -1431,11 +1543,14 @@ end_30:
 	movq (%rax), %rax		# Move value into %rax
 	movq 0(%rax), %rax			# Move method address into %rax
 	movq %rax, %r9			# Move method address into r9
-	pushq %rbp				# Push simple static link
+	movq %rbp, %rax			# Prepare static link
+	pushq %rax				# Push static link
 	subq $8, %rsp			# Add dummy space
 	movq %r9, %rax			# Move heap pointer into r9
 	call *%rax				# Call method
-	addq $24, %rsp			# Deallocate dummy space, static link and arguments
+	addq $8, %rsp			# Remove dummy space
+	addq $8, %rsp			# Deallocate space on stack for static link
+	addq $8, %rsp			# Pop the arguments pushed to the stack
 	call print				# Call the print procedure
 	movq %rbp, %rax			# Prepare to access variable from another scope
 	movq -120(%rax), %rax		# Move value into %rax
@@ -1443,11 +1558,14 @@ end_30:
 	movq (%rax), %rax		# Move value into %rax
 	movq 8(%rax), %rax			# Move method address into %rax
 	movq %rax, %r9			# Move method address into r9
-	pushq %rbp				# Push simple static link
+	movq %rbp, %rax			# Prepare static link
+	pushq %rax				# Push static link
 	subq $8, %rsp			# Add dummy space
 	movq %r9, %rax			# Move heap pointer into r9
 	call *%rax				# Call method
-	addq $24, %rsp			# Deallocate dummy space, static link and arguments
+	addq $8, %rsp			# Remove dummy space
+	addq $8, %rsp			# Deallocate space on stack for static link
+	addq $8, %rsp			# Pop the arguments pushed to the stack
 	call print				# Call the print procedure
 	movq %rbp, %rax			# Prepare to access variable from another scope
 	movq -120(%rax), %rax		# Move value into %rax
@@ -1455,18 +1573,24 @@ end_30:
 	movq (%rax), %rax		# Move value into %rax
 	movq 16(%rax), %rax			# Move method address into %rax
 	movq %rax, %r9			# Move method address into r9
-	pushq %rbp				# Push simple static link
+	movq %rbp, %rax			# Prepare static link
+	pushq %rax				# Push static link
 	subq $8, %rsp			# Add dummy space
 	movq %r9, %rax			# Move heap pointer into r9
 	call *%rax				# Call method
-	addq $24, %rsp			# Deallocate dummy space, static link and arguments
+	addq $8, %rsp			# Remove dummy space
+	addq $8, %rsp			# Deallocate space on stack for static link
+	addq $8, %rsp			# Pop the arguments pushed to the stack
 	call print				# Call the print procedure
 	movq $39, %rax			# Put a number in %rax
 	movq %rax, -128(%rbp)		# Move initialized value into space on stack
-	pushq %rbp				# Push simple static link
+	movq %rbp, %rax			# Prepare static link
+	pushq %rax				# Push static link
 	subq $8, %rsp			# Add dummy space
 	call runIncrements			# Call the runIncrements function
-	addq $16, %rsp			# Deallocate dummy space, static link and arguments
+	addq $8, %rsp			# Remove dummy space
+	addq $8, %rsp			# Deallocate space on stack for static link
+	addq $0, %rsp			# Pop the arguments pushed to the stack
 	movq %rbp, %rax			# Prepare to access variable from another scope
 	movq -128(%rax), %rax		# Move value into %rax
 	call print				# Call the print procedure
@@ -1474,11 +1598,13 @@ end_30:
 	addq $24, heap_pointer(%rip)	# Add size of object to heap pointer
 	leaq Calculator_descriptor(%rip), %rax	# Move class descriptor into %rax
 	movq %rax, (%rcx)			# Move class descriptor into object
-	pushq %rbp				# Push simple static link
+	movq %rbp, %rax			# Prepare static link
+	pushq %rax				# Push static link
 	pushq %rcx				# Push heap pointer
 	call Calculator			# Call Calculator constructor
 	movq 16(%rbp), %rcx			# Move potential heap pointer into %rcx
-	addq $16, %rsp			# Deallocate heap pointer and static link
+	addq $8, %rsp			# Deallocate space on stack for heap pointer
+	addq $8, %rsp			# Deallocate space on stack for static link
 	movq %rax, -136(%rbp)		# Move initialized value into space on stack
 	movq %rbp, %rax			# Prepare to access variable from another scope
 	movq -136(%rax), %rax		# Move value into %rax
@@ -1486,21 +1612,26 @@ end_30:
 	movq (%rax), %rax		# Move value into %rax
 	movq 8(%rax), %rax			# Move method address into %rax
 	movq %rax, %r9			# Move method address into r9
-	pushq %rbp				# Push simple static link
+	movq %rbp, %rax			# Prepare static link
+	pushq %rax				# Push static link
 	subq $8, %rsp			# Add dummy space
 	movq %r9, %rax			# Move heap pointer into r9
 	call *%rax				# Call method
-	addq $24, %rsp			# Deallocate dummy space, static link and arguments
+	addq $8, %rsp			# Remove dummy space
+	addq $8, %rsp			# Deallocate space on stack for static link
+	addq $8, %rsp			# Pop the arguments pushed to the stack
 	call print				# Call the print procedure
 	movq heap_pointer(%rip), %rcx			# Move heap pointer into %rcx
 	addq $16, heap_pointer(%rip)	# Add size of object to heap pointer
 	leaq Box_descriptor(%rip), %rax	# Move class descriptor into %rax
 	movq %rax, (%rcx)			# Move class descriptor into object
-	pushq %rbp				# Push simple static link
+	movq %rbp, %rax			# Prepare static link
+	pushq %rax				# Push static link
 	pushq %rcx				# Push heap pointer
 	call Box			# Call Box constructor
 	movq 16(%rbp), %rcx			# Move potential heap pointer into %rcx
-	addq $16, %rsp			# Deallocate heap pointer and static link
+	addq $8, %rsp			# Deallocate space on stack for heap pointer
+	addq $8, %rsp			# Deallocate space on stack for static link
 	movq %rax, -144(%rbp)		# Move initialized value into space on stack
 	movq %rbp, %rax			# Prepare to access variable from another scope
 	movq -144(%rax), %rax		# Move value into %rax
@@ -1510,32 +1641,40 @@ end_30:
 	movq %rax, %r9			# Move method address into r9
 	movq $43, %rax			# Put a number in %rax
 	pushq %rax			# Push argument number 1 to stack
-	pushq %rbp				# Push simple static link
+	movq %rbp, %rax			# Prepare static link
+	pushq %rax				# Push static link
 	subq $8, %rsp			# Add dummy space
 	movq %r9, %rax			# Move heap pointer into r9
 	call *%rax				# Call method
-	addq $32, %rsp			# Deallocate dummy space, static link and arguments
+	addq $8, %rsp			# Remove dummy space
+	addq $8, %rsp			# Deallocate space on stack for static link
+	addq $16, %rsp			# Pop the arguments pushed to the stack
 	movq %rbp, %rax			# Prepare to access variable from another scope
 	movq -144(%rax), %rax		# Move value into %rax
 	pushq %rax				# Push heap pointer to be used as argument
 	movq (%rax), %rax		# Move value into %rax
 	movq 8(%rax), %rax			# Move method address into %rax
 	movq %rax, %r9			# Move method address into r9
-	pushq %rbp				# Push simple static link
+	movq %rbp, %rax			# Prepare static link
+	pushq %rax				# Push static link
 	subq $8, %rsp			# Add dummy space
 	movq %r9, %rax			# Move heap pointer into r9
 	call *%rax				# Call method
-	addq $24, %rsp			# Deallocate dummy space, static link and arguments
+	addq $8, %rsp			# Remove dummy space
+	addq $8, %rsp			# Deallocate space on stack for static link
+	addq $8, %rsp			# Pop the arguments pushed to the stack
 	call print				# Call the print procedure
 	movq heap_pointer(%rip), %rcx			# Move heap pointer into %rcx
 	addq $16, heap_pointer(%rip)	# Add size of object to heap pointer
 	leaq Outer_descriptor(%rip), %rax	# Move class descriptor into %rax
 	movq %rax, (%rcx)			# Move class descriptor into object
-	pushq %rbp				# Push simple static link
+	movq %rbp, %rax			# Prepare static link
+	pushq %rax				# Push static link
 	pushq %rcx				# Push heap pointer
 	call Outer			# Call Outer constructor
 	movq 16(%rbp), %rcx			# Move potential heap pointer into %rcx
-	addq $16, %rsp			# Deallocate heap pointer and static link
+	addq $8, %rsp			# Deallocate space on stack for heap pointer
+	addq $8, %rsp			# Deallocate space on stack for static link
 	movq %rax, -152(%rbp)		# Move initialized value into space on stack
 	movq %rbp, %rax			# Prepare to access variable from another scope
 	movq -152(%rax), %rax		# Move value into %rax
@@ -1543,21 +1682,26 @@ end_30:
 	movq (%rax), %rax		# Move value into %rax
 	movq 0(%rax), %rax			# Move method address into %rax
 	movq %rax, %r9			# Move method address into r9
-	pushq %rbp				# Push simple static link
+	movq %rbp, %rax			# Prepare static link
+	pushq %rax				# Push static link
 	subq $8, %rsp			# Add dummy space
 	movq %r9, %rax			# Move heap pointer into r9
 	call *%rax				# Call method
-	addq $24, %rsp			# Deallocate dummy space, static link and arguments
+	addq $8, %rsp			# Remove dummy space
+	addq $8, %rsp			# Deallocate space on stack for static link
+	addq $8, %rsp			# Pop the arguments pushed to the stack
 	call print				# Call the print procedure
 	movq heap_pointer(%rip), %rcx			# Move heap pointer into %rcx
 	addq $16, heap_pointer(%rip)	# Add size of object to heap pointer
 	leaq Accumulator_descriptor(%rip), %rax	# Move class descriptor into %rax
 	movq %rax, (%rcx)			# Move class descriptor into object
-	pushq %rbp				# Push simple static link
+	movq %rbp, %rax			# Prepare static link
+	pushq %rax				# Push static link
 	pushq %rcx				# Push heap pointer
 	call Accumulator			# Call Accumulator constructor
 	movq 16(%rbp), %rcx			# Move potential heap pointer into %rcx
-	addq $16, %rsp			# Deallocate heap pointer and static link
+	addq $8, %rsp			# Deallocate space on stack for heap pointer
+	addq $8, %rsp			# Deallocate space on stack for static link
 	movq %rax, -160(%rbp)		# Move initialized value into space on stack
 	movq %rbp, %rax			# Prepare to access variable from another scope
 	movq -160(%rax), %rax		# Move value into %rax
@@ -1567,11 +1711,14 @@ end_30:
 	movq %rax, %r9			# Move method address into r9
 	movq $20, %rax			# Put a number in %rax
 	pushq %rax			# Push argument number 1 to stack
-	pushq %rbp				# Push simple static link
+	movq %rbp, %rax			# Prepare static link
+	pushq %rax				# Push static link
 	subq $8, %rsp			# Add dummy space
 	movq %r9, %rax			# Move heap pointer into r9
 	call *%rax				# Call method
-	addq $32, %rsp			# Deallocate dummy space, static link and arguments
+	addq $8, %rsp			# Remove dummy space
+	addq $8, %rsp			# Deallocate space on stack for static link
+	addq $16, %rsp			# Pop the arguments pushed to the stack
 	movq %rbp, %rax			# Prepare to access variable from another scope
 	movq -160(%rax), %rax		# Move value into %rax
 	pushq %rax				# Push heap pointer to be used as argument
@@ -1580,28 +1727,34 @@ end_30:
 	movq %rax, %r9			# Move method address into r9
 	movq $25, %rax			# Put a number in %rax
 	pushq %rax			# Push argument number 1 to stack
-	pushq %rbp				# Push simple static link
+	movq %rbp, %rax			# Prepare static link
+	pushq %rax				# Push static link
 	subq $8, %rsp			# Add dummy space
 	movq %r9, %rax			# Move heap pointer into r9
 	call *%rax				# Call method
-	addq $32, %rsp			# Deallocate dummy space, static link and arguments
+	addq $8, %rsp			# Remove dummy space
+	addq $8, %rsp			# Deallocate space on stack for static link
+	addq $16, %rsp			# Pop the arguments pushed to the stack
 	movq %rbp, %rax			# Prepare to access variable from another scope
 	movq -160(%rax), %rax		# Move value into %rax
 	pushq %rax				# Push heap pointer to be used as argument
 	movq (%rax), %rax		# Move value into %rax
 	movq 8(%rax), %rax			# Move method address into %rax
 	movq %rax, %r9			# Move method address into r9
-	pushq %rbp				# Push simple static link
+	movq %rbp, %rax			# Prepare static link
+	pushq %rax				# Push static link
 	subq $8, %rsp			# Add dummy space
 	movq %r9, %rax			# Move heap pointer into r9
 	call *%rax				# Call method
-	addq $24, %rsp			# Deallocate dummy space, static link and arguments
+	addq $8, %rsp			# Remove dummy space
+	addq $8, %rsp			# Deallocate space on stack for static link
+	addq $8, %rsp			# Pop the arguments pushed to the stack
 	call print				# Call the print procedure
 	movq $1, %rax			# Put true in %rax
 	movq %rax, -168(%rbp)		# Move initialized value into space on stack
 	movq $0, %rax			# Put false in %rax
 	movq %rax, -176(%rbp)		# Move initialized value into space on stack
-# Start if statement 31
+				# Start if statement 31
 	movq %rbp, %rax			# Prepare to access variable from another scope
 	movq -176(%rax), %rax		# Move value into %rax
 	pushq %rax				# Push right side to stack
@@ -1620,11 +1773,12 @@ logical_false_22:
 logical_end_22:
 	cmp $0, %rax			# Check the condition
 	je end_31				# Skip if the condition is false
-	movq $-1, %rax			# Put a number in %rax
+	movq $1, %rax			# Put a number in %rax
+	negq %rax				# Negate value
 	call print				# Call the print procedure
 	jmp end_31				# Skip the else
 end_31:
-# Start if statement 32
+				# Start if statement 32
 	movq %rbp, %rax			# Prepare to access variable from another scope
 	movq -168(%rax), %rax		# Move value into %rax
 	pushq %rax				# Push right side to stack
@@ -1643,11 +1797,12 @@ logical_false_23:
 logical_end_23:
 	cmp $0, %rax			# Check the condition
 	je end_32				# Skip if the condition is false
-	movq $-1, %rax			# Put a number in %rax
+	movq $1, %rax			# Put a number in %rax
+	negq %rax				# Negate value
 	call print				# Call the print procedure
 	jmp end_32				# Skip the else
 end_32:
-# Start if statement 33
+				# Start if statement 33
 	movq %rbp, %rax			# Prepare to access variable from another scope
 	movq -176(%rax), %rax		# Move value into %rax
 	pushq %rax				# Push right side to stack
@@ -1666,11 +1821,12 @@ logical_true_24:
 logical_end_24:
 	cmp $0, %rax			# Check the condition
 	je end_33				# Skip if the condition is false
-	movq $-1, %rax			# Put a number in %rax
+	movq $1, %rax			# Put a number in %rax
+	negq %rax				# Negate value
 	call print				# Call the print procedure
 	jmp end_33				# Skip the else
 end_33:
-# Start if statement 34
+				# Start if statement 34
 	movq %rbp, %rax			# Prepare to access variable from another scope
 	movq -168(%rax), %rax		# Move value into %rax
 	pushq %rax				# Push right side to stack
@@ -1692,11 +1848,12 @@ logical_end_25:
 	movzbl %al, %eax			# Invert flag
 	cmp $0, %rax			# Check the condition
 	je end_34				# Skip if the condition is false
-	movq $-1, %rax			# Put a number in %rax
+	movq $1, %rax			# Put a number in %rax
+	negq %rax				# Negate value
 	call print				# Call the print procedure
 	jmp end_34				# Skip the else
 end_34:
-# Start if statement 35
+				# Start if statement 35
 	movq %rbp, %rax			# Prepare to access variable from another scope
 	movq -168(%rax), %rax		# Move value into %rax
 	cmpq $0, %rax			# Invert flag
@@ -1718,11 +1875,12 @@ logical_true_26:
 logical_end_26:
 	cmp $0, %rax			# Check the condition
 	je end_35				# Skip if the condition is false
-	movq $-1, %rax			# Put a number in %rax
+	movq $1, %rax			# Put a number in %rax
+	negq %rax				# Negate value
 	call print				# Call the print procedure
 	jmp end_35				# Skip the else
 end_35:
-# Start if statement 36
+				# Start if statement 36
 	movq %rbp, %rax			# Prepare to access variable from another scope
 	movq -168(%rax), %rax		# Move value into %rax
 	cmpq $0, %rax			# Invert flag
@@ -1744,11 +1902,12 @@ logical_false_27:
 logical_end_27:
 	cmp $0, %rax			# Check the condition
 	je end_36				# Skip if the condition is false
-	movq $-1, %rax			# Put a number in %rax
+	movq $1, %rax			# Put a number in %rax
+	negq %rax				# Negate value
 	call print				# Call the print procedure
 	jmp end_36				# Skip the else
 end_36:
-# Start if statement 37
+				# Start if statement 37
 	movq %rbp, %rax			# Prepare to access variable from another scope
 	movq -168(%rax), %rax		# Move value into %rax
 	pushq %rax				# Push right side to stack
@@ -1827,7 +1986,7 @@ logical_end_32:
 	call print				# Call the print procedure
 	jmp end_37				# Skip the else
 end_37:
-# Start if statement 38
+				# Start if statement 38
 	movq %rbp, %rax			# Prepare to access variable from another scope
 	movq -184(%rax), %rax		# Move value into %rax
 	cmp $0, %rax			# Check the condition
@@ -1836,7 +1995,8 @@ end_37:
 	call print				# Call the print procedure
 	jmp end_38				# Skip the else
 else_part_38:
-	movq $-1, %rax			# Put a number in %rax
+	movq $1, %rax			# Put a number in %rax
+	negq %rax				# Negate value
 	call print				# Call the print procedure
 end_38:
 	movq $0, %rax			# Put a number in %rax
@@ -1857,7 +2017,7 @@ end_38:
 	movq -200(%rax), %rax		# Move value into %rax
 	movq %rbp, %rax			# Prepare to access variable from another scope
 	movq %rdx, -200(%rax)		# Move right side into location of left side of assign
-# Start if statement 39
+				# Start if statement 39
 	movq %rbp, %rax			# Prepare to access variable from another scope
 	movq -200(%rax), %rax		# Move value into %rax
 	pushq %rax				# Push right side to stack
@@ -1890,7 +2050,8 @@ logical_true_34:
 logical_end_34:
 	cmp $0, %rax			# Check the condition
 	je else_part_39			# Skip to the else if the condition is false
-	movq $-1, %rax			# Put a number in %rax
+	movq $1, %rax			# Put a number in %rax
+	negq %rax				# Negate value
 	call print				# Call the print procedure
 	jmp end_39				# Skip the else
 else_part_39:
@@ -1909,7 +2070,7 @@ end_39:
 	movq -192(%rax), %rax		# Move value into %rax
 	movq %rbp, %rax			# Prepare to access variable from another scope
 	movq %rdx, -192(%rax)		# Move right side into location of left side of assign
-# Start if statement 40
+				# Start if statement 40
 	movq %rbp, %rax			# Prepare to access variable from another scope
 	movq -192(%rax), %rax		# Move value into %rax
 	pushq %rax				# Push right side to stack
@@ -1932,18 +2093,21 @@ logical_end_35:
 	call print				# Call the print procedure
 	jmp end_40				# Skip the else
 else_part_40:
-	movq $-1, %rax			# Put a number in %rax
+	movq $1, %rax			# Put a number in %rax
+	negq %rax				# Negate value
 	call print				# Call the print procedure
 end_40:
 	movq heap_pointer(%rip), %rcx			# Move heap pointer into %rcx
 	addq $16, heap_pointer(%rip)	# Add size of object to heap pointer
 	leaq theCompilerWorks_descriptor(%rip), %rax	# Move class descriptor into %rax
 	movq %rax, (%rcx)			# Move class descriptor into object
-	pushq %rbp				# Push simple static link
+	movq %rbp, %rax			# Prepare static link
+	pushq %rax				# Push static link
 	pushq %rcx				# Push heap pointer
 	call theCompilerWorks			# Call theCompilerWorks constructor
 	movq 16(%rbp), %rcx			# Move potential heap pointer into %rcx
-	addq $16, %rsp			# Deallocate heap pointer and static link
+	addq $8, %rsp			# Deallocate space on stack for heap pointer
+	addq $8, %rsp			# Deallocate space on stack for static link
 	movq %rax, -208(%rbp)		# Move initialized value into space on stack
 	movq %rbp, %rax			# Prepare to access variable from another scope
 	movq -208(%rax), %rax		# Move value into %rax
@@ -1951,20 +2115,25 @@ end_40:
 	movq (%rax), %rax		# Move value into %rax
 	movq 0(%rax), %rax			# Move method address into %rax
 	movq %rax, %r9			# Move method address into r9
-	pushq %rbp				# Push simple static link
+	movq %rbp, %rax			# Prepare static link
+	pushq %rax				# Push static link
 	subq $8, %rsp			# Add dummy space
 	movq %r9, %rax			# Move heap pointer into r9
 	call *%rax				# Call method
-	addq $24, %rsp			# Deallocate dummy space, static link and arguments
+	addq $8, %rsp			# Remove dummy space
+	addq $8, %rsp			# Deallocate space on stack for static link
+	addq $8, %rsp			# Pop the arguments pushed to the stack
 	movq heap_pointer(%rip), %rcx			# Move heap pointer into %rcx
 	addq $16, heap_pointer(%rip)	# Add size of object to heap pointer
 	leaq ExtraTest_descriptor(%rip), %rax	# Move class descriptor into %rax
 	movq %rax, (%rcx)			# Move class descriptor into object
-	pushq %rbp				# Push simple static link
+	movq %rbp, %rax			# Prepare static link
+	pushq %rax				# Push static link
 	pushq %rcx				# Push heap pointer
 	call ExtraTest			# Call ExtraTest constructor
 	movq 16(%rbp), %rcx			# Move potential heap pointer into %rcx
-	addq $16, %rsp			# Deallocate heap pointer and static link
+	addq $8, %rsp			# Deallocate space on stack for heap pointer
+	addq $8, %rsp			# Deallocate space on stack for static link
 	movq 8(%rax), %rax		# Move value into %rax
 	movq %rax, -216(%rbp)		# Move initialized value into space on stack
 	movq %rbp, %rax			# Prepare to access variable from another scope
@@ -1974,28 +2143,36 @@ end_40:
 	addq $8, heap_pointer(%rip)	# Add size of object to heap pointer
 	leaq otherTest_descriptor(%rip), %rax	# Move class descriptor into %rax
 	movq %rax, (%rcx)			# Move class descriptor into object
-	pushq %rbp				# Push simple static link
+	movq %rbp, %rax			# Prepare static link
+	pushq %rax				# Push static link
 	pushq %rcx				# Push heap pointer
 	call otherTest			# Call otherTest constructor
 	movq 16(%rbp), %rcx			# Move potential heap pointer into %rcx
-	addq $16, %rsp			# Deallocate heap pointer and static link
+	addq $8, %rsp			# Deallocate space on stack for heap pointer
+	addq $8, %rsp			# Deallocate space on stack for static link
 	pushq %rax				# Push heap pointer to be used as argument
 	movq (%rax), %rax		# Move value into %rax
 	movq 0(%rax), %rax			# Move method address into %rax
 	movq %rax, %r9			# Move method address into r9
-	pushq %rbp				# Push simple static link
+	movq %rbp, %rax			# Prepare static link
+	pushq %rax				# Push static link
 	subq $8, %rsp			# Add dummy space
 	movq %r9, %rax			# Move heap pointer into r9
 	call *%rax				# Call method
-	addq $24, %rsp			# Deallocate dummy space, static link and arguments
+	addq $8, %rsp			# Remove dummy space
+	addq $8, %rsp			# Deallocate space on stack for static link
+	addq $8, %rsp			# Pop the arguments pushed to the stack
 	movq 8(%rax), %rax		# Move value into %rax
 	call print				# Call the print procedure
 	movq $1, %rax			# Put a number in %rax
 	pushq %rax				# Push right side to stack
-	pushq %rbp				# Push simple static link
+	movq %rbp, %rax			# Prepare static link
+	pushq %rax				# Push static link
 	subq $8, %rsp			# Add dummy space
 	call funnyFunc			# Call the funnyFunc function
-	addq $16, %rsp			# Deallocate dummy space, static link and arguments
+	addq $8, %rsp			# Remove dummy space
+	addq $8, %rsp			# Deallocate space on stack for static link
+	addq $0, %rsp			# Pop the arguments pushed to the stack
 	movq 8(%rax), %rax		# Move value into %rax
 	popq %rbx				# Pop right side into %rbx
 	addq %rbx, %rax			# Perform addition
@@ -2004,10 +2181,13 @@ end_40:
 	pushq %rax				# Push right side to stack
 	movq $4, %rax			# Put a number in %rax
 	pushq %rax		# Push argument number 1 to stack
-	pushq %rbp				# Push simple static link
+	movq %rbp, %rax			# Prepare static link
+	pushq %rax				# Push static link
 	subq $8, %rsp			# Add dummy space
 	call factorial			# Call the factorial function
-	addq $24, %rsp			# Deallocate dummy space, static link and arguments
+	addq $8, %rsp			# Remove dummy space
+	addq $8, %rsp			# Deallocate space on stack for static link
+	addq $8, %rsp			# Pop the arguments pushed to the stack
 	popq %rbx				# Pop right side into %rbx
 	addq %rbx, %rax			# Perform addition
 	call print				# Call the print procedure

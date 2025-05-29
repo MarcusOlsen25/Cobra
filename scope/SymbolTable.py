@@ -75,6 +75,9 @@ class SymbolTable:
 
     def setMethodCounter(self, counter: int):
         self.methodCounter = counter
+        
+    def setVarCounter(self, counter: int):
+        self.varCounter = counter
 
     def getMethods(self):
         return [method for method in self._tab.values() if isinstance(method, SymbolTable.MethodValue)]
