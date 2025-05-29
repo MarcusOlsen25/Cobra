@@ -224,6 +224,8 @@ class AssemblyVisitor(Visitor):
     def visitVarExpression(self, expr: VarExpression):
         entry = self.table.lookup(expr.var)
         if isinstance(entry, SymbolTable.VariableValue):
+            if expr.lineno <= entry.lineNo:
+                entry = self.table.parent.lookup(expr.var)
             self.accessVar(entry)
             self.generateCode("movq", f"{entry.offset}(%rax)", "%rax", 2, "# Move value into %rax")
             return entry

@@ -19,13 +19,13 @@ class PeepholeOptimizer:
             
             # Examine each instruction
             for i in range(len(self.instructions)):
-                # self.optimiseNoLocalVariables(i)
-                # self.optimiseAdditionsToRSP(i)
-                # self.optimisePushSimpleSL(i)
-                # self.optimiseSaveBasePointer(i)
-                # self.optimiseInstantNegation(i)
-                # self.optimiseAssembleDummies(i)     # Maybe irrelevant
-                # self.optimiseVariableAccess(i)
+                self.optimiseNoLocalVariables(i)
+                self.optimiseAdditionsToRSP(i)
+                self.optimisePushSimpleSL(i)
+                self.optimiseSaveBasePointer(i)
+                self.optimiseInstantNegation(i)
+                self.optimiseAssembleDummies(i)     # Maybe irrelevant
+                self.optimiseVariableAccess(i)
 
                 # Problematic
                 # self.optimiseDirectInitialization(i)

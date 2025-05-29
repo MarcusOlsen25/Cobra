@@ -22,10 +22,7 @@ print tigger.one();
 '''
     
 
-# with open("test.co", "r") as file:
-#     test = file.read()
-    
-with open("longProgram.co", "r") as file:
+with open("test.co", "r") as file:
     test = file.read()
 
 # Change this line from 'test' to 'data' and vice versa

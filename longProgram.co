@@ -17,20 +17,128 @@ class c_two {
     c_one cc = new c_one();
 
     func get() int {
-        return cc.get();
+        return this.cc.get();
+    }
+}
+
+class c_three {
+    int z = 3;
+    c_two cc = new c_two();
+
+    func get() int {
+        return this.cc.get();
+    }
+}
+
+class c_four {
+    int z = 4;
+    c_three cc = new c_three();
+
+    func get() int {
+        return this.cc.get();
+    }
+}
+
+class c_five {
+    int z = 5;
+    c_four cc = new c_four();
+
+    func get() int {
+        return this.cc.get();
+    }
+}
+
+class c_six {
+    int z = 6;
+    c_five cc = new c_five();
+
+    func get() int {
+        return this.cc.get();
+    }
+}
+
+class c_seven {
+    int z = 7;
+    c_six cc = new c_six();
+
+    func get() int {
+        return this.cc.get();
+    }
+}
+
+class c_eight {
+    int z = 8;
+    c_seven cc = new c_seven();
+
+    func get() int {
+        return this.cc.get();
+    }
+}
+
+class c_nine {
+    int z = 9;
+    c_eight cc = new c_eight();
+
+    func get() int {
+        return this.cc.get();
+    }
+}
+
+class c_ten {
+    int z = 10;
+    c_nine cc = new c_nine();
+
+    func get() int {
+        return this.cc.get();
+    }
+}
+
+c_ten cc = new c_ten();
+
+int i = 0;
+int x = 0;
+
+while i < 10000 then {
+    i = i + 1;
+
+    while x < 10000 then {
+        x = x + cc.get();
+    }
+    x = 0;
+
+}
+
+
+
+func add() void {
+    3 + 3;
+}
+func sub() void {
+    3 - 3;
+}
+func mult() void {
+    3 * 3;
+}
+func div() void {
+    3 / 3;
+}
+
+func loop() void {
+    int i = -1;
+    while i < 1000 then {
+        i = i + 1;
+        int x = -1;
+
+        while x > -1000 then {
+            x = x - 1;
+            add();
+            sub();
+            mult();
+            div();
+        }
     }
 }
 
 
-c_two cc = new c_two();
 
-int i = 0;
-int x;
-
-x = cc.get();
-i = i + 1;
-
-   
-
-print i;
-print x;
+loop();

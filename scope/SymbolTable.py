@@ -88,6 +88,7 @@ class SymbolTable:
             self.type = stmt.type
             self.offset = offset
             self.level = level
+            self.lineNo = stmt.lineno
 
     class FunctionValue:
         def __init__(self, stmt: FunctionDeclaration, functionName: str, level: int, newTable: 'SymbolTable'):

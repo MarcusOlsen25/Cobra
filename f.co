@@ -2,110 +2,27 @@
 
 
 
+Optimised
 
-
-class c_one {
-    int z = 1;
-
-    func get() int {
-        return this.z;
-    }
-}
-
-class c_two {
-    int z = 2;
-    c_one cc = new c_one();
-
-    func get() int {
-        return cc.get();
-    }
-}
-
-class c_three {
-    int z = 3;
-    c_two cc = new c_two();
-
-    func get() int {
-        return cc.get();
-    }
-}
-
-class c_four {
-    int z = 4;
-    c_three cc = new c_three();
-
-    func get() int {
-        return cc.get();
-    }
-}
-
-class c_five {
-    int z = 5;
-    c_four cc = new c_four();
-
-    func get() int {
-        return cc.get();
-    }
-}
-
-class c_six {
-    int z = 6;
-    c_five cc = new c_five();
-
-    func get() int {
-        return cc.get();
-    }
-}
-
-class c_seven {
-    int z = 7;
-    c_six cc = new c_six();
-
-    func get() int {
-        return cc.get();
-    }
-}
-
-class c_eight {
-    int z = 8;
-    c_seven cc = new c_seven();
-
-    func get() int {
-        return cc.get();
-    }
-}
-
-class c_nine {
-    int z = 9;
-    c_eight cc = new c_eight();
-
-    func get() int {
-        return cc.get();
-    }
-}
-
-class c_ten {
-    int z = 10;
-    c_nine cc = new c_nine();
-
-    func get() int {
-        return cc.get();
-    }
-}
-
-c_ten cc = new c_ten();
-
-int i = 0;
-int x;
-
-while i <= 10 then {
-    x = cc.get();
-    i = i + 1;
-
-    while x <= 10 then {
-        x = x + cc.get();
-    }
-}
-
-print i;
-print x;
+comp_end_0:
+	cmp $0, %rax			# Check the condition
+	je else_part_0			# Skip to the else if the condition is false
+	pushq %rbp				# Push simple static link
+	subq $24, %rsp			# Add many dummy spaces
+	movq $1, %rax			# Put a number in %rax
+	negq %rax				# Negate value
+	call print				# Call the print procedure
+end_then_0:				# Clean up then block stack frame
+	addq $24, %rsp			# Deallocate dummy spaces and static link
+	jmp end_0				# Skip the else
+else_part_0:
+	pushq %rbp				# Push simple static link
+	subq $24, %rsp			# Add many dummy spaces
+	movq $33, %rax			# Put a number in %rax
+	call print				# Call the print procedure
+end_else_0:
+	addq $24, %rsp			# Deallocate dummy spaces and static link
+end_0:
+end_test33:			# End function
+	addq $8, %rsp			# Remove dummy base pointer
+	ret						# Return from the function
