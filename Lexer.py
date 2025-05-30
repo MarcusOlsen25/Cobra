@@ -2,6 +2,7 @@ import ply.lex as lex
 import Lexer
 import sys
 
+# Reserved keywords
 reserved = {"if": "IF",
             "then": "THEN",
             "else": "ELSE",

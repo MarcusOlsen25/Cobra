@@ -2,8 +2,7 @@ from ASTstatements import *
 
 class SymbolTable:
     """Implements a classic symbol table for static nested
-    scope. Names for each scope are collected in a
-    Python dictionary. The parent scope can be accessed
+    scope. The parent scope can be accessed
     via the parent reference.
     """
     def __init__(self, parent, scopeType: str):
@@ -38,7 +37,8 @@ class SymbolTable:
 
     def insertMethod(self, stmt: MethodDeclaration, newTable):
         self._tab[stmt.var] = SymbolTable.MethodValue(stmt, self.level, newTable, self.incrementMethodCounter())
-         
+        
+    # Performs a lookup of a symbol in the whole scope hierarchy
     def lookup(self, name: str):
         if name in self._tab:
             return self._tab[name]
@@ -47,13 +47,13 @@ class SymbolTable:
         else:
             return None
         
-    # Used amongst other things for fields
+    # Performs a local lookup of a symbol 
     def lookupLocal(self, name: str):
         if name in self._tab:
             return self._tab[name]
         else:
             return None
-        
+    
     def incrementFieldCounter(self):
         self.fieldCounter += 8
         return self.fieldCounter
@@ -70,12 +70,15 @@ class SymbolTable:
         self.methodCounter += 8
         return self.methodCounter
     
+    # Used for initialising a class that inherits from another
     def setFieldCounter(self, counter: int):
         self.fieldCounter = counter
 
+    # Used for initialising a class that inherits from another
     def setMethodCounter(self, counter: int):
         self.methodCounter = counter
-        
+    
+    # Used for initialising symbol tables for conditional statements
     def setVarCounter(self, counter: int):
         self.varCounter = counter
 

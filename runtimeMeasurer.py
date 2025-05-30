@@ -12,7 +12,7 @@ from errorTester import *
 from peepholeOptimizer import *
 
 
-
+# Measures the runtime of a compiled Cobra program with and without optimisation
 def measureRuntime():
     
     with open("longProgram.co", "r") as file:
@@ -53,7 +53,7 @@ def measureRuntime():
     print(f"The optimised code was {originalRuntime - optimisedRuntime:.6f} seconds better.")
 
 
-
+# Compiles a Cobra program without performing peep-hole optimisation
 def compileOriginal(cobraCode: str):
 
     table = SymbolTable(None, "Function")
@@ -135,7 +135,7 @@ def compileOriginal(cobraCode: str):
 
 
 
-
+# Compiles a Cobra program and performs peep-hole optimisation
 def compileOptimised(cobraCode: str):
 
     table = SymbolTable(None, "Function")

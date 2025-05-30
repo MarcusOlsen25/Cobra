@@ -4,18 +4,22 @@ from ASTstatements import *
 from scope.SymbolTable import *
 from .exception import *
 
+# Visitor class responsible for ensuring the proper use of symbols and for reporting 
+# typing conflicts and incorrect function definitions and calls
 class TypeVisitor(Visitor):
 
     def __init__(self, table: SymbolTable, typeErrors, functionErrors):
         self.table = table
         self.typeErrors = typeErrors
         self.functionErrors = functionErrors
-    
+
+    # Raises a TypeException and adds it to the list of type errors
     def addTypeError(self, message: str, lineno: int):
         exception = TypeException(message, lineno)
         self.typeErrors.append(exception)
         raise exception
-    
+
+    # Raises a FunctionException and adds it to the list of function errors
     def addFunctionError(self, message: str, lineno: int):
         exception = FunctionException(message, lineno)
         self.functionErrors.append(exception)
@@ -24,6 +28,7 @@ class TypeVisitor(Visitor):
     def visitUnaryExpression(self, expr: UnaryExpression):
         try:
             expr.value.accept(self)
+            # Check the operator matches the type
             valueType = self.evaluateExpressionType(expr.value)
             if (valueType != "int" and not isinstance(valueType, NullType)) and expr.operator == "-":
                 self.addTypeError(f"Type error in line {expr.lineno}: The operand '-' is only compatible with integer values, got {valueType} instead.", expr.lineno)
@@ -34,7 +39,7 @@ class TypeVisitor(Visitor):
     def visitBinaryExpression(self, expr: BinaryExpression):
         expr.left.accept(self)
         expr.right.accept(self)
-        # Check that it has no illegal types
+        # Check that it does not have illegal types
         self.evaluateExpressionType(expr)
     
     def visitNumberExpression(self, expr: NumberExpression):
@@ -55,6 +60,7 @@ class TypeVisitor(Visitor):
     def visitAssignExpression(self, expr: AssignExpression):
         try:
             var = expr.var.accept(self) 
+            # Check the assignment matches the declared type 
             declaredType = var.type
             inferredType = self.evaluateExpressionType(expr.value)
             if not self.compareTypes(inferredType, declaredType):
@@ -64,6 +70,7 @@ class TypeVisitor(Visitor):
                     
     def visitVarDeclaration(self, stmt: VarDeclaration):
         try:
+            # If initialised, check it matches the declared type
             if stmt.initializer:
                 inferredType = self.evaluateExpressionType(stmt.initializer)
                 if not self.compareTypes(inferredType, stmt.type):
@@ -84,10 +91,8 @@ class TypeVisitor(Visitor):
                 if entry:
                     if isinstance(entry, SymbolTable.VariableValue) or isinstance(entry, SymbolTable.FieldValue):
                         return entry.type
-                    else:
-                        print(expr.lineno)
-                else:
-                    return "unknown"
+                    elif isinstance(entry, SymbolTable.ClassValue):
+                        return entry.name
             elif isinstance(expr, BinaryExpression):
                 left_type = self.evaluateExpressionType(expr.left)
                 right_type = self.evaluateExpressionType(expr.right)
@@ -135,7 +140,6 @@ class TypeVisitor(Visitor):
             return 
 
 
-    #Using func as a type
     def visitFunctionDeclaration(self, stmt: FunctionDeclaration):   
         try:
             # Find the correct symbol table
@@ -167,6 +171,7 @@ class TypeVisitor(Visitor):
         # A list of all the return types found 
         types = []
         
+        # Traverse all the statements and add any return types to the list
         for s in list:
             if isinstance(s, ReturnStatement):
                 if s.value:
@@ -185,11 +190,12 @@ class TypeVisitor(Visitor):
     def visitCallExpression(self, expr: CallExpression):
         try:
             entry = expr.var.accept(self)
+            # Check that it has the right number of arguments
             incorrectNrOfArgs = len(entry.params) != len(expr.arguments)
             if incorrectNrOfArgs:
                 self.addFunctionError(f"Incorrect number of arguments for {expr.var.var} in line {expr.lineno}.", expr.lineno)
             
-            # Type check
+            # Check that the types of the arguments match the declared types of the parameters
             i = 0
             while i < len(expr.arguments):
                 inferredType = self.evaluateExpressionType(expr.arguments[i])
@@ -198,7 +204,8 @@ class TypeVisitor(Visitor):
                     self.addFunctionError(f"The arguments given in line {expr.lineno} do not match the types of the parameters for {entry.functionName}.", expr.lineno)
                 expr.arguments[i].accept(self)
                 i += 1
-                
+
+            # The return type is used fx when assigning the result of a call to a variable
             returnType = self.table.lookup(entry.returnType)
             return returnType
             
@@ -211,26 +218,32 @@ class TypeVisitor(Visitor):
     def visitIfStatement(self, stmt: IfStatement):
         try:
             stmt.condition.accept(self)
+            
+            # Check the statements in the then block
             self.table = stmt.thenTable
             for s in stmt.thenStatement:
                 s.accept(self)
             self.table = self.table.parent
 
             if stmt.elseStatement:
+                # Check the statements in the else block
                 self.table = stmt.elseTable
                 for s in stmt.elseStatement:
                     s.accept(self)
                 self.table = self.table.parent 
+                
         except TypeException:
             return
     
     def visitWhileStatement(self, stmt: WhileStatement):
         try:
             stmt.condition.accept(self)
+            # Check the statements in the then block
             self.table = stmt.table
             for s in stmt.thenStatement:
                 s.accept(self)
             self.table = self.table.parent
+            
         except TypeException:
             return
                
@@ -245,6 +258,7 @@ class TypeVisitor(Visitor):
         classEntry = self.table.lookup(stmt.var)
         self.table = classEntry.table
         
+        # Check the statements inside the class declaration
         for s in stmt.body:
             s.accept(self)
         
@@ -254,15 +268,16 @@ class TypeVisitor(Visitor):
         return expr.var.accept(self)
         
     def visitPropertyAccessExpression(self, expr: PropertyAccessExpression):
-        # Traverse each property call until you come to the end
         varEntry = expr.property.accept(self)
-    
+
+        # Find the type
         if not isinstance(varEntry, SymbolTable.ClassValue):
             classEntry = self.table.lookup(varEntry.type)
         else:
             classEntry = varEntry
             
         propertyEntry = classEntry.table.lookupLocal(expr.var)
+        # Traverse each property call until you come to the end
         while not propertyEntry and classEntry.super:
             classEntry = self.table.lookup(classEntry.super)
             propertyEntry = classEntry.table.lookupLocal(expr.var)
@@ -273,12 +288,12 @@ class TypeVisitor(Visitor):
     def visitMethodCallExpression(self, expr: MethodCallExpression):
         try:
             methodEntry = expr.property.accept(self)
-            
+            # Check that it has the right number of arguments
             incorrectNrOfArgs = len(methodEntry.params) - 1 != len(expr.arguments)
             if incorrectNrOfArgs:
                 self.addFunctionError(f"Incorrect number of arguments for {methodEntry.name} in line {expr.lineno}, expected {len(methodEntry.params)}, got {len(expr.arguments)}.", expr.lineno)
 
-            # Type check
+            # Check that the types of the arguments match the declared types of the parameters
             i = 0
             while i < len(expr.arguments):
                 inferredType = self.evaluateExpressionType(expr.arguments[i])
@@ -288,6 +303,7 @@ class TypeVisitor(Visitor):
                 expr.arguments[i].accept(self)
                 i += 1
 
+            # The return type is used fx when assigning the result of a call to a variable
             returnType = self.table.lookup(methodEntry.returnType)
             return returnType
         except FunctionException:
@@ -295,6 +311,7 @@ class TypeVisitor(Visitor):
     
     def visitMethodDeclaration(self, stmt: MethodDeclaration):
         try: 
+            # Find the correct symbol table
             method = self.table.lookupLocal(stmt.var)
             self.table = method.table
 

@@ -4,6 +4,8 @@ from ASTstatements import *
 from scope.SymbolTable import *
 from .exception import *
 
+# Visitor class responsible for managing scope-related tasks during AST traversal, 
+# such as symbol table management and scope error reporting
 class ScopeVisitor(Visitor):
     
     def __init__(self, table: SymbolTable, scopeErrors):
@@ -11,6 +13,7 @@ class ScopeVisitor(Visitor):
         self.scopeErrors = scopeErrors
         self.functionStack = []
         
+    # Raises a ScopeException and adds it to the list of scope errors
     def addScopeError(self, message: str, lineno: int):
         exception = ScopeException(message, lineno)
         self.scopeErrors.append(exception)
@@ -29,11 +32,13 @@ class ScopeVisitor(Visitor):
     def visitVarExpression(self, expr: VarExpression):
         try:
             lookup = self.table.lookup(expr.var)
+            # Check whether it is undeclared
             if not lookup:
                 self.addScopeError(f"Undeclared variable {expr.var} in line {expr.lineno}.", expr.lineno)
+            # Ensure it is the right type
             elif not (isinstance(lookup, SymbolTable.VariableValue) or isinstance(lookup, SymbolTable.FieldValue) 
                       or isinstance(lookup, SymbolTable.ClassValue)):
-                self.addScopeError(f"The ID {expr.var} in line {expr.lineno} is neither a variable nor a field.", expr.lineno)
+                self.addScopeError(f"The ID {expr.var} in line {expr.lineno} is neither a variable, a field nor a class.", expr.lineno)
             else:
                 return lookup
         except ScopeException:
@@ -54,29 +59,34 @@ class ScopeVisitor(Visitor):
                     
     def visitVarDeclaration(self, stmt: VarDeclaration):
         try:
+            # Check for previous declaration or invalid indentifier
             if isinstance(self.table.lookup(stmt.var), SymbolTable.ClassValue):
                 self.addScopeError(f"Error: {stmt.var} in line {stmt.lineno} cannot be used as a variable name, since it is a class.", stmt.lineno)
             elif self.table.lookupLocal(stmt.var):
                 self.addScopeError(f"The variable {stmt.var} in line {stmt.lineno} is already defined in this scope.", stmt.lineno)
             else:
+                # If it is an instance of a class
                 if stmt.type != "int" and stmt.type != "bool":
                     classEntry = self.table.lookup(stmt.type)
                     if not classEntry:
                         self.addScopeError(f"The class {stmt.type} referenced in line {stmt.lineno} is not defined.", stmt.lineno)
                 self.table.insertVar(stmt)
+                # Check the initializer
                 if stmt.initializer:
                     stmt.initializer.accept(self)     
         except ScopeException:
             return
     
-    #Using func as a type
     def visitFunctionDeclaration(self, stmt: FunctionDeclaration):
         try:
+            # Check for previous declaration
             if self.table.lookup(stmt.var):
                 self.addScopeError(f"The variable {stmt.var} in line {stmt.lineno} is already defined.", stmt.lineno)
             else:
+                # Verify the function name
                 functionName = self.getFunctionName(stmt.var)
                 self.functionStack.append(functionName)
+                # Update the symbol tables
                 newTable = SymbolTable(self.table, "Function")
                 self.table.insertFunction(stmt, functionName, newTable)
                 self.table = newTable
@@ -95,14 +105,17 @@ class ScopeVisitor(Visitor):
     def visitCallExpression(self, expr: CallExpression):
         try:
             lookup = self.table.lookup(expr.var.var)
+            # Check that it is defined
             if not lookup:
                 self.addScopeError(f"The function {expr.var.var} from line {expr.lineno} is not defined.", expr.lineno)
+            # Check that it is indeed a function
             elif not isinstance(lookup, SymbolTable.FunctionValue):
                 self.addScopeError(f"The ID {expr.var.var} in line {expr.lineno} is not a function.", expr.lineno)
             else:
                 for i in range(len(expr.arguments) - 1, -1, -1):
                     expr.arguments[i].accept(self)
-                    
+            
+            # The return type is used fx when assigning the result of a call to a variable
             returnType = self.table.lookup(lookup.returnType)
             return returnType
         except ScopeException:
@@ -111,6 +124,7 @@ class ScopeVisitor(Visitor):
     def visitParameterStatement(self, stmt: ParameterStatement):
         try:
             lookup = self.table.lookupLocal(stmt.var)
+            # Check it isn't defined in this scope
             if lookup:
                 self.addScopeError(f"The variable {stmt.var} in line {stmt.lineno} is already defined in this scope.", stmt.lineno)
             else:
@@ -168,17 +182,22 @@ class ScopeVisitor(Visitor):
     def visitClassDeclaration(self, stmt: ClassDeclaration):
         try:
             lookup = self.table.lookup(stmt.var)
+            # Check that it isn't previously defined
             if lookup:
                 self.addScopeError(f"The variable {stmt.var} in line {stmt.lineno} is already defined.", stmt.lineno)
             else:
+                # Update the symbol tables
                 newTable = SymbolTable(self.table, "Class")
                 self.table.insertClass(stmt, newTable)
+                # In case of inheritance
                 superEntry = None
                 if stmt.super:
                     superEntry = self.table.lookup(stmt.super)
+                    # Check for super class
                     if not superEntry:
                         self.addScopeError(f"Scope error for {stmt.var} in line {stmt.lineno}.", stmt.lineno)
                     else:
+                        # Inherit the fields and methods of the super class
                         newTable.setFieldCounter(superEntry.table.fieldCounter)
                         newTable.setMethodCounter(superEntry.table.methodCounter)
 
@@ -196,14 +215,16 @@ class ScopeVisitor(Visitor):
         
     def visitPropertyAccessExpression(self, expr: PropertyAccessExpression):
         try:
-            # Traverse each property call until you come to the end
             varEntry = expr.property.accept(self)
+            # If the property was not found
             if not varEntry:
                 self.addScopeError(f"Error accessing a property in line {expr.lineno}.", expr.lineno) 
+            # If the property was the wrong type
             elif not (isinstance(varEntry, SymbolTable.VariableValue) or isinstance(varEntry, SymbolTable.FieldValue) or 
                       isinstance(varEntry, SymbolTable.ClassValue) or isinstance(varEntry, SymbolTable.FunctionValue)):
-                self.addScopeError(f"Error: {expr.property.var} in line {expr.lineno} has no properties, since it is neither a variable nor a field.", expr.lineno)
+                self.addScopeError(f"Error: {expr.property.var} in line {expr.lineno} has no properties.", expr.lineno)
             else:
+                # Identify its type
                 if not isinstance(varEntry, SymbolTable.ClassValue):
                     classEntry = self.table.lookup(varEntry.type)
                 else:
@@ -213,6 +234,7 @@ class ScopeVisitor(Visitor):
                     self.addScopeError(f"Couldn't find class {varEntry.type} in line {expr.lineno}\n", expr.lineno)
                 else:
                     propertyEntry = classEntry.table.lookupLocal(expr.var)
+                    # Traverse each property call until you come to the end
                     while not propertyEntry and classEntry.super:
                         classEntry = self.table.lookup(classEntry.super)
                         propertyEntry = classEntry.table.lookupLocal(expr.var)
@@ -226,13 +248,16 @@ class ScopeVisitor(Visitor):
     def visitMethodCallExpression(self, expr: MethodCallExpression):  
         try:
             methodEntry = expr.property.accept(self)
+            # Check it is defined
             if not methodEntry:
                 self.addScopeError(f"The method {expr.property.var} from line {expr.lineno} is not defined.", expr.lineno)
+            # Check it is the right type
             elif not isinstance(methodEntry, SymbolTable.MethodValue):
                 self.addScopeError(f"The ID {methodEntry.name} in line {expr.lineno} is not a method.", expr.lineno)
             else:
                 for arg in expr.arguments:
                     arg.accept(self)
+            # The return type is used fx when assigning the result of a call to a variable
             returnType = self.table.lookup(methodEntry.returnType)
             return returnType
 
@@ -242,13 +267,16 @@ class ScopeVisitor(Visitor):
     def visitMethodDeclaration(self, stmt: MethodDeclaration):
         try:
             lookup = self.table.lookupLocal(stmt.var)
+            # Check it isn't previously defined
             if lookup:
                 self.addScopeError(f"The method {stmt.var} in line {stmt.lineno} is already defined in this scope.", stmt.lineno)
             else:
+                # Update the table
                 newTable = SymbolTable(self.table, "Method")
                 self.table.insertMethod(stmt, newTable)
                 self.table = newTable
 
+                # Include reference to its object
                 stmt.params.append(ParameterStatement(stmt.className, "this", stmt.lineno))
 
                 for param in stmt.params:
@@ -264,6 +292,8 @@ class ScopeVisitor(Visitor):
     def visitNullExpression(self, expr: NullExpression):
         pass
 
+    # Returns a valid name for a function 
+    # Used for nested functions
     def getFunctionName(self, function: str):
         if len(self.functionStack) == 0:
             return function

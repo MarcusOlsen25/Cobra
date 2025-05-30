@@ -32,6 +32,7 @@ class Parser:
                     | class'''
         p[0] = p[1]
 
+    # Class declaration
     def p_class(self, p):
         '''class : CLASS ID extends LBRACE classDeclarationList RBRACE'''
         for declaration in p[5]:
@@ -39,6 +40,7 @@ class Parser:
                 declaration.className = p[2]
         p[0] = ClassDeclaration(p[2], p[5], p[3], p.lineno(1))
 
+    # Extensions for inheritance
     def p_extends(self, p):
         '''extends : EXTENDS ID
                 | empty'''
@@ -46,6 +48,8 @@ class Parser:
             p[0] = p[2]
         else:
             p[0] = None
+
+    # Contents of a class
 
     def p_classDeclarationList_multiple(self, p):
         '''classDeclarationList : classDeclarationList classDeclaration'''
@@ -60,6 +64,7 @@ class Parser:
                             | methodDeclaration'''
         p[0] = p[1]
 
+    # Method declaration
     def p_methodDeclaration(self, p): 
         '''methodDeclaration : FUNC ID LPAREN parameter_list RPAREN type LBRACE declaration_list RBRACE'''
         p[0] = MethodDeclaration(p[2], p[4], p[8], p[6], p.lineno(1))

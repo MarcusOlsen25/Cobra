@@ -99,7 +99,8 @@ def testLexicalErrors():
         print("Lexical Error Detection: Failure!\n")
         
     return success
-        
+
+# Auxiliary function for testing lexical errors
 def auxTestLexicalErrors(cobraCode: str, expectedErrors: list[str], testNr: int):
     success = True
     lexer = Lexer()
@@ -125,7 +126,8 @@ def auxTestLexicalErrors(cobraCode: str, expectedErrors: list[str], testNr: int)
         
         
         
-# Apparently, testing syntactic errors is not as easy. One error at a time. 
+# Includes mulitple tests to keep error messages predictable.
+# Often reports an additional '}'
 def testSyntacticErrors():
     print("Testing syntactic errors now:")
         
@@ -197,7 +199,8 @@ def testSyntacticErrors():
         
     return success
         
-
+# Auxiliary function for testing syntactic errors
+# Assumes the code is lexically correct
 def auxTestSyntacticErrors(cobraCode: str, expectedErrors: list[str], testNr: int):
     success = True
     parseLex = Lexer()  
@@ -221,7 +224,9 @@ def auxTestSyntacticErrors(cobraCode: str, expectedErrors: list[str], testNr: in
         print(f"\tTest {testNr} fails! :(")
     return success
 
-        
+
+# Tests scope errors 
+# Assumes the code is lexically and syntactically correct
 def testScopeErrors():
     
     print("Testing scope errors now:")
@@ -243,6 +248,7 @@ def testScopeErrors():
         "Error: banan in line 84 cannot be used as a variable name, since it is a class."
     ]
     
+    # It tests the code defined in this file
     with open("testScopeErrors.co", "r") as file:
         cobraCode = file.read()
 
@@ -280,7 +286,8 @@ def testScopeErrors():
     return success
 
 
-
+# Tests type errors 
+# Assumes the code is lexically and syntactically correct, and that there are no scope errors
 def testTypeErrors():
     
     print("Testing type errors now:")
@@ -294,7 +301,8 @@ def testTypeErrors():
         "Illegal type in binary operation in line 26.",
         "Type mismatch for t in line 28: expected int, got tiger."
         ]
-    
+
+    # It tests the code defined in this file
     with open("testTypeErrors.co", "r") as file:
         cobraCode = file.read()
 
@@ -333,7 +341,8 @@ def testTypeErrors():
 
 
 
-
+# Tests function errors 
+# Assumes the code is lexically and syntactically correct, and that there are no scope or type errors
 def testFunctionErrors():
     
     print("Testing function errors now:")
@@ -347,7 +356,8 @@ def testFunctionErrors():
         "Incorrect number of arguments for four in line 35.",
         "Incorrect number of arguments for four in line 37."
     ]
-    
+
+    # It tests the code defined in this file
     with open("testFunctionErrors.co", "r") as file:
         cobraCode = file.read()
 

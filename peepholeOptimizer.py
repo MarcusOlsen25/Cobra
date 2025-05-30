@@ -17,7 +17,7 @@ class PeepholeOptimizer:
             
             startVal = self.terminatingFunction()
             
-            # Examine each instruction
+            # Examine each instruction 
             for i in range(len(self.instructions)):
                 self.optimiseNoLocalVariables(i)
                 self.optimiseInstantNegation(i)
@@ -25,13 +25,6 @@ class PeepholeOptimizer:
                 self.optimiseVariableAccess(i)
                 self.optimiseAdditionsToRSP(i)
                 self.optimiseSaveBasePointer(i)
-                
-                self.optimiseAssembleDummies(i)     # Irrelevant
-
-
-                # Problematic
-                # self.optimiseDirectInitialization(i)
-                hwllo = 9
                         
             # Remove the instructions marked as garbage     
             # Reverse iteration prevents index problems     
@@ -50,8 +43,6 @@ class PeepholeOptimizer:
         lengthAfter = self.terminatingFunction()
         print(f"Optimised {lengthBefore - lengthAfter} lines. :)")
     
-    
-    
     # Finds and removes allocation and deallocation of nothing at all
     def optimiseNoLocalVariables(self, index: int):
         '''
@@ -63,8 +54,6 @@ class PeepholeOptimizer:
         if ((one.upcode == "addq" or one.upcode == "subq") and one.operand1 == "$0" 
             and one.operand2 == "%rsp"):
             self.indexesToRemove.append(index)
-    
-    
     
     # Deallocates multiple things at once
     def optimiseAdditionsToRSP(self, index: int):
@@ -112,8 +101,7 @@ class PeepholeOptimizer:
                     one.operand1 = f"${newValue}"
                     one.comment = "# Deallocate dummy space, static link and arguments"
                     self.indexesToRemove.append(index+1)
-                    
-                            
+                                  
     # The static link doesn't always need to be prepared
     def optimisePushSimpleSL(self, index: int):
         '''
@@ -133,10 +121,6 @@ class PeepholeOptimizer:
                 self.indexesToRemove.append(index)
                 self.instructions[index+1] = simpleSL
                 
-    
-                
-    
-
     # Avoids saving base pointer pointlessly                    
     def optimiseSaveBasePointer(self, index: int):
         '''
@@ -182,10 +166,6 @@ class PeepholeOptimizer:
                 
                 i += 1
                 
-                
-                
-                
-                
     # Negate numbers in a single step
     def optimiseInstantNegation(self, index: int):
         '''
@@ -206,9 +186,6 @@ class PeepholeOptimizer:
                     number = number.replace('-', '')
                 one.operand1 = "$" + number
                 self.indexesToRemove.append(index)
-                
-    
-    
     
     # The static link is not always traversed, no need to prepare
     def optimiseVariableAccess(self, index: int):
@@ -226,68 +203,4 @@ class PeepholeOptimizer:
                 two.operand1 = offset + "(%rbp)"
                 two.comment = "# Access variable"
                 self.indexesToRemove.append(index)
-                
-
-           
-                
-                    
-    
-    # This pattern is no longer found after if and while don't have their own scopes
-    # Add dummy spaces more efficiently
-    def optimiseAssembleDummies(self, index: int):
-        '''
-        subq $16, %rsp			# Add dummy spaces
-    	subq $8, %rsp			# Add dummy base pointer
-        ->
-        subq $24, %rsp          # Add many dummy spaces
-        
-        addq $8, %rsp			# Remove dummy base pointer
-    	addq $24, %rsp			# Deallocate dummy spaces and static link
-        ->
-        addq $32, %rsp          # Deallocate many dummy spaces and static link
-        '''
-        two = self.instructions[index]
-        
-        if two.comment == "# Add dummy base pointer":
-            one = self.instructions[index-1]
-            if one.comment == "# Add dummy spaces" and one.operand1 == "$16":
-                two.operand1 = "$24"
-                two.comment =  "# Add many dummy spaces"
-                self.indexesToRemove.append(index-1)
-        
-        elif two.comment == "# Deallocate dummy spaces and static link":
-            one = self.instructions[index-1]
-            if one.comment == "# Remove dummy base pointer":
-                two.operand1 = "$32"
-                two.comment = "# Deallocate many dummy spaces and static link"
-                self.indexesToRemove.append(index-1)    
-    
-    
-    
-    # Can the heap pointer be pushed in one go? 
-    # Once put in %rcx it is used in many places...
-    def optimisePushHP(self, index: int):
-        one = self.instructions[index]
-    
-    # Error: operand type mismatch for `movq'    (Damn it! It was a good idea...)
-    # Some initialized values can be put directly where they belong
-    def optimiseDirectInitialization(self, index: int):
-        '''
-        movq $3, %rax           # Put a number in %rax
-        movq %rax, -8(%rbp)     # Move initialized value into space on stack
-        ->
-        movq $3, -8(%rbp)       # Move initialized value directly into space on stack
-        '''
-        two = self.instructions[index]
-        
-        if (two.upcode == "movq" and two.operand1 == "%rax" and 
-            two.comment == "# Move initialized value into space on stack"):
-            
-            one = self.instructions[index-1]
-            
-            if (one.upcode == "movq" and one.operand2 == "%rax"):
-            
-                self.indexesToRemove.append(index-1)
-                two.operand2 = one.operand1
-                two.comment = "# Move initialized value directly into space on stack"
-            
+                   
