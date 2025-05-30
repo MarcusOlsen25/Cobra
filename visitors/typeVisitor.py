@@ -88,7 +88,6 @@ class TypeVisitor(Visitor):
                         print(expr.lineno)
                 else:
                     return "unknown"
-                # return entry.type
             elif isinstance(expr, BinaryExpression):
                 left_type = self.evaluateExpressionType(expr.left)
                 right_type = self.evaluateExpressionType(expr.right)
@@ -105,10 +104,6 @@ class TypeVisitor(Visitor):
                             self.addTypeError(f"Illegal type in binary operation in line {expr.lineno}.", expr.lineno)
                     case "and" | "or":
                         return "bool"
-                        # if left_type == "bool" and right_type == "bool":
-                        #     return "bool"
-                        # else:
-                        #     self.addTypeError(f"Illegal type in binary operation in line {expr.lineno}.", expr.lineno)
                     case "==" | "!=":
                         return "bool"
             elif isinstance(expr, UnaryExpression):
@@ -216,37 +211,26 @@ class TypeVisitor(Visitor):
     def visitIfStatement(self, stmt: IfStatement):
         try:
             stmt.condition.accept(self)
-            
             self.table = stmt.thenTable
-
             for s in stmt.thenStatement:
                 s.accept(self)
-                
             self.table = self.table.parent
 
             if stmt.elseStatement:
-                
                 self.table = stmt.elseTable
-
                 for s in stmt.elseStatement:
                     s.accept(self)
-                    
-                self.table = self.table.parent
-                
+                self.table = self.table.parent 
         except TypeException:
             return
     
     def visitWhileStatement(self, stmt: WhileStatement):
         try:
             stmt.condition.accept(self)
-            
             self.table = stmt.table
-
             for s in stmt.thenStatement:
                 s.accept(self)
-                
             self.table = self.table.parent
-            
         except TypeException:
             return
                
@@ -260,10 +244,10 @@ class TypeVisitor(Visitor):
     def visitClassDeclaration(self, stmt: ClassDeclaration):    
         classEntry = self.table.lookup(stmt.var)
         self.table = classEntry.table
-
+        
         for s in stmt.body:
             s.accept(self)
-    
+        
         self.table = self.table.parent
     
     def visitConstructorExpression(self, expr: ConstructorExpression):

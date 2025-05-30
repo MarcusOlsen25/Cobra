@@ -126,7 +126,7 @@ class Parser:
         '''expression : assignment'''
         p[0] = p[1]
 
-    # Expression - assignment
+    # Assignment
     def p_assignment(self, p):
         '''assignment : property ASSIGN logical'''
         p[1].isAssign = True
@@ -147,7 +147,7 @@ class Parser:
         '''logical : logical AND equality'''
         p[0] = BinaryExpression(p[1], p[2], p[3], p.lineno(2))
         
-    # LogicAnd -> equality
+    # Logical -> equality
     def p_logical_equality(self, p):
         '''logical : equality'''
         p[0] = p[1]
@@ -222,12 +222,12 @@ class Parser:
         '''factor : unary'''
         p[0] = p[1]
         
-    # Unary not
+    # Unary - not
     def p_unary(self, p):
         '''unary : NOT unary'''
         p[0] = UnaryExpression(p[1], p[2], p.lineno(1))
 
-    # Unary minus
+    # Unary - minus
     def p_unary_minus(self, p):
         '''unary : MINUS unary'''
         p[0] = UnaryExpression(p[1], p[2], p.lineno(1))
@@ -280,6 +280,7 @@ class Parser:
                 | FALSE'''
         p[0] = BoolExpression(p[1], p.lineno(1))
 
+    # Primary -> null
     def p_primary_null(self, p):
         '''primary : NULL'''
         p[0] = NullExpression()
@@ -323,7 +324,7 @@ class Parser:
         '''parameter_list :'''
         p[0] = []
 
-    # In case of an empty program - this is not working...
+    # Empty
     def p_empty(self, p):
         'empty :'
         p[0] = None

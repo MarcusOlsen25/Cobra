@@ -20,12 +20,14 @@ class PeepholeOptimizer:
             # Examine each instruction
             for i in range(len(self.instructions)):
                 self.optimiseNoLocalVariables(i)
-                self.optimiseAdditionsToRSP(i)
-                self.optimisePushSimpleSL(i)
-                self.optimiseSaveBasePointer(i)
                 self.optimiseInstantNegation(i)
-                self.optimiseAssembleDummies(i)     # Maybe irrelevant
+                self.optimisePushSimpleSL(i)
                 self.optimiseVariableAccess(i)
+                self.optimiseAdditionsToRSP(i)
+                self.optimiseSaveBasePointer(i)
+                
+                self.optimiseAssembleDummies(i)     # Irrelevant
+
 
                 # Problematic
                 # self.optimiseDirectInitialization(i)
@@ -148,10 +150,6 @@ class PeepholeOptimizer:
         ...
         addq $8, %rsp       # Remove dummy base pointer
         '''
-        warning = '''This pattern is tricky. You can define variables that are never used in a scope 
-        that matches this pattern. They get placed in the wrong place, overwriting the static link. 
-        The code still works, since neither the variable or the static link are used, but still. 
-        Is this alright? If we can prove that neither is used?'''
         
         one = self.instructions[index]
         
@@ -168,9 +166,9 @@ class PeepholeOptimizer:
                 
                 # Saving the base pointer again, accessing a variable, declaring an initialised variable, 
                 # traversing the static link, pushing the heap pointer, or calling anything other than print
-                if (two.comment == "# Save base pointer" or two.comment == "# Prepare to access variable from another scope" 
+                if (two.comment == "# Save base pointer" or two.comment == "# Prepare to access variable" 
                     or two.comment == "# Traverse static link once" or (two.upcode == "call" and two.operand1 != "print")
-                    or two.comment == "# Push heap pointer" or two.comment == "# Access variable from another scope" 
+                    or two.comment == "# Push heap pointer" or two.comment == "# Access variable" 
                     or two.comment == "# Move initialized value into space on stack"):
                     done = True
                 
@@ -215,21 +213,19 @@ class PeepholeOptimizer:
     # The static link is not always traversed, no need to prepare
     def optimiseVariableAccess(self, index: int):
         '''
-        movq %rbp, %rax			# Prepare to access variable from another scope
+        movq %rbp, %rax			# Prepare to access variable
         movq -8(%rax), %rax		# Move value into %rax
         ->
-        movq -8(%rbp), %rax     # Access variable from another scope
+        movq -8(%rbp), %rax     # Access variable
         '''
         one = self.instructions[index]
-        if one.comment == "# Prepare to access variable from another scope":
+        if one.comment == "# Prepare to access variable":
             two = self.instructions[index+1]
             if (two.comment == "# Move value into %rax"):
                 offset = two.operand1.replace('(%rax)', '')
-                # print(offset)
                 two.operand1 = offset + "(%rbp)"
-                two.comment = "# Access variable from another scope"
+                two.comment = "# Access variable"
                 self.indexesToRemove.append(index)
-                # print(index+1)
                 
 
            

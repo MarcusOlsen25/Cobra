@@ -36,7 +36,6 @@ tokens = [
 'ASSIGN',
 'LBRACE',
 'RBRACE',
-# 'NOT',
 'EQUALS',
 'NOTEQUALS',
 'GREATER',
@@ -58,7 +57,6 @@ t_COMMA             = r','
 t_ASSIGN            = r'='
 t_LBRACE            = r'{'
 t_RBRACE            = r'}'
-# t_NOT               = r'!'
 t_EQUALS            = r'=='
 t_NOTEQUALS         = r'!='
 t_GREATER           = r'>'
@@ -69,6 +67,8 @@ t_DOT               = r'\.'
 t_SEMICOLON         = r';'
 
 
+# IDs cannot start with a number
+# Must be scanned before t_NUMBER
 def t_INVALID_ID(t):
     r'\d+[a-zA-Z_]+[a-zA-Z_0-9]*'
     Lexer.lexicalErrors.append(f"Invalid identifier '{t.value}' in line {t.lineno}")
@@ -102,6 +102,7 @@ class Lexer:
     def __init__(self):
         self.lexer = lex.lex(module=sys.modules[__name__])
         
+    # For performing a separate lexical analysis
     def tokenize(self, data):
         self.lexicalErrors.clear()
         self.lexer.input(data)

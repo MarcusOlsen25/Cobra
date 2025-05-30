@@ -99,7 +99,6 @@ class AssemblyVisitor(Visitor):
                 self.orLogical()
     
     def equalityComparison(self):
-        # Save label counter and update it
         label = self.binaryLabelCounter
         self.binaryLabelCounter += 1
         self.generateCode("cmp", "%rax", "%rbx", 3, "# Compare both sides")
@@ -111,7 +110,6 @@ class AssemblyVisitor(Visitor):
         self.addLabel(f"comp_end_{label}", None, None)
         
     def inequalityComparison(self):
-        # Save label counter and update it
         label = self.binaryLabelCounter
         self.binaryLabelCounter += 1
         self.generateCode("cmp", "%rax", "%rbx", 3, "# Compare both sides")
@@ -123,7 +121,6 @@ class AssemblyVisitor(Visitor):
         self.addLabel(f"comp_end_{label}", None, None)
         
     def greaterComparison(self):
-        # Save label counter and update it
         label = self.binaryLabelCounter
         self.binaryLabelCounter += 1
         self.generateCode("cmp", "%rax", "%rbx", 3, "# Compare both sides")
@@ -135,7 +132,6 @@ class AssemblyVisitor(Visitor):
         self.addLabel(f"comp_end_{label}", None, None)
         
     def lessComparison(self):
-        # Save label counter and update it
         label = self.binaryLabelCounter
         self.binaryLabelCounter += 1
         self.generateCode("cmp", "%rax", "%rbx", 3, "# Compare both sides")
@@ -147,7 +143,6 @@ class AssemblyVisitor(Visitor):
         self.addLabel(f"comp_end_{label}", None, None)
         
     def greaterOrEqualComparison(self):
-        # Save label counter and update it
         label = self.binaryLabelCounter
         self.binaryLabelCounter += 1
         self.generateCode("cmp", "%rax", "%rbx", 3, "# Compare both sides")
@@ -159,7 +154,6 @@ class AssemblyVisitor(Visitor):
         self.addLabel(f"comp_end_{label}", None, None)
         
     def lessOrEqualComparison(self):
-        # Save label counter and update it
         label = self.binaryLabelCounter
         self.binaryLabelCounter += 1
         self.generateCode("cmp", "%rax", "%rbx", 3, "# Compare both sides")
@@ -171,7 +165,6 @@ class AssemblyVisitor(Visitor):
         self.addLabel(f"comp_end_{label}", None, None)
         
     def andLogical(self):
-        # Save label counter and update it
         label = self.binaryLabelCounter
         self.binaryLabelCounter += 1
         self.generateCode("movq", "$0", "%rdx", 3, "# Put FALSE in %rdx")
@@ -186,7 +179,6 @@ class AssemblyVisitor(Visitor):
         self.addLabel(f"logical_end_{label}", None, None)
         
     def orLogical(self):
-        # Save label counter and update it
         label = self.binaryLabelCounter
         self.binaryLabelCounter += 1
         self.generateCode("movq", "$0", "%rdx", 3, "# Put FALSE in %rdx")
@@ -224,7 +216,7 @@ class AssemblyVisitor(Visitor):
     def visitVarExpression(self, expr: VarExpression):
         entry = self.table.lookup(expr.var)
         if isinstance(entry, SymbolTable.VariableValue):
-            if expr.lineno <= entry.lineNo:
+            if expr.lineno < entry.lineNo:
                 entry = self.table.parent.lookup(expr.var)
             self.accessVar(entry)
             self.generateCode("movq", f"{entry.offset}(%rax)", "%rax", 2, "# Move value into %rax")
@@ -298,7 +290,7 @@ class AssemblyVisitor(Visitor):
         pass
 
     def accessVar(self, entry: SymbolTable.VariableValue):
-        self.generateCode("movq", "%rbp", "%rax", 3, "# Prepare to access variable from another scope")
+        self.generateCode("movq", "%rbp", "%rax", 3, "# Prepare to access variable")
         for i in range(self.table.level - entry.level):
             self.generateCode("movq", "24(%rax)", "%rax", 2, "# Traverse static link once")
         
@@ -325,13 +317,12 @@ class AssemblyVisitor(Visitor):
         self.generateCode("addq", f"${argsToPop}", "%rsp", 3, "# Pop the arguments pushed to the stack")
     
     def visitIfStatement(self, stmt: IfStatement):
-        # Save label counter and update it
         label = self.ifLabelCounter
         self.ifLabelCounter += 1
         
         self.addComment(4, f"# Start if statement {label}")
         
-        # For now 0 is false and everything else is true
+        # Everything other than 0 is still true 
         stmt.condition.accept(self)
         self.generateCode("cmp", "$0", "%rax", 3, "# Check the condition")
 
@@ -341,17 +332,13 @@ class AssemblyVisitor(Visitor):
             self.generateCode("je", f"end_{label}", None, 4, "# Skip if the condition is false")
         
         self.table = stmt.thenTable
-
         for s in stmt.thenStatement:
             s.accept(self)
-
         self.generateCode("jmp", f"end_{label}", None, 4, "# Skip the else")
 
         if stmt.elseStatement:
             self.addLabel(f"else_part_{label}", None, None)
-
             self.table = stmt.elseTable
-
             for s in stmt.elseStatement:
                 s.accept(self)
 
@@ -364,14 +351,11 @@ class AssemblyVisitor(Visitor):
         label = self.whileLabelCounter
         self.whileLabelCounter += 1
         
-        self.addComment(0, f"# Start while statement {label}")
-        
-        # Enter a new scope
+        self.addComment(0, f"# Start while statement {label}")        
         self.table = stmt.table
-
         self.addLabel(f"while_loop_{label}", None, None)
         
-        # For now 0 is false and everything else is true
+        # Everything other than 0 is still true 
         stmt.condition.accept(self)
         self.generateCode("cmp", "$0", "%rax", 3, "# Check the condition")
         self.generateCode("je", f"end_while_{label}", None, 3, "# Skip if the condition is false")

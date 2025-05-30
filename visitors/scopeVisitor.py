@@ -124,14 +124,10 @@ class ScopeVisitor(Visitor):
         # Create a new symbol table and visit the statements in the thenStatement
         newTable = SymbolTable(self.table, "If")
         stmt.thenTable = newTable
-
         stmt.thenTable.setVarCounter(self.table.varCounter)
-
         self.table = stmt.thenTable
-
         for s in stmt.thenStatement:
             s.accept(self)
-            
         self.table = self.table.parent
 
         if stmt.elseStatement:
@@ -139,13 +135,10 @@ class ScopeVisitor(Visitor):
             # Create a new symbol table and visit the statements in the elseStatement 
             newTable = SymbolTable(self.table, "Else")
             stmt.elseTable = newTable
-
             stmt.elseTable.setVarCounter(self.table.varCounter)
             self.table = stmt.elseTable
-
             for s in stmt.elseStatement:
                 s.accept(self)
-                
             self.table = self.table.parent
 
     def visitWhileStatement(self, stmt: WhileStatement):
@@ -154,14 +147,10 @@ class ScopeVisitor(Visitor):
         # Create a new symbol table and visit the statements in the thenStatement
         newTable = SymbolTable(self.table, "While")
         stmt.table = newTable
-
         stmt.table.setVarCounter(self.table.varCounter)
-        
         self.table = stmt.table
-
         for s in stmt.thenStatement:
             s.accept(self)
-            
         self.table = self.table.parent
 
     def visitPrintStatement(self, stmt: PrintStatement):
@@ -178,7 +167,6 @@ class ScopeVisitor(Visitor):
             
     def visitClassDeclaration(self, stmt: ClassDeclaration):
         try:
-            # This lookup is not local. This is because of class descriptors. Do you agree, Marcus?
             lookup = self.table.lookup(stmt.var)
             if lookup:
                 self.addScopeError(f"The variable {stmt.var} in line {stmt.lineno} is already defined.", stmt.lineno)

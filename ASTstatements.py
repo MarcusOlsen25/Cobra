@@ -1,11 +1,9 @@
 from ASTexpressions import *
-# from scope.SymbolTable import SymbolTable     # This causes a circular import problem
 
 class Stmt:
     pass
 
 class VarDeclaration(Stmt):
-    #Add type
     def __init__(self, var: str, initializer: Expr, type: str, lineno: int):
         self.var = var
         self.initializer = initializer

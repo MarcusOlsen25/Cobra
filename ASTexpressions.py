@@ -30,7 +30,6 @@ class NumberExpression(Expr):
         return visitor.visitNumberExpression(self)
     
 class VarExpression(Expr):
-    #Add type
     def __init__(self, var: str, lineno: int):
         self.var = var
         self.lineno = lineno
@@ -85,7 +84,7 @@ class PropertyAccessExpression(Expr):
     def __init__(self, property: Expr, var: str, lineno: int):
         self.property = property
         self.var = var
-        self.isAssign = False   # What is this?
+        self.isAssign = False   
         self.isMethod = False
         self.lineno = lineno
 

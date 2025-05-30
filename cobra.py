@@ -10,15 +10,20 @@ from peepholeOptimizer import *
 # The line numbers match the error messages + 10.  
 data = '''
 
+int x = 1;
 class tiger {
-    int x = 3;
-    func one() int {
-        return this.x;
+    int x = 2;
+    func one() void {
+        print x;
+    }
+    func two() void {
+        print this.x;
     }
 }
 
 tiger tigger = new tiger();
-print tigger.one();
+tigger.one();
+tigger.two();
 '''
     
 
@@ -26,7 +31,7 @@ with open("test.co", "r") as file:
     test = file.read()
 
 # Change this line from 'test' to 'data' and vice versa
-cobraCode = test
+cobraCode = data
 
 # Runs the main program
 def compileCobra(cobraCode: str):
@@ -104,12 +109,12 @@ def compileCobra(cobraCode: str):
                     peepholeOptimizer.optimise()
                     program = peepholeOptimizer.instructions
                     
-                    print("Program compiled successfully into test.s")
-
                     with open("assembly/test.s", "w") as file:
                             for p in program:
                                 file.write(prettyPrintAssembly(p))
                                 file.write("\n")
+                                
+                    print("Program compiled successfully into test.s")
 
 
 # Runs the program as normal

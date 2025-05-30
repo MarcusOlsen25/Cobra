@@ -125,6 +125,8 @@ def compileOriginal(cobraCode: str):
 
                     program += assemblyVisitor.main
                     
+                    # No optimisation
+                    
                     with open("assembly/testTime1.s", "w") as file:
                             for p in program:
                                 file.write(prettyPrintAssembly(p))

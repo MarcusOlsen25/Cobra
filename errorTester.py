@@ -5,7 +5,7 @@ from visitors.scopeVisitor import ScopeVisitor
 from scope.SymbolTable import *
 from visitors.instruction import *
 
-# This program defines tests to ensure the correctness of the Cobra compiler. 
+# This program defines tests to ensure the correctness of the error handling. 
 
 def testAllErrors():
     
@@ -25,7 +25,7 @@ def testAllErrors():
 
 
 
-
+# Includes mulitple tests to keep error messages predictable.
 def testLexicalErrors():
     
     print("Testing lexical errors now:")
