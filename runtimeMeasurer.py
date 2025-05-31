@@ -10,14 +10,19 @@ from scope.SymbolTable import *
 from visitors.instruction import *
 from errorTester import *
 from peepholeOptimizer import *
+import sys
 
 
 # Measures the runtime of a compiled Cobra program with and without optimisation
 def measureRuntime():
     
-    with open("longProgram.co", "r") as file:
-        cobraCode = file.read()
+    if len(sys.argv) != 2:
+        sys.exit(1)
+
+    with open(sys.argv[1], "r") as file:
+        test = file.read()
     
+    cobraCode = test
     # Compile from Cobra to Assembly
     compileOriginal(cobraCode)
     compileOptimised(cobraCode)

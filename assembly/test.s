@@ -1091,7 +1091,7 @@ comp_end_14:
 end_22:
 	movq $20, %rax			# Put a number in %rax
 	movq %rax, -56(%rbp)		# Move initialized value into space on stack
-# Start while statement 0
+				# Start while statement 0
 while_loop_0:
 	movq $25, %rax			# Put a number in %rax
 	pushq %rax				# Push right side to stack
@@ -1121,7 +1121,7 @@ comp_end_15:
 end_while_0:
 	movq $26, %rax			# Put a number in %rax
 	movq %rax, -64(%rbp)		# Move initialized value into space on stack
-# Start while statement 1
+				# Start while statement 1
 while_loop_1:
 	movq $55, %rax			# Put a number in %rax
 	pushq %rax				# Push right side to stack

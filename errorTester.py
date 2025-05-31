@@ -393,3 +393,5 @@ def testFunctionErrors():
         print("Function Error Detection: Failure!\n")
         
     return success
+
+testAllErrors()

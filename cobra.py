@@ -7,18 +7,13 @@ from scope.SymbolTable import *
 from visitors.instruction import *
 from errorTester import *
 from peepholeOptimizer import *
-# The line numbers match the error messages + 10.  
-data = '''
+import sys
+if len(sys.argv) != 2:
+    sys.exit(1)
 
-int x = 1;
-func x() void {
-    print 3;
-}
-x();
-'''
+
     
-
-with open("test.co", "r") as file:
+with open(sys.argv[1], "r") as file:
     test = file.read()
 
 # Change this line from 'test' to 'data' and vice versa
