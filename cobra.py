@@ -8,11 +8,11 @@ from visitors.instruction import *
 from errorTester import *
 from peepholeOptimizer import *
 import sys
+
+
 if len(sys.argv) != 2:
     sys.exit(1)
 
-
-    
 with open(sys.argv[1], "r") as file:
     test = file.read()
 
@@ -105,11 +105,3 @@ def compileCobra(cobraCode: str):
 
 # Runs the program as normal
 compileCobra(cobraCode)  
-
-# Test programs for error handling
-# testAllErrors()
-# testLexicalErrors()         
-# testSyntacticErrors()
-# testScopeErrors()
-# testTypeErrors()
-# testFunctionErrors()

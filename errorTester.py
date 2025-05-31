@@ -249,7 +249,7 @@ def testScopeErrors():
     ]
     
     # It tests the code defined in this file
-    with open("testScopeErrors.co", "r") as file:
+    with open("tests/testScopeErrors.co", "r") as file:
         cobraCode = file.read()
 
     table = SymbolTable(None, "Function")
@@ -263,9 +263,6 @@ def testScopeErrors():
         statement.accept(scopeVisitor)
     
     success = True
-    
-    print(len(scopeVisitor.scopeErrors))
-    print(len(expectedErrorMessages))
 
     if len(scopeVisitor.scopeErrors) == len(expectedErrorMessages):
         i = 0
@@ -303,7 +300,7 @@ def testTypeErrors():
         ]
 
     # It tests the code defined in this file
-    with open("testTypeErrors.co", "r") as file:
+    with open("tests/testTypeErrors.co", "r") as file:
         cobraCode = file.read()
 
     table = SymbolTable(None, "Function")
@@ -358,7 +355,7 @@ def testFunctionErrors():
     ]
 
     # It tests the code defined in this file
-    with open("testFunctionErrors.co", "r") as file:
+    with open("tests/testFunctionErrors.co", "r") as file:
         cobraCode = file.read()
 
     table = SymbolTable(None, "Function")
@@ -393,5 +390,3 @@ def testFunctionErrors():
         print("Function Error Detection: Failure!\n")
         
     return success
-
-testAllErrors()
