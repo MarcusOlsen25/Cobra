@@ -437,6 +437,7 @@ class AssemblyVisitor(Visitor):
         
         # Include the class descriptor at the beginning of the program
         self.init.append(Instruction(None, None, None, f"{stmt.var}_descriptor", None, None))
+        #Inherit all fields and methods from super classes
         super = stmt.super
         super_classes = []
         while super:
@@ -446,10 +447,12 @@ class AssemblyVisitor(Visitor):
 
         super_classes.reverse()
 
+        # Add methods of super class to class descriptor
         for superEntry in super_classes:
             for entry in superEntry.table.getMethods():
                 self.init.append(Instruction(None, None, None, None, 1, f".quad {entry.name}"))
-
+        
+        # Add methods to class descriptor
         for entry in self.table.getMethods():
             self.init.append(Instruction(None, None, None, None, 1, f".quad {entry.name}"))
 
@@ -499,10 +502,12 @@ class AssemblyVisitor(Visitor):
             classEntry = self.table.lookup(classEntry.super)
             propertyEntry = classEntry.table.lookupLocal(expr.var)
 
+        # If the property is a method call
         if expr.isMethod:
             self.generateCode("pushq", "%rax", None, 4, "# Push heap pointer to be used as argument")
             self.generateCode("movq", "(%rax)", "%rax", 2, "# Move value into %rax")
 
+        # If the value of the property is accessed
         if not expr.isAssign and not expr.isMethod:
             self.generateCode("movq", f"{propertyEntry.offset}(%rax)", "%rax", 2, "# Move value into %rax")
 
